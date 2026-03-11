@@ -1,2 +1,3 @@
 def fav_food():
-    return []
+    return ["apple, orange"]
+
