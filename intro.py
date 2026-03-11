@@ -1,2 +1,2 @@
 def fav_food():
-    return []
+    return ['noddles']
