@@ -4,4 +4,6 @@ def fav_food():
 
 def login():
     return["login"]
-    return ['noddles', 'rice', 'bread', 'meat', 'vegetables']
+    
+def color():
+    return["change color"]
