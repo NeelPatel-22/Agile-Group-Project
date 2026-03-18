@@ -6,12 +6,16 @@ def login():
     return["login"]
     
 #def color():
+    return["change color"]
     #return["change color"]
 
 
 
-def sun():
+#def sun():
     return["sun 1"]
+
+def subway():
+    return["l111"]
 
     def sun():
     return["sun 1"]
