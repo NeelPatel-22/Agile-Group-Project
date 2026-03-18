@@ -7,3 +7,6 @@ def login():
     
 def color():
     return["change color"]
+
+def sun():
+    return["sun"]
