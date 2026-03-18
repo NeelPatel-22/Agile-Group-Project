@@ -9,4 +9,4 @@ def color():
     return["change color"]
 
 def sun():
-    return["sun"]
+    return["sun 1"]
