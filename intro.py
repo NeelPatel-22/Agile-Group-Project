@@ -7,6 +7,9 @@ def login():
     
 #def color():
     return["change color"]
+    #return["change color"]
+
+
 
 #def sun():
     return["sun 1"]
@@ -14,3 +17,5 @@ def login():
 def subway():
     return["l111"]
 
+    def sun():
+    return["sun 1"]
