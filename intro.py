@@ -5,9 +5,9 @@ def fav_food():
 def login():
     return["login"]
     
-def color():
+#def color():
     return["change color"]
 
-def sun():
+#def sun():
     return["sun 1"]
 
