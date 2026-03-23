@@ -1,11 +1,80 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Git Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Website Name - Online Movie Booking</title>
+<style>
+  :root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f0f0f0;
+    --text-color: #333;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background-color);
+    margin: 0;
+    padding: 0;
+  }
+</style>
 </head>
 
 <body>
-Hello Github 1!
+
+ <div class="page"> #Container for the entire page content
+  <header class="header">
+    <div class="logo">
+      <h1>Our Website Name</h1>
+    </div>
+    <div class="search"> #Search bar for finding movies
+        <input type="text" placeholder="Search movies...">
+        <button type="submit">Search</button>
+    </div>
+    <div class="actions"> #Action buttons for booking and sign up   
+        <button>Booking</button>
+        <button>Sign Up</button>
+    </div>
+  </header>
+  <nav class="nav"> #Navigation menu '#' need to add links to the pages
+    <a href="#">Event</a>
+    <a href="#">Reviews</a>
+    <a href="#">Place</a>
+  </nav>
+
+   <main> #Main content area of the website
+    <section  class="Main"> #Main content of the website
+        <div class="Main-left"> 
+            <button>&lt;</button>#Button to navigate to the previous movie
+
+            </div class="Main-content">
+                <h1>Movie Trailer</h1>
+                <p>Watch the latest movie trailers here! Trailer or Advertisement</p>
+            </div>
+
+            <button>&gt;</button> #Button to navigate to the next movie
+        <div>
+    
+        <aside class="Main-right">
+            <h2>Create Your Account</h2>
+            <form>
+                <input type="text" placeholder="First Name" required><br>
+                <input type="text" placeholder="Last Name" required><br>
+                <input type="email" placeholder="Email" required><br>
+                <input type="password" placeholder="Password" required><br>
+                <button type="submit">Sign Up</button>
+            </form>
+        </aside>
+    
+    </section>
+   </main>
+
 </body>
 
 </html>
