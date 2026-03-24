@@ -28,94 +28,105 @@
 
 <body>
 
- <div class="page"> #Container for the entire page content
+ <div class="page">  <!--Container for the entire page content-->
   <header class="header">
     <div class="logo">
       <h1>Our Website Name</h1>
     </div>
-    <div class="search"> #Search bar for finding movies
+    <div class="search"> <!--Search bar for finding movies-->
         <input type="text" placeholder="Search movies...">
         <button type="submit">Search</button>
     </div>
-    <div class="actions"> #Action buttons for booking and sign up   
+    <div class="actions"> <!--Action buttons for booking and sign up-->
         <button>Booking</button>
         <button>Sign Up</button>
     </div>
   </header>
-  <nav class="nav"> #Navigation menu '#' need to add links to the pages
+  <nav class="nav"> <!--Navigation menu-->
     <a href="#">Event</a>
     <a href="#">Reviews</a>
     <a href="#">Place</a>
   </nav>
 
-   <main> #Main content area of the website
-    <section  class="Main"> #Main content of the website
-        <div class="Main-left"> 
-            <button>&lt;</button>#Button to navigate to the previous movie
+   <main> <!--Main content area of the website-->
+        <section  class="main"> <!--Main content of the website-->
+            <div class="main-left"> 
+                <button>&lt;</button><!--Button to navigate to the previous movie-->
 
-            </div class="Main-content">
-                <h1>Movie Trailer</h1>
-                <p>Watch the latest movie trailers here! Trailer or Advertisement</p>
+                    <div class="main-content">
+                        <h1>Movie Trailer</h1>
+                        <p>Watch the latest movie trailers here! Trailer or Advertisement</p>
+                    </div>
+
+                <button>&gt;</button> <!--Button to navigate to the next movie-->
             </div>
-
-            <button>&gt;</button> Button to navigate to the next movie
-        <div>
     
-        <aside class="Main-right">
-            <h2>Create Your Account</h2>
-            <form>
-                <input type="text" placeholder="First Name" required><br>
-                <input type="text" placeholder="Last Name" required><br>
-                <input type="email" placeholder="Email" required><br>
-                <input type="password" placeholder="Password" required><br>
-                <button type="submit">Sign Up</button>
-            </form>
-        </aside>
+            <aside class="main-right">
+                <h2>Create Your Account</h2>
+                <form>
+                    <input type="text" placeholder="First Name" required><br>
+                    <input type="text" placeholder="Last Name" required><br>
+                    <input type="email" placeholder="Email" required><br>
+                    <input type="password" placeholder="Password" required><br>
+                    <button type="submit">Sign Up</button>
+                </form>
+            </aside>
     
-    </section>
+        </section>
 
-    <section class="Movie"> 
-        <div class="Movie-top">
-            <h2>Movie(Trailer)</h2>
-            <div class="Type">
-                <button>See All</button>
-                <button>Action</button>
-                <button>Comedy</button>
+        <section class="movie"> 
+            <div class="movie-top">
+                <h2>Movie(Trailer)</h2>
+                <div class="type">
+                    <button>See All</button>
+                    <button>Action</button>
+                    <button>Comedy</button>
+                </div>
             </div>
-        </div>
 
-        <div class="Movie-list">
-            <div class="Movie-card">
-                <img src="movie1.MP4" alt="Movie 1">
-                <h3>Movie Title 1</h3>
-                <p>Short description of Movie 1.</p>
-            </div>
-            <div class="Movie-card">
-                <img src="movie2.MP4" alt="Movie 2">
-                <h3>Movie Title 2</h3>
-                <p>Short description of Movie 2.</p>
-            </div>
-            <div class="Movie-card">
-                <img src="movie3.MP4" alt="Movie 3">
-                <h3>Movie Title 3</h3>
-                <p>Short description of Movie 3.</p>
+            <div class="movie-list">
+                <div class="movie-card">
+                    <video controls>
+                        <source src="movie1.MP4" type="video/mp4">
+                    </video>
+                    <h3>Movie Title 1</h3>
+                    <p>Short description of Movie 1.</p>
+                </div>
+            
+                <div class="movie-card">
+                    <video controls>
+                        <source src="movie2.MP4" type="video/mp4">
+                    </video>
+                    <h3>Movie Title 2</h3>
+                    <p>Short description of Movie 2.</p>
+                </div>
+                <div class="movie-card">
+                    <video controls>
+                        <source src="movie3.MP4" type="video/mp4">
+                    </video>
+                    <h3>Movie Title 3</h3>
+                    <p>Short description of Movie 3.</p>
+                </div>
             </div>
             
-        </div>
-        <div class="Adv-list">
-            <div class="Adv-card">
-                <img src="Advertisement2.MP4" alt="Advertisement 1">
-                <h3>Advertisement Title 1</h3>
-                <p>Short description of advertisement 1.</p>
-            </div>
-        </div>
         
-    </section>
+            <div class="adv-list">
+                <div class="adv-card">
+                    <video controls>
+                        <source src="advertisement2.MP4" type="video/mp4">
+                    </video>
+                    <h3>Advertisement Title 1</h3>
+                    <p>Short description of advertisement 1.</p>
+                </div>
+            </div>
+        
+        
+        </section>
 
 
    </main>
 
-   <footer class="footer"> #Footer section of the website
+   <footer class="footer"> <!--Footer section of the website-->
         <div class="footer-links">
             <div>
                 <h3>About Us</h3>
