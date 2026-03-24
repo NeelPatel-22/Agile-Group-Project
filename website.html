@@ -28,144 +28,160 @@
 
 <body>
 
- <div class="page">  <!--Container for the entire page content-->
-  <header class="header">
-    <div class="logo">
-      <h1>Our Website Name</h1>
-    </div>
-    <div class="search"> <!--Search bar for finding movies-->
-        <input type="text" placeholder="Search movies...">
-        <button type="submit">Search</button>
-    </div>
-    <div class="actions"> <!--Action buttons for booking and sign up-->
-        <button>Booking</button>
-        <button>Sign Up</button>
-    </div>
-  </header>
-  <nav class="nav"> <!--Navigation menu-->
-    <a href="#">Event</a>
-    <a href="#">Reviews</a>
-    <a href="#">Place</a>
-  </nav>
+    <div class="page">  <!--Container for the entire page content-->
+        <header class="header">
+            <div class="logo">
+                <h1 id= "Title">Our Website Name</h1> <!--set id for the title of the website-->
+            </div>
+            <div class="search"> <!--Search bar for finding movies-->
+                <input type="text"  id="searchInput" placeholder="Search movies...">
+                <button type="submit" id="searchButton">Search</button>
+            </div>
+            <div class="actions"> <!--Action buttons for booking and sign up-->
+                <button type="button" id="bookingButton">Booking</button>
+                <button type="button" id="signupButton">Sign Up</button>
+            </div>
+        </header>
+        <nav class="nav"> <!--Navigation menu-->
+            <a href="#">Event</a>
+            <a href="#">Reviews</a>
+            <a href="#">Place</a>
+        </nav>
 
-   <main> <!--Main content area of the website-->
-        <section  class="main"> <!--Main content of the website-->
-            <div class="main-left"> 
-                <button>&lt;</button><!--Button to navigate to the previous movie-->
+        <main> <!--Main content area of the website-->
+            <section class="main"> <!--Main content of the website-->
+                <div class="main-left"> 
+                    <button type="button" id="prevButton">&lt;</button><!--Button to navigate to the previous movie-->
 
                     <div class="main-content">
-                        <h1>Movie Trailer</h1>
-                        <p>Watch the latest movie trailers here! Trailer or Advertisement</p>
+                        <h1 id="mainTitle">Movie Trailer</h1>
+                        <p id="mainText">Watch the latest movie trailers here! Trailer or Advertisement</p>
                     </div>
 
-                <button>&gt;</button> <!--Button to navigate to the next movie-->
-            </div>
-    
-            <aside class="main-right">
-                <h2>Create Your Account</h2>
-                <form>
-                    <input type="text" placeholder="First Name" required><br>
-                    <input type="text" placeholder="Last Name" required><br>
-                    <input type="email" placeholder="Email" required><br>
-                    <input type="password" placeholder="Password" required><br>
-                    <button type="submit">Sign Up</button>
-                </form>
-            </aside>
-    
-        </section>
-
-        <section class="movie"> 
-            <div class="movie-top">
-                <h2>Movie(Trailer)</h2>
-                <div class="type">
-                    <button>See All</button>
-                    <button>Action</button>
-                    <button>Comedy</button>
+                    <button type="button" id="nextButton">&gt;</button> <!--Switching to the next movie -->
                 </div>
-            </div>
+    
+                <aside class="main-right">
+                    <h2>Create Your Account</h2>
+                    <form>
+                        <input type="text" placeholder="First Name" id="Firstname" required><br>
+                        <input type="text" placeholder="Last Name" id="Lastname" required><br>
+                        <input type="email" placeholder="Email" id="Email" required><br>
+                        <input type="password" placeholder="Password" id="Password" required><br>
+                        <button type="submit">Sign Up</button>
+                    </form>
+                </aside>
+    
+            </section>
 
-            <div class="movie-list">
-                <div class="movie-card">
-                    <video controls>
-                        <source src="movie1.MP4" type="video/mp4">
-                    </video>
-                    <h3>Movie Title 1</h3>
-                    <p>Short description of Movie 1.</p>
+            <section class="movie"> 
+                <div class="movie-top">
+                    <h2>Movie(Trailer)</h2>
+                    <div class="type">
+                        <button type="button" id="seeAllButton" >See All</button>
+                        <button type="button" id="actionButton" >Action</button>
+                        <button type="button" id="comedyButton" >Comedy</button>
+                    </div>
+                </div>
+
+                <div class="movie-list" id="movieList">
+                    <div class="movie-card" id="movieCard">
+                        <video controls>
+                            <source src="movie1.MP4" type="video/mp4">
+                        </video>
+                        <h3>Movie Title 1</h3>
+                        <p>Short description of Movie 1.</p>
+                        <p class="movie-tag">Action</p>
+                        <p class="movie-price">$12.99</p>
+                    </div>
+            
+                    <div class="movie-card">
+                        <video controls>
+                            <source src="movie2.MP4" type="video/mp4">
+                        </video>
+                        <h3>Movie Title 2</h3>
+                        <p>Short description of Movie 2.</p>
+                        <p class="movie-tag">Comedy</p>
+                        <p class="movie-price">$10.99</p>
+                    </div>
+                    <div class="movie-card">
+                        <video controls>
+                            <source src="movie3.MP4" type="video/mp4">
+                        </video>
+                        <h3>Movie Title 3</h3>
+                        <p>Short description of Movie 3.</p>
+                        <p class="movie-tag">Drama</p>
+                        <p class="movie-price">$9.99</p>
+                    </div>
                 </div>
             
-                <div class="movie-card">
-                    <video controls>
-                        <source src="movie2.MP4" type="video/mp4">
-                    </video>
-                    <h3>Movie Title 2</h3>
-                    <p>Short description of Movie 2.</p>
-                </div>
-                <div class="movie-card">
-                    <video controls>
-                        <source src="movie3.MP4" type="video/mp4">
-                    </video>
-                    <h3>Movie Title 3</h3>
-                    <p>Short description of Movie 3.</p>
-                </div>
-            </div>
             
         
-            <div class="adv-list">
-                <div class="adv-card">
-                    <video controls>
-                        <source src="advertisement2.MP4" type="video/mp4">
-                    </video>
-                    <h3>Advertisement Title 1</h3>
-                    <p>Short description of advertisement 1.</p>
+                <div class="adv-list" id="advList">
+                    <div class="adv-card">
+                        <video controls>
+                            <source src="advertisement2.MP4" type="video/mp4">
+                        </video>
+                        <h3>Advertisement Title 1</h3>
+                        <p>Short description of advertisement 1.</p>
+                    </div>
                 </div>
-            </div>
         
         
-        </section>
+            </section>
 
 
-   </main>
+        </main>
 
-   <footer class="footer"> <!--Footer section of the website-->
-        <div class="footer-links">
-            <div>
-                <h3>About Us</h3>
-                <p>Contact</p>
-                <p>Location</p>
-                <p>Discounts</p>
-            </div>
+        <footer class="footer"> <!--Footer section of the website-->
+            <div class="footer-links">
+                <div>
+                    <h3>About Us</h3>
+                    <p>Contact</p>
+                    <p>Location</p>
+                    <p>Discounts</p>
+                </div>
                 
-            </div>
-                <h3>Support</h3>
-                <p>Help Center</p>
-                <p>FAQs(AI)</p>
-                <p>Password Reset</p>
+                <div>
+                    <h3>Support</h3>
+                    <p>Help Center</p>
+                    <p>FAQs(AI)</p>
+                    <p>Password Reset</p>
+                </div>
+
+                <div>
+                    <h3>Movie(trailers)</h3>
+                    <p>Action</p>
+                    <p>Cartoon</p>
+                    <p>Comedy</p>
+                </div>
+
+                <div>
+                    <h3>Career</h3>
+                    <p>Work with Us</p>
+                    <p>Work for Us</p>
+                </div>
             </div>
 
-            <div>
-                <h3>Movie(trailers)</h3>
-                <p>Action</p>
-                <p>Cartoon</p>
-                <p>Comedy</p>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Our Website Name.</span>
+                <span>Privacy Policy</span>
+                <span>Terms of Service</span>
+                <select>language
+                    <option>English</option>
+                    <option>Hindi</option>
+                    <option>Chinese</option>
+                </select>
+                <select>Currency
+                    <option>USD</option>
+                    <option>AUD</option>
+                    <option>CNY</option>
+                </select>
             </div>
+        </footer>
 
-            <div>
-                <h3>Career</h3>
-                <p>Work with Us</p>
-                <p>Work for Us</p>
-            </div>
-        </div>
 
-        <div class="footer-bottom">
-            <span>&copy; 2026 Our Website Name.</span>
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
-            <span>Language</span>
-            <span>Currency</span>
-        </div>
-   </footer>
-
-</div>
+    </div>
 </body>
 
 </html>
