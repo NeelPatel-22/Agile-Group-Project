@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings | CinemaNow</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="page-shell container">
+    <header class="topbar">
+      <div class="brand">CinemaNow</div>
+      <nav class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Movies</a>
+        <a href="seat-selection.html">New Booking</a>
+        <a href="#">Profile</a>
+      </nav>
+    </header>
+
+    <section class="hero-card">
+      <span class="eyebrow">Checkpoint 2 Prototype</span>
+      <h1>My Bookings</h1>
+      <p>This page lets the user quickly review upcoming sessions, booking history, and a possible cancellation action.</p>
+    </section>
+
+    <main class="content-card">
+      <div class="bookings-header">
+        <div>
+          <h2>Current and Past Bookings</h2>
+          <p class="muted">A later version can connect this page to a real user account and database.</p>
+        </div>
+        <a class="button-secondary" style="width:auto; padding:0 18px;" href="seat-selection.html">Make New Booking</a>
+      </div>
+
+      <div class="booking-list">
+        <article class="booking-item">
+          <div>
+            <h3>Galactic Echoes</h3>
+            <p class="muted small">30 Mar 2026, 7:30 PM, Theatre 4</p>
+          </div>
+          <div>
+            <strong>Seats:</strong> B2, B3, D3, D4<br>
+            <strong>Reference:</strong> CN-20451
+          </div>
+          <div>
+            <div class="status-row">
+              <span class="pill upcoming">Upcoming</span>
+            </div>
+            <div class="button-row">
+              <button class="button-danger" type="button">Cancel Booking</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="booking-item">
+          <div>
+            <h3>Midnight Signal</h3>
+            <p class="muted small">18 Mar 2026, 8:45 PM, Theatre 2</p>
+          </div>
+          <div>
+            <strong>Seats:</strong> C5, C6<br>
+            <strong>Reference:</strong> CN-19802
+          </div>
+          <div>
+            <div class="status-row">
+              <span class="pill completed">Completed</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="booking-item">
+          <div>
+            <h3>Ocean of Neon</h3>
+            <p class="muted small">10 Mar 2026, 6:00 PM, Theatre 1</p>
+          </div>
+          <div>
+            <strong>Seats:</strong> A7, A8<br>
+            <strong>Reference:</strong> CN-19177
+          </div>
+          <div>
+            <div class="status-row">
+              <span class="pill cancelled">Cancelled</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
