@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Detail Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="recipe-detail.css?v=5">
+</head>
+<body class="recipe-page">
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top shadow-sm">
+    <div class="container-fluid px-4 px-lg-5">
+      <a class="navbar-brand fw-semibold" href="#">KitchenNest</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Recipes</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Community</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Share</a></li>
+          <li class="nav-item"><a class="btn btn-outline-secondary btn-sm ms-lg-2" href="#">Sign In</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-fluid py-4 py-lg-5">
+    <div class="row gx-4 gx-xxl-5 align-items-start">
+      <div class="col-xl-2 d-none d-xl-block" aria-hidden="true"></div>
+
+      <section class="col-12 col-lg-8 col-xl-7 recipe-main">
+        <article class="card border-0 shadow-sm recipe-card">
+          <div class="card-body p-4 p-lg-5">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+              <a href="#" class="author-link d-inline-flex align-items-center gap-3 text-decoration-none">
+                <div class="author-avatar">ML</div>
+                <div>
+                  <div class="fw-semibold text-dark">Mia Lee</div>
+                  <div class="text-muted small">Home Cook and Weekend Baker</div>
+                </div>
+              </a>
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge text-bg-light border">Comfort Food</span>
+                <span class="badge text-bg-light border">35 Minutes</span>
+                <span class="badge text-bg-light border">4 Servings</span>
+              </div>
+            </div>
+
+            <header class="mb-4">
+              <p class="text-uppercase text-muted small fw-semibold mb-2">Featured Recipe</p>
+              <h1 class="display-6 fw-bold mb-3">Creamy Roasted Pumpkin Pasta</h1>
+              <p class="lead text-muted mb-0">
+                A silky pumpkin sauce, roasted garlic, and crispy sage come together in a quick dinner that feels cozy without being heavy.
+              </p>
+            </header>
+
+            <section class="hero-visual mb-4" aria-label="Recipe cover image">
+              <svg viewBox="0 0 960 520" role="img" aria-label="A bowl of creamy pumpkin pasta with sage leaves">
+                <defs>
+                  <linearGradient id="heroBg" x1="0%" x2="100%" y1="0%" y2="100%">
+                    <stop offset="0%" stop-color="#fff7ef"></stop>
+                    <stop offset="100%" stop-color="#ffe1bd"></stop>
+                  </linearGradient>
+                </defs>
+                <rect width="960" height="520" rx="36" fill="url(#heroBg)"></rect>
+                <circle cx="760" cy="120" r="56" fill="#ffd18a" opacity="0.65"></circle>
+                <circle cx="155" cy="390" r="72" fill="#ffcf92" opacity="0.45"></circle>
+                <ellipse cx="485" cy="272" rx="265" ry="160" fill="#a6602d"></ellipse>
+                <ellipse cx="485" cy="256" rx="250" ry="145" fill="#fff1df"></ellipse>
+                <ellipse cx="485" cy="250" rx="210" ry="112" fill="#f29f52"></ellipse>
+                <path d="M365 225c65-62 161-70 240-11 48 36 46 90-10 116-76 35-171 29-242-12-52-30-44-65 12-93z" fill="#f8bf73"></path>
+                <path d="M340 215c58 49 110 75 220 96" fill="none" stroke="#f7d9a2" stroke-linecap="round" stroke-width="16"></path>
+                <path d="M360 195c74 63 149 92 247 112" fill="none" stroke="#f7d9a2" stroke-linecap="round" stroke-width="16"></path>
+                <path d="M590 176c12-27 30-44 55-52 2 24-5 46-26 67-13 14-27 20-43 16 2-12 6-21 14-31z" fill="#5b7c3a"></path>
+                <path d="M635 246c15-24 35-40 62-45-1 24-12 44-34 60-15 11-31 15-47 11 4-11 10-18 19-26z" fill="#6f9248"></path>
+                <path d="M309 247c9-21 25-34 48-40-1 20-10 36-27 49-12 9-24 12-36 8 3-7 7-12 15-17z" fill="#6f9248"></path>
+              </svg>
+            </section>
+
+            <section class="row g-4 mb-5">
+              <div class="col-lg-5">
+                <div class="content-panel h-100">
+                  <h2 class="h4 mb-3">Ingredients</h2>
+                  <ul class="list-group list-group-flush ingredient-list">
+                    <li class="list-group-item">300g pasta of your choice</li>
+                    <li class="list-group-item">2 cups roasted pumpkin cubes</li>
+                    <li class="list-group-item">4 cloves roasted garlic</li>
+                    <li class="list-group-item">3/4 cup cooking cream</li>
+                    <li class="list-group-item">1/3 cup grated parmesan</li>
+                    <li class="list-group-item">8 sage leaves</li>
+                    <li class="list-group-item">1 tbsp olive oil</li>
+                    <li class="list-group-item">Salt and black pepper</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-lg-7">
+                <div class="content-panel h-100">
+                  <h2 class="h4 mb-3">Why People Love It</h2>
+                  <p class="mb-3">
+                    This pasta is designed for busy evenings: roast the pumpkin in advance, blend the sauce in one step, and finish everything in the same pan.
+                  </p>
+                  <div class="row g-3">
+                    <div class="col-sm-6">
+                      <div class="info-chip">
+                        <div class="small text-muted text-uppercase fw-semibold">Flavor</div>
+                        <div class="fw-semibold">Creamy, sweet, and savory</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="info-chip">
+                        <div class="small text-muted text-uppercase fw-semibold">Skill Level</div>
+                        <div class="fw-semibold">Beginner friendly</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="info-chip">
+                        <div class="small text-muted text-uppercase fw-semibold">Best For</div>
+                        <div class="fw-semibold">Family dinner or meal prep</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="info-chip">
+                        <div class="small text-muted text-uppercase fw-semibold">Pair With</div>
+                        <div class="fw-semibold">Lemon salad and sparkling water</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="content-panel notice-panel mb-5" aria-label="Recipe notes and dietary cautions">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <h2 class="h4 mb-0">Recipe Notice</h2>
+                <span class="badge text-bg-light border">Please Check Before Cooking</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <div class="notice-item h-100">
+                    <div class="small text-uppercase fw-semibold text-muted mb-2">Spice Level</div>
+                    <p class="mb-0">Mild by default. Add chili flakes or fresh chili only if you want extra heat.</p>
+                  </div>
+                </div>
+                <div class="col-md-8">
+                  <div class="notice-item h-100">
+                    <div class="small text-uppercase fw-semibold text-muted mb-2">Dietary Cautions</div>
+                    <p class="mb-0">
+                      This recipe may not be suitable for vegetarians, people with religious dietary restrictions, or users with common allergies such as gluten or milk intolerance unless ingredients are substituted carefully.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="mb-5">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <h2 class="h3 mb-0">Step-by-Step Method</h2>
+                <span class="text-muted small">Photo guide included</span>
+              </div>
+
+              <div class="step-card">
+                <div class="step-photo step-photo-one" aria-hidden="true">
+                  <svg viewBox="0 0 320 220">
+                    <rect width="320" height="220" rx="28" fill="#fff2e0"></rect>
+                    <rect x="54" y="54" width="212" height="108" rx="20" fill="#e39a58"></rect>
+                    <circle cx="95" cy="95" r="16" fill="#f4bb7a"></circle>
+                    <circle cx="145" cy="106" r="14" fill="#f8cd95"></circle>
+                    <circle cx="193" cy="97" r="15" fill="#f4bb7a"></circle>
+                    <circle cx="234" cy="109" r="12" fill="#f8cd95"></circle>
+                    <path d="M72 168c40-20 136-20 184 0" fill="none" stroke="#688c46" stroke-linecap="round" stroke-width="10"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="step-number">Step 1</div>
+                  <h3 class="h5">Roast the pumpkin and garlic</h3>
+                  <p class="mb-0 text-muted">
+                    Toss pumpkin cubes and garlic with olive oil, then roast at 200 C until soft and lightly caramelized. This builds the sweetness of the sauce.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step-card">
+                <div class="step-photo step-photo-two" aria-hidden="true">
+                  <svg viewBox="0 0 320 220">
+                    <rect width="320" height="220" rx="28" fill="#fff2e0"></rect>
+                    <circle cx="160" cy="112" r="74" fill="#f7c17f"></circle>
+                    <circle cx="160" cy="112" r="54" fill="#f3a660"></circle>
+                    <rect x="140" y="30" width="38" height="44" rx="10" fill="#8f9fa8"></rect>
+                    <path d="M112 150c34-22 65-25 96 0" fill="none" stroke="#ffe3ba" stroke-linecap="round" stroke-width="12"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="step-number">Step 2</div>
+                  <h3 class="h5">Blend a smooth sauce</h3>
+                  <p class="mb-0 text-muted">
+                    Blend roasted pumpkin, garlic, cream, a splash of pasta water, and parmesan until smooth. Season generously with salt and pepper.
+                  </p>
+                </div>
+              </div>
+
+              <div class="step-card">
+                <div class="step-photo step-photo-three" aria-hidden="true">
+                  <svg viewBox="0 0 320 220">
+                    <rect width="320" height="220" rx="28" fill="#fff2e0"></rect>
+                    <ellipse cx="160" cy="116" rx="110" ry="56" fill="#a45f31"></ellipse>
+                    <ellipse cx="160" cy="110" rx="98" ry="46" fill="#f5a95c"></ellipse>
+                    <path d="M100 102c32 28 80 46 120 44" fill="none" stroke="#f7d7a6" stroke-linecap="round" stroke-width="14"></path>
+                    <path d="M232 72c10-18 24-28 43-32-2 18-10 32-28 43-10 7-19 9-30 6 3-6 7-11 15-17z" fill="#6f9248"></path>
+                  </svg>
+                </div>
+                <div>
+                  <div class="step-number">Step 3</div>
+                  <h3 class="h5">Finish with pasta and crispy sage</h3>
+                  <p class="mb-0 text-muted">
+                    Coat the cooked pasta with sauce over low heat, loosen with extra pasta water if needed, and top with quickly fried sage leaves before serving.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section class="content-panel mb-4">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <h2 class="h4 mb-0">Share This Recipe</h2>
+                <span class="small text-muted">Invite friends to cook it with you</span>
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-warning text-dark fw-semibold" id="copyLinkButton" type="button">Copy Recipe Link</button>
+                <button class="btn btn-outline-secondary" id="copyShareTextButton" type="button">Copy Share Text</button>
+                <button class="btn btn-outline-secondary" id="saveRecipeButton" type="button">Save Recipe</button>
+              </div>
+              <p class="small text-muted mt-3 mb-0" id="shareFeedback">Link ready to share.</p>
+            </section>
+
+            <section class="content-panel mb-4" id="ratingSection">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div>
+                  <h2 class="h4 mb-1">Rate This Recipe</h2>
+                  <p class="small text-muted mb-0">Tell other cooks how this dish turned out for you.</p>
+                </div>
+                <div class="rating-summary text-lg-end">
+                  <div class="fw-bold fs-4"><span id="ratingAverage">4.8</span>/5</div>
+                  <div class="small text-muted"><span id="ratingCount">128</span> ratings</div>
+                </div>
+              </div>
+
+              <div class="star-picker mb-3" role="group" aria-label="Choose a rating from one to five">
+                <button class="star-button" type="button" data-value="1" aria-label="1 star">&#9733;</button>
+                <button class="star-button" type="button" data-value="2" aria-label="2 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="3" aria-label="3 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="4" aria-label="4 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="5" aria-label="5 stars">&#9733;</button>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-dark" id="submitRatingButton" type="button">Submit Rating</button>
+                <span class="align-self-center small text-muted" id="ratingFeedback">Choose a star rating and submit.</span>
+              </div>
+            </section>
+
+            <section class="content-panel" id="comments">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                <div>
+                  <h2 class="h4 mb-1">Comments</h2>
+                  <p class="small text-muted mb-0">Post your thoughts or reply with an @mention style message.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-light border px-3 py-2" id="commentCounter">4 comments</span>
+              </div>
+
+              <form id="commentForm" class="comment-form mb-4">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label" for="commentName">Display name</label>
+                    <input class="form-control" id="commentName" name="commentName" type="text" placeholder="GuestCook">
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label" for="commentInput">Your comment</label>
+                    <textarea class="form-control" id="commentInput" name="commentInput" rows="3" placeholder="Share a tip or ask a question..."></textarea>
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                  <button class="btn btn-warning text-dark fw-semibold" type="submit">Post Comment</button>
+                  <button class="btn btn-outline-secondary d-none" id="cancelReplyButton" type="button">Cancel Reply</button>
+                  <span class="small text-muted" id="replyIndicator">Posting as a new comment.</span>
+                </div>
+              </form>
+
+              <div class="comment-thread" id="commentThread">
+                <article class="comment-card" data-user="NinaCook">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">NC</span>
+                      <span>
+                        <strong>NinaCook</strong>
+                        <span class="comment-time">2 hours ago</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">The sauce was so smooth. I added chili flakes and it balanced the sweetness really well.</p>
+                  <div class="replies">
+                    <article class="comment-card reply-card" data-user="MiaLee">
+                      <div class="comment-header">
+                        <a href="#" class="comment-user">
+                          <span class="comment-avatar">ML</span>
+                          <span>
+                            <strong>MiaLee</strong>
+                            <span class="comment-time">1 hour ago</span>
+                          </span>
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                      </div>
+                      <p class="comment-body mb-0"><span class="mention">@NinaCook</span> Chili flakes are a great idea. Smoked paprika also works nicely here.</p>
+                    </article>
+                  </div>
+                </article>
+
+                <article class="comment-card" data-user="OliverHome">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">OH</span>
+                      <span>
+                        <strong>OliverHome</strong>
+                        <span class="comment-time">5 hours ago</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">I used oat cream instead of dairy cream and the texture still turned out rich and glossy.</p>
+                </article>
+
+                <article class="comment-card" data-user="SophieBakes">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">SB</span>
+                      <span>
+                        <strong>SophieBakes</strong>
+                        <span class="comment-time">Yesterday</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">Can I make the sauce one day ahead and reheat it later?</p>
+                </article>
+              </div>
+            </section>
+          </div>
+        </article>
+      </section>
+
+      <aside class="col-12 col-lg-4 col-xl-3 popular-sidebar-column">
+        <div class="card border-0 shadow-sm popular-panel">
+          <div class="card-body p-3 p-lg-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h2 class="h5 mb-0">Popular Recipes</h2>
+              <a href="#" class="small text-decoration-none">See all</a>
+            </div>
+
+            <div class="d-grid gap-3">
+              <a href="#" class="popular-link text-decoration-none">
+                <div class="popular-thumb thumb-1"></div>
+                <div>
+                  <div class="fw-semibold text-dark">Honey Soy Chicken Bowl</div>
+                  <div class="small text-muted">Quick dinner with steamed greens</div>
+                </div>
+              </a>
+
+              <a href="#" class="popular-link text-decoration-none">
+                <div class="popular-thumb thumb-2"></div>
+                <div>
+                  <div class="fw-semibold text-dark">Miso Butter Mushrooms</div>
+                  <div class="small text-muted">Savory skillet side dish</div>
+                </div>
+              </a>
+
+              <a href="#" class="popular-link text-decoration-none">
+                <div class="popular-thumb thumb-3"></div>
+                <div>
+                  <div class="fw-semibold text-dark">Berry Yogurt Pancakes</div>
+                  <div class="small text-muted">Weekend brunch favorite</div>
+                </div>
+              </a>
+
+              <a href="#" class="popular-link text-decoration-none">
+                <div class="popular-thumb thumb-4"></div>
+                <div>
+                  <div class="fw-semibold text-dark">Garlic Shrimp Rice Pot</div>
+                  <div class="small text-muted">One-pan comfort meal</div>
+                </div>
+              </a>
+
+              <a href="#" class="popular-link text-decoration-none">
+                <div class="popular-thumb thumb-5"></div>
+                <div>
+                  <div class="fw-semibold text-dark">Roasted Tomato Soup</div>
+                  <div class="small text-muted">Smooth, bright, and warming</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <button class="back-to-top-btn" id="backToTopButton" type="button" aria-label="Back to top">
+    ↑ Top
+  </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const recipeUrl = "https://example.com/recipes/creamy-roasted-pumpkin-pasta";
+    const shareMessage = "Take a look at this recipe: " + recipeUrl;
+    const shareFeedback = document.getElementById("shareFeedback");
+    const copyLinkButton = document.getElementById("copyLinkButton");
+    const copyShareTextButton = document.getElementById("copyShareTextButton");
+    const saveRecipeButton = document.getElementById("saveRecipeButton");
+
+    copyLinkButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(recipeUrl);
+        shareFeedback.textContent = "Recipe link copied to clipboard.";
+      } catch (error) {
+        shareFeedback.textContent = "Clipboard access is unavailable, but the share link is ready.";
+      }
+    });
+
+    copyShareTextButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(shareMessage);
+        shareFeedback.textContent = "Share text copied to clipboard.";
+      } catch (error) {
+        shareFeedback.textContent = "Clipboard access is unavailable, but the share text is ready.";
+      }
+    });
+
+    let saved = false;
+    saveRecipeButton.addEventListener("click", () => {
+      saved = !saved;
+      saveRecipeButton.textContent = saved ? "Saved" : "Save Recipe";
+      shareFeedback.textContent = saved ? "Recipe saved to your list." : "Recipe removed from your saved list.";
+    });
+
+    const starButtons = Array.from(document.querySelectorAll(".star-button"));
+    const submitRatingButton = document.getElementById("submitRatingButton");
+    const ratingAverage = document.getElementById("ratingAverage");
+    const ratingCount = document.getElementById("ratingCount");
+    const ratingFeedback = document.getElementById("ratingFeedback");
+
+    let selectedRating = 0;
+    let currentAverage = 4.8;
+    let currentCount = 128;
+
+    function paintStars(value) {
+      starButtons.forEach((button) => {
+        const isActive = Number(button.dataset.value) <= value;
+        button.classList.toggle("active", isActive);
+      });
+    }
+
+    starButtons.forEach((button) => {
+      button.addEventListener("mouseenter", () => paintStars(Number(button.dataset.value)));
+      button.addEventListener("focus", () => paintStars(Number(button.dataset.value)));
+      button.addEventListener("click", () => {
+        selectedRating = Number(button.dataset.value);
+        paintStars(selectedRating);
+        ratingFeedback.textContent = "Selected " + selectedRating + " out of 5.";
+      });
+    });
+
+    document.querySelector(".star-picker").addEventListener("mouseleave", () => paintStars(selectedRating));
+
+    submitRatingButton.addEventListener("click", () => {
+      if (!selectedRating) {
+        ratingFeedback.textContent = "Please choose a rating before submitting.";
+        return;
+      }
+
+      const totalScore = currentAverage * currentCount + selectedRating;
+      currentCount += 1;
+      currentAverage = totalScore / currentCount;
+
+      ratingAverage.textContent = currentAverage.toFixed(1);
+      ratingCount.textContent = String(currentCount);
+      ratingFeedback.textContent = "Thanks for rating this recipe.";
+    });
+
+    const commentForm = document.getElementById("commentForm");
+    const commentInput = document.getElementById("commentInput");
+    const commentName = document.getElementById("commentName");
+    const commentThread = document.getElementById("commentThread");
+    const cancelReplyButton = document.getElementById("cancelReplyButton");
+    const replyIndicator = document.getElementById("replyIndicator");
+    const commentCounter = document.getElementById("commentCounter");
+    const backToTopButton = document.getElementById("backToTopButton");
+
+    let replyTarget = null;
+    let replyUser = "";
+
+    function getInitials(name) {
+      return name
+        .replace(/[^a-zA-Z0-9 ]/g, "")
+        .trim()
+        .split(/\s+/)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join("")
+        .slice(0, 2) || "GC";
+    }
+
+    function updateCommentCount() {
+      const total = commentThread.querySelectorAll(".comment-card").length;
+      commentCounter.textContent = total + (total === 1 ? " comment" : " comments");
+    }
+
+    function formatComment(text) {
+      return text.replace(/(^|\s)(@\w+)/g, '$1<span class="mention">$2</span>');
+    }
+
+    function setReplyState(targetCard, username) {
+      replyTarget = targetCard;
+      replyUser = username;
+      cancelReplyButton.classList.remove("d-none");
+      replyIndicator.textContent = "Replying to @" + username + ".";
+
+      if (!commentInput.value.trim().startsWith("@" + username)) {
+        commentInput.value = "@" + username + " ";
+      }
+
+      commentInput.focus();
+    }
+
+    function clearReplyState() {
+      replyTarget = null;
+      replyUser = "";
+      cancelReplyButton.classList.add("d-none");
+      replyIndicator.textContent = "Posting as a new comment.";
+    }
+
+    function createCommentCard(name, text, isReply) {
+      const article = document.createElement("article");
+      article.className = "comment-card" + (isReply ? " reply-card" : "");
+      article.dataset.user = name;
+
+      article.innerHTML = `
+        <div class="comment-header">
+          <a href="#" class="comment-user">
+            <span class="comment-avatar">${getInitials(name)}</span>
+            <span>
+              <strong>${name}</strong>
+              <span class="comment-time">Just now</span>
+            </span>
+          </a>
+          <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+        </div>
+        <p class="comment-body mb-0">${formatComment(text)}</p>
+      `;
+
+      if (!isReply) {
+        const replies = document.createElement("div");
+        replies.className = "replies";
+        article.appendChild(replies);
+      }
+
+      return article;
+    }
+
+    commentThread.addEventListener("click", (event) => {
+      const replyButton = event.target.closest(".reply-button");
+      if (!replyButton) {
+        return;
+      }
+
+      const targetCard = replyButton.closest(".comment-card");
+      const username = targetCard.dataset.user;
+      setReplyState(targetCard, username);
+    });
+
+    cancelReplyButton.addEventListener("click", () => {
+      clearReplyState();
+      commentInput.value = "";
+    });
+
+    commentForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = commentName.value.trim() || "GuestCook";
+      const text = commentInput.value.trim();
+
+      if (!text) {
+        replyIndicator.textContent = "Please enter a comment before posting.";
+        return;
+      }
+
+      const isReply = Boolean(replyTarget);
+      const postedReplyUser = replyUser;
+      const newCard = createCommentCard(name, text, isReply);
+
+      if (isReply) {
+        let replyContainer = replyTarget.querySelector(".replies");
+        if (!replyContainer) {
+          replyContainer = document.createElement("div");
+          replyContainer.className = "replies";
+          replyTarget.appendChild(replyContainer);
+        }
+
+        replyContainer.appendChild(newCard);
+      } else {
+        commentThread.prepend(newCard);
+      }
+
+      commentForm.reset();
+      updateCommentCount();
+      clearReplyState();
+      replyIndicator.textContent = isReply ? "Reply posted to @" + postedReplyUser + "." : "Comment posted successfully.";
+    });
+
+    function toggleBackToTopButton() {
+      const shouldShow = window.scrollY > 280;
+      backToTopButton.classList.toggle("visible", shouldShow);
+    }
+
+    backToTopButton.addEventListener("click", () => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    });
+
+    window.addEventListener("scroll", toggleBackToTopButton);
+
+    updateCommentCount();
+    toggleBackToTopButton();
+  </script>
+</body>
+</html>
