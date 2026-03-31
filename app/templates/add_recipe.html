@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Add Recipe | RecipeHub{% endblock %}
+
+{% block content %}
+<div class="container page-section">
+    <div class="form-container">
+        <h2 class="text-center mb-4">Add Recipe</h2>
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Recipe Title</label>
+                <input type="text" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ingredients</label>
+                <textarea class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Instructions</label>
+                <textarea class="form-control" rows="5"></textarea>
+            </div>
+
+            <button class="btn btn-success w-100">Submit Recipe</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
