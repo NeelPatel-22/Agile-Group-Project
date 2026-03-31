@@ -107,3 +107,27 @@ body {
 .page-section {
   padding: 60px 0;
 }
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+
+  .recipe-card img {
+    height: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .hero-section {
+    min-height: 65vh;
+    padding: 40px 15px;
+  }
+}
