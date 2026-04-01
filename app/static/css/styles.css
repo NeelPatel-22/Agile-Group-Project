@@ -11,6 +11,11 @@
   --soft-green: #eef8f2;
   --soft-border: #e9ecef;
   --panel-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  /* extra recipe detail styling */
+  --muted-text: #6c757d;
+  --soft-green: #eef8f2;
+  --soft-border: #e9ecef;
+  --panel-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
 }
 
 body {
