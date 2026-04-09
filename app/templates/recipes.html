@@ -174,13 +174,134 @@
               </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="share-box">
-              <div class="d-flex flex-wrap gap-2">
-                <a href="#" class="btn custom-btn">Save Recipe</a>
-                <a href="#" class="btn custom-btn">Like Recipe</a>
+            <!-- Share -->
+            <section class="content-panel mb-4">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <h2 class="h4 mb-0">Share This Recipe</h2>
+                <span class="small text-muted">Invite friends to cook it with you</span>
               </div>
-            </div>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-warning text-dark fw-semibold" id="copyLinkButton" type="button">Copy Recipe Link</button>
+                <button class="btn btn-outline-secondary" id="copyShareTextButton" type="button">Copy Share Text</button>
+                <button class="btn btn-outline-secondary" id="saveRecipeButton" type="button">Save Recipe</button>
+              </div>
+              <p class="small text-muted mt-3 mb-0" id="shareFeedback">Link ready to share.</p>
+            </section>
+
+            <!-- Rating -->
+            <section class="content-panel mb-4" id="ratingSection">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                <div>
+                  <h2 class="h4 mb-1">Rate This Recipe</h2>
+                  <p class="small text-muted mb-0">Tell other cooks how this dish turned out for you.</p>
+                </div>
+                <div class="rating-summary text-lg-end">
+                  <div class="fw-bold fs-4"><span id="ratingAverage">4.8</span>/5</div>
+                  <div class="small text-muted"><span id="ratingCount">128</span> ratings</div>
+                </div>
+              </div>
+
+              <div class="star-picker mb-3" role="group" aria-label="Choose a rating from one to five">
+                <button class="star-button" type="button" data-value="1" aria-label="1 star">&#9733;</button>
+                <button class="star-button" type="button" data-value="2" aria-label="2 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="3" aria-label="3 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="4" aria-label="4 stars">&#9733;</button>
+                <button class="star-button" type="button" data-value="5" aria-label="5 stars">&#9733;</button>
+              </div>
+
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-dark" id="submitRatingButton" type="button">Submit Rating</button>
+                <span class="align-self-center small text-muted" id="ratingFeedback">Choose a star rating and submit.</span>
+              </div>
+            </section>
+
+            <!-- Comments -->
+            <section class="content-panel" id="comments">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                <div>
+                  <h2 class="h4 mb-1">Comments</h2>
+                  <p class="small text-muted mb-0">Post your thoughts or reply with an @mention style message.</p>
+                </div>
+                <span class="badge rounded-pill text-bg-light border px-3 py-2" id="commentCounter">4 comments</span>
+              </div>
+
+              <form id="commentForm" class="comment-form mb-4">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label" for="commentName">Display name</label>
+                    <input class="form-control" id="commentName" name="commentName" type="text" placeholder="GuestCook">
+                  </div>
+                  <div class="col-md-8">
+                    <label class="form-label" for="commentInput">Your comment</label>
+                    <textarea class="form-control" id="commentInput" name="commentInput" rows="3" placeholder="Share a tip or ask a question..."></textarea>
+                  </div>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                  <button class="btn btn-warning text-dark fw-semibold" type="submit">Post Comment</button>
+                  <button class="btn btn-outline-secondary d-none" id="cancelReplyButton" type="button">Cancel Reply</button>
+                  <span class="small text-muted" id="replyIndicator">Posting as a new comment.</span>
+                </div>
+              </form>
+
+              <div class="comment-thread" id="commentThread">
+                <article class="comment-card" data-user="NinaCook">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">NC</span>
+                      <span>
+                        <strong>NinaCook</strong>
+                        <span class="comment-time">2 hours ago</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">The sauce was so smooth. I added chili flakes and it balanced the sweetness really well.</p>
+                  <div class="replies">
+                    <article class="comment-card reply-card" data-user="MiaLee">
+                      <div class="comment-header">
+                        <a href="#" class="comment-user">
+                          <span class="comment-avatar">ML</span>
+                          <span>
+                            <strong>MiaLee</strong>
+                            <span class="comment-time">1 hour ago</span>
+                          </span>
+                        </a>
+                        <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                      </div>
+                      <p class="comment-body mb-0"><span class="mention">@NinaCook</span> Chili flakes are a great idea. Smoked paprika also works nicely here.</p>
+                    </article>
+                  </div>
+                </article>
+
+                <article class="comment-card" data-user="OliverHome">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">OH</span>
+                      <span>
+                        <strong>OliverHome</strong>
+                        <span class="comment-time">5 hours ago</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">I used oat cream instead of dairy cream and the texture still turned out rich and glossy.</p>
+                </article>
+
+                <article class="comment-card" data-user="SophieBakes">
+                  <div class="comment-header">
+                    <a href="#" class="comment-user">
+                      <span class="comment-avatar">SB</span>
+                      <span>
+                        <strong>SophieBakes</strong>
+                        <span class="comment-time">Yesterday</span>
+                      </span>
+                    </a>
+                    <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+                  </div>
+                  <p class="comment-body mb-0">Can I make the sauce one day ahead and reheat it later?</p>
+                </article>
+              </div>
+            </section>
 
           </div>
         </article>
@@ -243,4 +364,212 @@
     </div>
   </div>
 </section>
+<script>
+  const recipeUrl = {{ url_for('main.recipes', _external=True)|tojson }};
+  const shareMessage = "Take a look at this recipe: " + recipeUrl;
+  const shareFeedback = document.getElementById("shareFeedback");
+  const copyLinkButton = document.getElementById("copyLinkButton");
+  const copyShareTextButton = document.getElementById("copyShareTextButton");
+  const saveRecipeButton = document.getElementById("saveRecipeButton");
+
+  copyLinkButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(recipeUrl);
+      shareFeedback.textContent = "Recipe link copied to clipboard.";
+    } catch (error) {
+      shareFeedback.textContent = "Clipboard access is unavailable, but the share link is ready.";
+    }
+  });
+
+  copyShareTextButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(shareMessage);
+      shareFeedback.textContent = "Share text copied to clipboard.";
+    } catch (error) {
+      shareFeedback.textContent = "Clipboard access is unavailable, but the share text is ready.";
+    }
+  });
+
+  let saved = false;
+  saveRecipeButton.addEventListener("click", () => {
+    saved = !saved;
+    saveRecipeButton.textContent = saved ? "Saved" : "Save Recipe";
+    shareFeedback.textContent = saved ? "Recipe saved to your list." : "Recipe removed from your saved list.";
+  });
+
+  const starButtons = Array.from(document.querySelectorAll(".star-button"));
+  const starPicker = document.querySelector(".star-picker");
+  const submitRatingButton = document.getElementById("submitRatingButton");
+  const ratingAverage = document.getElementById("ratingAverage");
+  const ratingCount = document.getElementById("ratingCount");
+  const ratingFeedback = document.getElementById("ratingFeedback");
+
+  let selectedRating = 0;
+  let currentAverage = 4.8;
+  let currentCount = 128;
+
+  function paintStars(value) {
+    starButtons.forEach((button) => {
+      const isActive = Number(button.dataset.value) <= value;
+      button.classList.toggle("active", isActive);
+    });
+  }
+
+  starButtons.forEach((button) => {
+    button.addEventListener("mouseenter", () => paintStars(Number(button.dataset.value)));
+    button.addEventListener("focus", () => paintStars(Number(button.dataset.value)));
+    button.addEventListener("click", () => {
+      selectedRating = Number(button.dataset.value);
+      paintStars(selectedRating);
+      ratingFeedback.textContent = "Selected " + selectedRating + " out of 5.";
+    });
+  });
+
+  starPicker.addEventListener("mouseleave", () => paintStars(selectedRating));
+
+  submitRatingButton.addEventListener("click", () => {
+    if (!selectedRating) {
+      ratingFeedback.textContent = "Please choose a rating before submitting.";
+      return;
+    }
+
+    const totalScore = currentAverage * currentCount + selectedRating;
+    currentCount += 1;
+    currentAverage = totalScore / currentCount;
+
+    ratingAverage.textContent = currentAverage.toFixed(1);
+    ratingCount.textContent = String(currentCount);
+    ratingFeedback.textContent = "Thanks for rating this recipe.";
+  });
+
+  const commentForm = document.getElementById("commentForm");
+  const commentInput = document.getElementById("commentInput");
+  const commentName = document.getElementById("commentName");
+  const commentThread = document.getElementById("commentThread");
+  const cancelReplyButton = document.getElementById("cancelReplyButton");
+  const replyIndicator = document.getElementById("replyIndicator");
+  const commentCounter = document.getElementById("commentCounter");
+
+  let replyTarget = null;
+  let replyUser = "";
+
+  function getInitials(name) {
+    return name
+      .replace(/[^a-zA-Z0-9 ]/g, "")
+      .trim()
+      .split(/\s+/)
+      .map((part) => part.charAt(0).toUpperCase())
+      .join("")
+      .slice(0, 2) || "GC";
+  }
+
+  function updateCommentCount() {
+    const total = commentThread.querySelectorAll(".comment-card").length;
+    commentCounter.textContent = total + (total === 1 ? " comment" : " comments");
+  }
+
+  function formatComment(text) {
+    return text.replace(/(^|\\s)(@\\w+)/g, '$1<span class="mention">$2</span>');
+  }
+
+  function setReplyState(targetCard, username) {
+    replyTarget = targetCard;
+    replyUser = username;
+    cancelReplyButton.classList.remove("d-none");
+    replyIndicator.textContent = "Replying to @" + username + ".";
+
+    if (!commentInput.value.trim().startsWith("@" + username)) {
+      commentInput.value = "@" + username + " ";
+    }
+
+    commentInput.focus();
+  }
+
+  function clearReplyState() {
+    replyTarget = null;
+    replyUser = "";
+    cancelReplyButton.classList.add("d-none");
+    replyIndicator.textContent = "Posting as a new comment.";
+  }
+
+  function createCommentCard(name, text, isReply) {
+    const article = document.createElement("article");
+    article.className = "comment-card" + (isReply ? " reply-card" : "");
+    article.dataset.user = name;
+
+    article.innerHTML = `
+      <div class="comment-header">
+        <a href="#" class="comment-user">
+          <span class="comment-avatar">${getInitials(name)}</span>
+          <span>
+            <strong>${name}</strong>
+            <span class="comment-time">Just now</span>
+          </span>
+        </a>
+        <button class="btn btn-sm btn-outline-secondary reply-button" type="button">Reply</button>
+      </div>
+      <p class="comment-body mb-0">${formatComment(text)}</p>
+    `;
+
+    if (!isReply) {
+      const replies = document.createElement("div");
+      replies.className = "replies";
+      article.appendChild(replies);
+    }
+
+    return article;
+  }
+
+  commentThread.addEventListener("click", (event) => {
+    const replyButton = event.target.closest(".reply-button");
+    if (!replyButton) {
+      return;
+    }
+
+    const targetCard = replyButton.closest(".comment-card");
+    const username = targetCard.dataset.user;
+    setReplyState(targetCard, username);
+  });
+
+  cancelReplyButton.addEventListener("click", () => {
+    clearReplyState();
+    commentInput.value = "";
+  });
+
+  commentForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const name = commentName.value.trim() || "GuestCook";
+    const text = commentInput.value.trim();
+
+    if (!text) {
+      replyIndicator.textContent = "Please enter a comment before posting.";
+      return;
+    }
+
+    const isReply = Boolean(replyTarget);
+    const postedReplyUser = replyUser;
+    const newCard = createCommentCard(name, text, isReply);
+
+    if (isReply) {
+      let replyContainer = replyTarget.querySelector(".replies");
+      if (!replyContainer) {
+        replyContainer = document.createElement("div");
+        replyContainer.className = "replies";
+        replyTarget.appendChild(replyContainer);
+      }
+
+      replyContainer.appendChild(newCard);
+    } else {
+      commentThread.prepend(newCard);
+    }
+
+    commentForm.reset();
+    updateCommentCount();
+    clearReplyState();
+    replyIndicator.textContent = isReply ? "Reply posted to @" + postedReplyUser + "." : "Comment posted successfully.";
+  });
+
+  updateCommentCount();
+</script>
 {% endblock %}
