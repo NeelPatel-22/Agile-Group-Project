@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Home | RecipeHub{% endblock %}
+{% block title %}Recipes | RecipeHub{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">{% endblock %}
 
 {% block content %}
 <section class="page-section recipe-detail-main">
@@ -9,7 +10,7 @@
 
       <!-- Main Recipe Content -->
       <div class="col-lg-8">
-        <article class="card recipe-card">
+        <article class="card recipe-card recipe-detail-card">
           <div class="card-body p-4 p-lg-5">
 
             <!-- Top meta -->

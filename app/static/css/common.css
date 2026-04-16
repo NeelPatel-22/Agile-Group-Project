@@ -1,0 +1,116 @@
+:root {
+  --primary-color: #198754;
+  --primary-dark: #146c43;
+  --primary-hover: #157347;
+  --light-bg: #f8f9fa;
+  --white: #ffffff;
+  --text-dark: #212529;
+  --muted-text: #6c757d;
+  --text-soft: #5f6b66;
+  --nav-link-hover: #d1e7dd;
+  --button-hover-bg: #f1f1f1;
+  --hero-overlay: rgba(25, 135, 84, 0.75);
+  --hero-gradient-end: #f8fbf9;
+  --soft-surface: #f4fbf7;
+  --soft-surface-2: #eef8f2;
+  --soft-surface-3: #f8fff9;
+  --soft-surface-4: #f7faf8;
+  --soft-surface-5: #fcfcfc;
+  --soft-surface-6: #dff2e6;
+  --warm-surface: #fffaf1;
+  --border-light: #dcdfe3;
+  --border-soft: #dcefe3;
+  --border-soft-alt: #ebf1ed;
+  --border-soft-muted: #e8ecea;
+  --border-warm: #f3e3be;
+  --profile-ring: #d1e7dd;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-strong: 0 14px 34px rgba(0, 0, 0, 0.08);
+  --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 8px 22px rgba(0, 0, 0, 0.04);
+  --shadow-green-strong: 0 8px 18px rgba(25, 135, 84, 0.22);
+  --shadow-green-soft: 0 8px 18px rgba(25, 135, 84, 0.16);
+  --focus-ring: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+  --radius: 12px;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-dark);
+  background-color: var(--white);
+  line-height: 1.6;
+}
+
+.custom-navbar {
+  background-color: var(--primary-color);
+  box-shadow: var(--shadow);
+}
+
+.nav-link {
+  color: var(--white) !important;
+  margin-left: 10px;
+}
+
+.nav-link:hover {
+  color: var(--nav-link-hover) !important;
+}
+
+.custom-footer {
+  background-color: var(--primary-dark);
+  color: var(--white);
+}
+
+.page-section {
+  padding: 60px 0;
+}
+
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-dark);
+}
+
+.custom-btn {
+  background-color: var(--white);
+  color: var(--primary-color);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.custom-btn:hover {
+  background-color: var(--button-hover-bg);
+}
+
+.recipe-card {
+  border: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-5px);
+}
+
+.recipe-card img {
+  height: 220px;
+  object-fit: cover;
+}
+
+.form-container {
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 768px) {
+  .recipe-card img {
+    height: 200px;
+  }
+}

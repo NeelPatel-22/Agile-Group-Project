@@ -1,0 +1,35 @@
+.auth-wrapper {
+  background: linear-gradient(135deg, var(--light-bg), var(--soft-surface-2));
+}
+
+.auth-card {
+  background: var(--white);
+}
+
+.auth-card .form-control {
+  border: 1px solid var(--border-light);
+  padding: 0.85rem 1rem;
+}
+
+.auth-card .form-control:focus {
+  box-shadow: var(--focus-ring);
+  border-color: var(--primary-color);
+}
+
+.auth-card .btn-success {
+  background-color: var(--primary-color);
+  border: none;
+  transition: 0.3s ease;
+}
+
+.auth-card .btn-success:hover {
+  background-color: var(--primary-hover);
+}
+
+.auth-card a {
+  color: var(--primary-color);
+}
+
+.auth-card a:hover {
+  color: var(--primary-dark);
+}

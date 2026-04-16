@@ -1,27 +1,11 @@
-from flask import Blueprint, render_template
+from app.routes_auth import auth_bp
+from app.routes_core import core_bp
+from app.routes_profile import profile_bp
+from app.routes_recipes import recipes_bp
 
-main = Blueprint('main', __name__)
 
-@main.route("/")
-def home():
-    return render_template("index.html")
-
-@main.route("/recipes")
-def recipes():
-    return render_template("recipes.html")
-
-@main.route("/login")
-def login():
-    return render_template("login.html")
-
-@main.route("/signup")
-def signup():
-    return render_template("signup.html")
-
-@main.route("/add-recipe")
-def add_recipe():
-    return render_template("add_recipe.html")
-
-@main.route("/profile")
-def profile():
-    return render_template("profile.html")
+def register_routes(app):
+    app.register_blueprint(core_bp)
+    app.register_blueprint(recipes_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(profile_bp)

@@ -1,28 +1,51 @@
 {% extends "base.html" %}
 
 {% block title %}Add Recipe | RecipeHub{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">{% endblock %}
 
 {% block content %}
 <div class="container page-section">
-    <div class="form-container">
+    <div class="form-container recipe-form-card">
         <h2 class="text-center mb-4">Add Recipe</h2>
-        <form>
+        <form method="POST" action="{{ url_for('recipes.add_recipe') }}">
             <div class="mb-3">
                 <label class="form-label">Recipe Title</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="description" rows="3" required></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Ingredients</label>
-                <textarea class="form-control" rows="4"></textarea>
+                <textarea class="form-control" name="ingredients" rows="4" required></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Instructions</label>
-                <textarea class="form-control" rows="5"></textarea>
+                <textarea class="form-control" name="steps" rows="5" required></textarea>
             </div>
 
-            <button class="btn btn-success w-100">Submit Recipe</button>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Category</label>
+                    <input type="text" class="form-control" name="category">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Cooking Time</label>
+                    <input type="text" class="form-control" name="cooking_time" placeholder="30 min">
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Servings</label>
+                    <input type="text" class="form-control" name="servings" placeholder="4">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Submit Recipe</button>
         </form>
     </div>
 </div>

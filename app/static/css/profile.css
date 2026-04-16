@@ -1,0 +1,39 @@
+.profile-page {
+  background-color: var(--light-bg);
+}
+
+.profile-panel,
+.profile-summary-card,
+.profile-stat-card {
+  border: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.profile-avatar {
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 4px solid var(--profile-ring);
+}
+
+.profile-meta-card {
+  background-color: var(--light-bg);
+  border-radius: 10px;
+}
+
+.profile-stat-card {
+  transition: transform 0.3s ease;
+}
+
+.profile-stat-card:hover {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 768px) {
+  .profile-avatar {
+    width: 110px;
+    height: 110px;
+  }
+}

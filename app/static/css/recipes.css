@@ -1,0 +1,215 @@
+.recipe-detail-main {
+  background: linear-gradient(to bottom, var(--white) 0%, var(--hero-gradient-end) 100%);
+}
+
+.recipe-page-title {
+  font-size: 2.7rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  line-height: 1.2;
+}
+
+.recipe-page-subtitle {
+  font-size: 1.08rem;
+  color: var(--text-soft);
+  max-width: 760px;
+}
+
+.author-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.author-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  color: var(--white);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-green-strong);
+}
+
+.info-chip {
+  background: var(--soft-surface);
+  border: 1px solid var(--border-soft);
+  color: var(--primary-dark);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.recipe-detail-card,
+.sidebar-card {
+  border-radius: 22px;
+  box-shadow: var(--shadow-strong);
+}
+
+.recipe-hero-image {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 1.5rem;
+}
+
+.content-panel {
+  background: var(--white);
+  border: 1px solid var(--border-soft-alt);
+  border-radius: 18px;
+  padding: 1.4rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-panel);
+}
+
+.ingredients-list .list-group-item {
+  border: 1px solid var(--border-soft-muted);
+  background: var(--soft-surface-5);
+  margin-bottom: 8px;
+  border-radius: 12px !important;
+}
+
+.recipe-highlight {
+  background: var(--soft-surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 1rem;
+  height: 100%;
+}
+
+.notice-item {
+  background: var(--warm-surface);
+  border: 1px solid var(--border-warm);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.step-card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid var(--border-soft-alt);
+  border-radius: 20px;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 1rem;
+}
+
+.step-photo {
+  height: 110px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--soft-surface-2), var(--soft-surface-6));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-green-soft);
+}
+
+.step-number {
+  display: inline-block;
+  background: var(--soft-surface-2);
+  color: var(--primary-dark);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.share-box {
+  background: linear-gradient(135deg, var(--soft-surface-3), var(--soft-surface-2));
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.popular-link {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 14px;
+  transition: 0.25s ease;
+}
+
+.popular-link:hover {
+  background: var(--soft-surface-4);
+}
+
+.popular-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+}
+
+.thumb-1 {
+  background-image: url("https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=500&q=80");
+}
+
+.thumb-2 {
+  background-image: url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=500&q=80");
+}
+
+.thumb-3 {
+  background-image: url("https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=500&q=80");
+}
+
+.thumb-4 {
+  background-image: url("https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=500&q=80");
+}
+
+.thumb-5 {
+  background-image: url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=500&q=80");
+}
+
+.recipe-form-card .form-control {
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.recipe-form-card .form-control:focus {
+  box-shadow: var(--focus-ring);
+  border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .recipe-page-title {
+    font-size: 2.1rem;
+  }
+
+  .step-card {
+    grid-template-columns: 1fr;
+  }
+
+  .recipe-hero-image {
+    height: 300px;
+  }
+}
