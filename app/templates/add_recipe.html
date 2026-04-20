@@ -9,17 +9,44 @@
         <form>
             <div class="mb-3">
                 <label class="form-label">Recipe Title</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" placeholder="Enter recipe title">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-select">
+                    <option selected disabled>Select category</option>
+                    <option>Breakfast</option>
+                    <option>Lunch</option>
+                    <option>Dinner</option>
+                    <option>Dessert</option>
+                    <option>Snack</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cooking Time (minutes)</label>
+                <input type="number" class="form-control" placeholder="e.g. 30">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Recipe Description</label>
+                <textarea class="form-control" rows="3" placeholder="Write a short description"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Ingredients</label>
-                <textarea class="form-control" rows="4"></textarea>
+                <textarea class="form-control" rows="4" placeholder="List ingredients"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Instructions</label>
-                <textarea class="form-control" rows="5"></textarea>
+                <textarea class="form-control" rows="5" placeholder="Write the preparation steps"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Image URL</label>
+                <input type="text" class="form-control" placeholder="Paste recipe image URL">
             </div>
 
             <button class="btn btn-success w-100">Submit Recipe</button>
