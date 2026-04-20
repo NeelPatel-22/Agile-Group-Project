@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} | RecipeHub{% endblock %}
+
+{% block content %}
+<section class="page-section recipe-detail-main">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+
+      <div class="col-lg-8">
+        <article class="card recipe-card">
+          <div class="card-body p-4 p-lg-5">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+              <a
+                href="{{ url_for('main.profile', user_id=recipe.author.id) }}"
+                class="author-link text-decoration-none"
+              >
+                <div class="author-avatar">{{ recipe.author.initials }}</div>
+                <div>
+                  <p class="mb-0 fw-semibold text-dark">{{ recipe.author.name }}</p>
+                  <p class="mb-0 text-muted small">{{ recipe.author.bio }}</p>
+                </div>
+              </a>
+
+              <div class="d-flex flex-wrap gap-2">
+                <span class="info-chip">{{ recipe.category }}</span>
+                <span class="info-chip">{{ recipe.cook_time }} Minutes</span>
+                <span class="info-chip">{{ recipe.servings }} Servings</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <p class="text-uppercase text-muted small fw-semibold mb-1">Recipe Details</p>
+              <h1 class="recipe-page-title mb-3">{{ recipe.title }}</h1>
+              <p class="recipe-page-subtitle mb-0">
+                {{ recipe.description }}
+              </p>
+            </div>
+
+            <img
+              src="{{ recipe.image_url }}"
+              alt="{{ recipe.title }}"
+              class="recipe-hero-image"
+            >
+
+            <div class="content-panel">
+              <div class="row g-4">
+                <div class="col-md-5">
+                  <h3 class="fw-bold mb-3">Ingredients</h3>
+                  <ul class="list-group ingredients-list">
+                    {% for ingredient in recipe.ingredients %}
+                    <li class="list-group-item">{{ ingredient }}</li>
+                    {% endfor %}
+                  </ul>
+                </div>
+
+                <div class="col-md-7">
+                  <h3 class="fw-bold mb-3">Quick Overview</h3>
+                  <p class="text-muted">
+                    {{ recipe.overview }}
+                  </p>
+
+                  <div class="row g-3">
+                    <div class="col-sm-6">
+                      <div class="recipe-highlight">
+                        <small class="text-muted d-block mb-1">Difficulty</small>
+                        <strong>{{ recipe.difficulty }}</strong>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="recipe-highlight">
+                        <small class="text-muted d-block mb-1">Best For</small>
+                        <strong>{{ recipe.best_for }}</strong>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="recipe-highlight">
+                        <small class="text-muted d-block mb-1">Cuisine</small>
+                        <strong>{{ recipe.cuisine }}</strong>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <div class="recipe-highlight">
+                        <small class="text-muted d-block mb-1">Uploaded By</small>
+                        <strong>{{ recipe.author.name }}</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h3 class="fw-bold mb-0">Step-by-Step Method</h3>
+                <span class="text-muted small">Follow the instructions below</span>
+              </div>
+
+              {% for step in recipe.steps %}
+              <div class="step-card {% if loop.last %}mb-0{% endif %}">
+                <div class="step-photo">
+                  <div class="step-icon-wrap">{{ loop.index }}</div>
+                </div>
+                <div>
+                  <span class="step-number">Step {{ loop.index }}</span>
+                  <h5 class="fw-semibold">{{ step.title }}</h5>
+                  <p class="text-muted mb-0">
+                    {{ step.description }}
+                  </p>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <div class="share-box">
+              <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+                <div class="d-flex flex-wrap gap-2">
+                  <a href="#" class="btn custom-btn">Save Recipe</a>
+                  <a href="#" class="btn custom-btn">Like Recipe</a>
+                </div>
+                <a
+                  href="{{ url_for('main.profile', user_id=recipe.author.id) }}"
+                  class="btn btn-outline-success"
+                >
+                  View {{ recipe.author.name }}'s Profile
+                </a>
+              </div>
+            </div>
+
+          </div>
+        </article>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card sidebar-card">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h4 class="fw-bold mb-0">More From {{ recipe.author.name }}</h4>
+              <a
+                href="{{ url_for('main.profile', user_id=recipe.author.id) }}"
+                class="small text-success text-decoration-none"
+              >
+                See profile
+              </a>
+            </div>
+
+            <div class="d-grid gap-3">
+              {% for item in more_recipes %}
+              <a
+                href="{{ url_for('main.recipe_detail', recipe_id=item.id) }}"
+                class="popular-link"
+              >
+                <div
+                  class="popular-thumb"
+                  style="background-image: url('{{ item.image_url }}');"
+                ></div>
+                <div>
+                  <h6 class="mb-1 text-dark">{{ item.title }}</h6>
+                  <p class="text-muted small mb-0">{{ item.description }}</p>
+                </div>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
