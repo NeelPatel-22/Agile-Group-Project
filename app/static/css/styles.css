@@ -6,12 +6,6 @@
   --text-dark: #212529;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --radius: 12px;
-  /* extra recipe detail styling */
-  --muted-text: #6c757d;
-  --soft-green: #eef8f2;
-  --soft-border: #e9ecef;
-  --panel-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  /* extra recipe detail styling */
   --muted-text: #6c757d;
   --soft-green: #eef8f2;
   --soft-border: #e9ecef;
@@ -118,7 +112,6 @@ body {
   padding: 60px 0;
 }
 
-/* Recipe detail page upgrade */
 .recipe-detail-main {
   background: linear-gradient(to bottom, #ffffff 0%, #f8fbf9 100%);
 }
@@ -146,11 +139,7 @@ body {
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--primary-color),
-    var(--primary-dark)
-  );
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   color: white;
   font-weight: 700;
   display: flex;
@@ -167,11 +156,6 @@ body {
   padding: 8px 14px;
   font-size: 0.9rem;
   font-weight: 600;
-}
-
-.recipe-card {
-  border-radius: 22px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.08);
 }
 
 .recipe-hero-image {
@@ -315,28 +299,7 @@ body {
 .thumb-5 {
   background-image: url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=500&q=80");
 }
-.profile-header-card {
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
 
-.profile-stat-card {
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: 0.3s ease;
-}
-
-.profile-stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.profile-avatar {
-  width: 130px;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 4px solid #d1e7dd;
-}
 .profile-header-card {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -365,15 +328,7 @@ body {
     width: 110px;
     height: 110px;
   }
-}
 
-@media (max-width: 768px) {
-  .profile-avatar {
-    width: 110px;
-    height: 110px;
-  }
-}
-@media (max-width: 768px) {
   .hero-title {
     font-size: 2.2rem;
   }
@@ -395,5 +350,9 @@ body {
   .hero-section {
     min-height: 65vh;
     padding: 40px 15px;
+  }
+
+  .step-card {
+    grid-template-columns: 1fr;
   }
 }

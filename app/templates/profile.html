@@ -3,12 +3,9 @@
 {% block title %}Profile | RecipeHub{% endblock %}
 
 {% block content %}
-
 <section class="page-section" style="background-color: var(--light-bg);">
   <div class="container">
     <div class="row g-4">
-      
-      <!-- Left Profile Card -->
       <div class="col-lg-4">
         <div class="card border-0 shadow-sm h-100" style="border-radius: var(--radius);">
           <div class="card-body text-center p-4">
@@ -28,17 +25,14 @@
             </p>
 
             <div class="d-grid gap-2">
-              <a href="#" class="btn btn-success">Edit Profile</a>
-              <a href="#" class="btn btn-outline-success">View Saved Recipes</a>
+              <a href="{{ url_for('main.profile') }}" class="btn btn-success">Edit Profile</a>
+              <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-success">View Saved Recipes</a>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Main Content -->
       <div class="col-lg-8">
-        
-        <!-- Account Overview -->
         <div class="card border-0 shadow-sm mb-4" style="border-radius: var(--radius);">
           <div class="card-body p-4">
             <h3 class="section-title mb-4">Account Overview</h3>
@@ -75,7 +69,6 @@
           </div>
         </div>
 
-        <!-- Stats -->
         <div class="row g-4 mb-4">
           <div class="col-md-4">
             <div class="card border-0 shadow-sm text-center h-100" style="border-radius: var(--radius);">
@@ -105,7 +98,6 @@
           </div>
         </div>
 
-        <!-- Recent Recipes -->
         <div class="card border-0 shadow-sm" style="border-radius: var(--radius);">
           <div class="card-body p-4">
             <h3 class="section-title mb-4">My Recent Recipes</h3>
@@ -124,7 +116,7 @@
                       A quick and easy pasta recipe made with fresh cream, herbs,
                       and garlic for a rich homemade meal.
                     </p>
-                    <a href="#" class="btn btn-success btn-sm">View Recipe</a>
+                    <a href="{{ url_for('main.recipes') }}" class="btn btn-success btn-sm">View Recipe</a>
                   </div>
                 </div>
               </div>
@@ -142,7 +134,7 @@
                       A colorful salad packed with vegetables, topped with a light
                       dressing and perfect for lunch or dinner.
                     </p>
-                    <a href="#" class="btn btn-success btn-sm">View Recipe</a>
+                    <a href="{{ url_for('main.recipes') }}" class="btn btn-success btn-sm">View Recipe</a>
                   </div>
                 </div>
               </div>
@@ -150,7 +142,6 @@
 
           </div>
         </div>
-
       </div>
     </div>
   </div>
