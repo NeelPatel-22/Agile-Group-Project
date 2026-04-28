@@ -19,16 +19,13 @@
               style="width: 130px; height: 130px; object-fit: cover; border: 4px solid #d1e7dd;"
             >
 
-            <h2 class="h4 fw-bold mb-1">Sarah Johnson</h2>
-            <p class="text-muted mb-3">@sarahcooks</p>
+            <h2 class="h4 fw-bold mb-1">{{ user_profile.username|replace('@', '')|title }}</h2>
+            <p class="text-muted mb-3">@{{ user_profile.username|replace('@', '') }}</p>
 
-            <p class="mb-4 text-muted">
-              Passionate home cook who loves sharing easy DIY recipes, healthy meals,
-              and quick kitchen ideas for busy lifestyles.
-            </p>
+            <p class="mb-4 text-muted">{{ user_profile.bio }}</p>
 
             <div class="d-grid gap-2">
-              <a href="#" class="btn btn-success">Edit Profile</a>
+              <a href="{{ url_for('main.edit_profile') }}" class="btn btn-success">Edit Profile</a>
               <a href="#" class="btn btn-outline-success">View Saved Recipes</a>
             </div>
           </div>
@@ -47,14 +44,14 @@
               <div class="col-md-6">
                 <div class="p-3 h-100" style="background-color: #f8f9fa; border-radius: 10px;">
                   <h6 class="fw-bold mb-1">Full Name</h6>
-                  <p class="mb-0 text-muted">Sarah Johnson</p>
+                  <p class="mb-0 text-muted">{{ user_profile.username|replace('@', '')|title }}</p>
                 </div>
               </div>
 
               <div class="col-md-6">
                 <div class="p-3 h-100" style="background-color: #f8f9fa; border-radius: 10px;">
                   <h6 class="fw-bold mb-1">Email</h6>
-                  <p class="mb-0 text-muted">sarah@example.com</p>
+                  <p class="mb-0 text-muted">{{ user_profile.email }}</p>
                 </div>
               </div>
 
