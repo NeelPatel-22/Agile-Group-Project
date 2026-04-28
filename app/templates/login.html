@@ -1,51 +1,38 @@
 {% extends "base.html" %}
-
 {% block title %}Login | RecipeHub{% endblock %}
-
-{% block page_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-{% endblock %}
-
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">{% endblock %}
 {% block body_class %}auth-page-body{% endblock %}
-
 {% block navbar %}{% endblock %}
 {% block footer %}{% endblock %}
-
 {% block content %}
 <section class="auth-split-page">
     <div class="auth-split-layout">
         <div class="auth-visual-panel">
             <div class="auth-visual-overlay">
                 <span class="auth-kicker">RecipeHub</span>
-                <h1>Welcome back.</h1>
-                <p>Sign in to continue exploring recipes and managing your account.</p>
+                <h1>Welcome back to your kitchen space.</h1>
+                <p>Discover recipes, save your favorites, and continue sharing your cooking journey with the community.</p>
             </div>
         </div>
-
         <div class="auth-form-panel">
             <div class="auth-form-card">
                 <div class="auth-form-wrap">
                     <h2>Login</h2>
-                    <p class="text-muted mb-4">Sign in to continue using RecipeHub.</p>
-
+                    <p class="text-muted mb-4">Sign in to see the recipe feed and your saved dishes.</p>
                     {% if error %}
                     <div class="alert alert-danger">{{ error }}</div>
                     {% endif %}
-
                     <form method="POST">
                         <div class="mb-3">
                             <label class="form-label">Email</label>
                             <input type="email" name="email" class="form-control" required>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Password</label>
                             <input type="password" name="password" class="form-control" required>
                         </div>
-
                         <button class="btn btn-success w-100">Login</button>
                     </form>
-
                     <div class="auth-links-row">
                         <a href="{{ url_for('main.signup') }}">Create an account</a>
                         <a href="{{ url_for('main.cover') }}">Return to home page</a>

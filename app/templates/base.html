@@ -19,9 +19,10 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-                    {% if current_user is defined and current_user.is_authenticated %}
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.recipes') }}">Recipes</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.profile', user_id=current_user.id) }}">Profile</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a></li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">Login</a></li>
                     <li class="nav-item"><a class="btn btn-success ms-lg-2" href="{{ url_for('main.signup') }}">Sign up</a></li>
