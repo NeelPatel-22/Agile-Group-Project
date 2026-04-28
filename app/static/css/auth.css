@@ -1,0 +1,122 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f0f0f;
+  padding: 2rem;
+}
+
+.auth-form-panel {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-form-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 2rem;
+  background: #181818;
+  border: 1px solid rgba(245, 197, 66, 0.2);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.45);
+}
+
+.auth-form-wrap {
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+}
+
+.auth-kicker {
+  display: inline-block;
+  margin-bottom: 0.8rem;
+  color: #f5c542;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.auth-form-wrap h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f5c542;
+  margin-bottom: 0.4rem;
+}
+
+.auth-form-wrap .text-muted {
+  color: #c7c7c7 !important;
+}
+
+.auth-form-wrap .form-label {
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+  color: #eeeeee;
+}
+
+.auth-form-wrap .form-control {
+  padding: 0.72rem 0.9rem;
+  background: #101010;
+  color: #ffffff;
+  border: 1px solid #333333;
+  border-radius: 8px;
+}
+
+.auth-form-wrap .form-control:focus {
+  background: #101010;
+  color: #ffffff;
+  border-color: #f5c542;
+  box-shadow: 0 0 0 0.2rem rgba(245, 197, 66, 0.18);
+}
+
+.auth-form-wrap .form-control::placeholder {
+  color: #888888;
+}
+
+.auth-form-wrap .mb-3 {
+  margin-bottom: 0.9rem !important;
+}
+
+.auth-form-wrap .alert {
+  padding: 0.7rem 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.auth-form-wrap .btn-success {
+  background: #f5c542;
+  color: #111111;
+  border: none;
+  font-weight: 700;
+  padding: 0.72rem 0.9rem;
+  border-radius: 8px;
+}
+
+.auth-form-wrap .btn-success:hover {
+  background: #ffd95c;
+  color: #000000;
+}
+
+.auth-links-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.15rem;
+}
+
+.auth-links-row a {
+  color: #f5c542;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.94rem;
+}
+
+.auth-links-row a:hover {
+  color: #ffd95c;
+}
+
+.auth-page-body .site-main {
+  display: flex;
+}
