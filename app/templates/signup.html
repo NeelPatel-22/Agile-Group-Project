@@ -2,28 +2,71 @@
 
 {% block title %}Sign Up | RecipeHub{% endblock %}
 
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+{% endblock %}
+
+{% block body_class %}auth-page-body{% endblock %}
+
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+
 {% block content %}
-<div class="container page-section">
-    <div class="form-container">
-        <h2 class="text-center mb-4">Sign Up</h2>
-        <form>
-            <div class="mb-3">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" placeholder="Choose a username">
-            </div>
+<section class="auth-page">
 
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" placeholder="Enter your email">
-            </div>
+    <div class="auth-form-panel">
+        <div class="auth-form-card">
+            <div class="auth-form-wrap">
 
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" placeholder="Create a password">
-            </div>
+                <span class="auth-kicker">RecipeHub</span>
+                <h2>Sign Up</h2>
 
-            <button class="btn btn-success w-100">Create Account</button>
-        </form>
+                <p class="text-muted mb-4">
+                    Create your RecipeHub account to start posting and saving recipes.
+                </p>
+
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="bio" class="form-control" rows="3" placeholder="Tell people about your cooking style"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Profile image</label>
+                        <input type="file" name="profile_image" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">Sign Up</button>
+                </form>
+
+                <div class="auth-links-row">
+                    <a href="{{ url_for('main.login') }}">Already have an account?</a>
+                    <a href="{{ url_for('main.cover') }}">Return home</a>
+                </div>
+
+            </div>
+        </div>
     </div>
-</div>
+
+</section>
 {% endblock %}
