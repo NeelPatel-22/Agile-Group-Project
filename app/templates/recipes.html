@@ -1,115 +1,252 @@
 {% extends "base.html" %}
-
 {% block title %}Recipes | RecipeHub{% endblock %}
-
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">{% endblock %}
+{% block body_class %}recipe-feed-page{% endblock %}
 {% block content %}
-<section class="page-section recipes-page">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h1 class="section-title">Explore Recipes</h1>
-      <p class="text-muted recipes-subtitle">
-        Browse delicious recipes shared by our community, search for your next meal,
-        and discover new cooks to follow.
-      </p>
-    </div>
+<section class="page-section recipe-detail-main">
+    <div class="container">
+        <div class="recipe-discovery-layout">
+            <aside class="recipe-search-column">
+                <div class="recipe-detail-card recipe-page-panel recipe-search-panel">
+                    <div class="card-body p-4">
+                        <div class="recipe-page-intro">
+                            <div class="title-block mb-0">
+                                <p class="eyebrow">Advanced Search</p>
+                                <h1 class="recipe-page-title recipe-search-title mb-1">Find recipes faster</h1>
+                                <p class="recipe-page-subtitle mb-0">Filter by type, difficulty, spice, and cooking details.</p>
+                            </div>
 
-    <div class="recipes-toolbar mb-5">
-      <form class="row g-3 align-items-center" method="GET" action="{{ url_for('main.recipes') }}">
-        <div class="col-lg-6">
-          <input
-            type="text"
-            class="form-control recipes-search-input"
-            name="q"
-            placeholder="Search recipes by name, ingredient, or category..."
-            value="{{ request.args.get('q', '') }}"
-          >
-        </div>
+                            <form method="GET" class="recipe-advanced-form">
+                                <div class="recipe-filter-group">
+                                    <label class="form-label" for="recipe-search-query">Keyword</label>
+                                    <input id="recipe-search-query" type="text" name="q" value="pasta" class="form-control" placeholder="Search title, ingredients, flavor, or use">
+                                </div>
 
-        <div class="col-md-6 col-lg-3">
-          <select class="form-select" name="category">
-            <option value="">All Categories</option>
-            <option value="Breakfast" {% if request.args.get('category') == 'Breakfast' %}selected{% endif %}>Breakfast</option>
-            <option value="Lunch" {% if request.args.get('category') == 'Lunch' %}selected{% endif %}>Lunch</option>
-            <option value="Dinner" {% if request.args.get('category') == 'Dinner' %}selected{% endif %}>Dinner</option>
-            <option value="Dessert" {% if request.args.get('category') == 'Dessert' %}selected{% endif %}>Dessert</option>
-            <option value="Snack" {% if request.args.get('category') == 'Snack' %}selected{% endif %}>Snack</option>
-          </select>
-        </div>
+                                <div class="recipe-filter-group">
+                                    <label class="form-label" for="recipe-category">Category</label>
+                                    <select id="recipe-category" name="category" class="form-select">
+                                        <option value="">All categories</option>
+                                        <option selected>Comfort Food</option>
+                                        <option>Salad</option>
+                                        <option>Breakfast</option>
+                                        <option>Dessert</option>
+                                    </select>
+                                </div>
 
-        <div class="col-md-6 col-lg-3 d-grid">
-          <button type="submit" class="btn btn-success">Search Recipes</button>
-        </div>
-      </form>
-    </div>
+                                <div class="recipe-filter-group">
+                                    <label class="form-label" for="recipe-skill-level">Skill Level</label>
+                                    <select id="recipe-skill-level" name="skill_level" class="form-select">
+                                        <option value="">Any skill level</option>
+                                        <option selected>Beginner friendly</option>
+                                        <option>Intermediate</option>
+                                        <option>Weekend project</option>
+                                    </select>
+                                </div>
 
-    <div class="row g-4">
-      {% for recipe in recipes %}
-      <div class="col-md-6 col-lg-4">
-        <div class="card recipe-list-card h-100">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="recipe-image-link">
-            <img
-              src="{{ recipe.image_url }}"
-              class="card-img-top"
-              alt="{{ recipe.title }}"
-            >
-          </a>
+                                <div class="recipe-filter-group">
+                                    <label class="form-label" for="recipe-spice-level">Spice Level</label>
+                                    <select id="recipe-spice-level" name="spice_level" class="form-select">
+                                        <option value="">Any spice level</option>
+                                        <option selected>Mild</option>
+                                        <option>Medium</option>
+                                        <option>Hot</option>
+                                    </select>
+                                </div>
 
-          <div class="card-body d-flex flex-column">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="recipe-category-badge">{{ recipe.category }}</span>
-              <span class="recipe-time">{{ recipe.cook_time }} mins</span>
+                                <div class="recipe-filter-grid">
+                                    <div class="recipe-filter-group">
+                                        <label class="form-label" for="recipe-cook-time">Cook Time</label>
+                                        <input id="recipe-cook-time" type="text" name="cook_time" value="30 min" class="form-control" placeholder="30 min">
+                                    </div>
+                                    <div class="recipe-filter-group">
+                                        <label class="form-label" for="recipe-servings">Servings</label>
+                                        <input id="recipe-servings" type="text" name="servings" value="4 people" class="form-control" placeholder="2 people">
+                                    </div>
+                                </div>
+
+                                <div class="recipe-filter-group">
+                                    <label class="form-label" for="recipe-best-for">Best For</label>
+                                    <input id="recipe-best-for" type="text" name="best_for" value="Weeknight dinner" class="form-control" placeholder="Weeknight dinner, meal prep, brunch">
+                                </div>
+
+                                <div class="recipe-search-actions">
+                                    <button class="btn btn-success" type="submit">Apply filters</button>
+                                    <a href="#" class="btn btn-outline-secondary">Clear</a>
+                                </div>
+                            </form>
+
+                            <div class="recipe-search-summary">
+                                <span>3 recipes found</span>
+                                <span>4 filters active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="recipe-feed-column">
+                <div class="recipe-feed-header">
+                    <div>
+                        <p class="eyebrow">Recipe Feed</p>
+                        <h2 class="recipe-feed-title mb-1">Explore recipes from the community</h2>
+                        <p class="recipe-feed-copy mb-0">Scroll the feed, comment on posts, and open a recipe when you want the full ingredients and method.</p>
+                    </div>
+                </div>
+
+                <div class="recipe-list">
+                    <article class="recipe-card" data-recipe-id="101">
+                        <div class="card recipe-detail-card h-100">
+                            <div class="card-body p-4">
+                                <div class="top-meta">
+                                    <div class="author-link">
+                                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Ava Patel" class="recipe-author-image">
+                                        <div>
+                                            <p class="author-name">Ava Patel</p>
+                                            <p class="author-role">Home cook and meal prep fan</p>
+                                        </div>
+                                    </div>
+                                    <div class="chip-group">
+                                        <span class="info-chip">Comfort Food</span>
+                                        <span class="info-chip">30 Minutes</span>
+                                        <span class="info-chip">4 Servings</span>
+                                    </div>
+                                </div>
+
+                                <div class="title-block">
+                                    <p class="eyebrow">Community Recipe</p>
+                                    <h3 class="recipe-page-title recipe-card-title">
+                                        <a href="#" class="recipe-detail-link">Creamy Garlic Pasta</a>
+                                    </h3>
+                                    <p class="recipe-page-subtitle recipe-card-summary">A smooth, cozy pasta with garlic, parmesan, and a bright lemon finish for quick weeknight dinners.</p>
+                                </div>
+
+                                <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=80" alt="Creamy garlic pasta" class="recipe-hero-image">
+
+                                <div class="recipe-card-toolbar">
+                                    <span class="recipe-date">18 Apr 2026</span>
+                                    <a href="#" class="btn btn-outline-success btn-sm">View recipe</a>
+                                </div>
+
+                                <div class="share-box">
+                                    <div class="recipe-actions">
+                                        <button class="btn btn-action like-btn active" data-recipe-id="101">Like Recipe <span class="like-count">42</span></button>
+                                        <button class="btn btn-action save-btn" data-recipe-id="101">Save Recipe <span class="save-count">18</span></button>
+                                        <span class="comment-counter">6 comments</span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-section">
+                                    <form class="comment-form" data-recipe-id="101">
+                                        <div class="input-group">
+                                            <input type="text" name="content" class="form-control" placeholder="Write a comment">
+                                            <button class="btn btn-dark">Post</button>
+                                        </div>
+                                    </form>
+                                    <div class="comment-list mt-3">
+                                        <div class="comment-item">
+                                            <strong>Mia</strong>
+                                            <span>Made this last night and the lemon was perfect.</span>
+                                        </div>
+                                        <div class="comment-item">
+                                            <strong>Jordan</strong>
+                                            <span>Adding this to my Sunday meal plan.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="recipe-card" data-recipe-id="102">
+                        <div class="card recipe-detail-card h-100">
+                            <div class="card-body p-4">
+                                <div class="top-meta">
+                                    <div class="author-link">
+                                        <div class="author-avatar">RS</div>
+                                        <div>
+                                            <p class="author-name">Riley Smith</p>
+                                            <p class="author-role">Weekend baker</p>
+                                        </div>
+                                    </div>
+                                    <div class="chip-group">
+                                        <span class="info-chip">Breakfast</span>
+                                        <span class="info-chip">20 Minutes</span>
+                                        <span class="info-chip">2 Servings</span>
+                                    </div>
+                                </div>
+
+                                <div class="title-block">
+                                    <p class="eyebrow">Community Recipe</p>
+                                    <h3 class="recipe-page-title recipe-card-title">
+                                        <a href="#" class="recipe-detail-link">Golden Breakfast Plate</a>
+                                    </h3>
+                                    <p class="recipe-page-subtitle recipe-card-summary">Crispy toast, soft eggs, roasted tomatoes, and herbs for a balanced start to the morning.</p>
+                                </div>
+
+                                <img src="https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80" alt="Golden breakfast plate" class="recipe-hero-image">
+
+                                <div class="recipe-card-toolbar">
+                                    <span class="recipe-date">11 Apr 2026</span>
+                                    <a href="#" class="btn btn-outline-success btn-sm">View recipe</a>
+                                </div>
+
+                                <div class="share-box">
+                                    <div class="recipe-actions">
+                                        <button class="btn btn-action like-btn" data-recipe-id="102">Like Recipe <span class="like-count">27</span></button>
+                                        <button class="btn btn-action save-btn active" data-recipe-id="102">Save Recipe <span class="save-count">14</span></button>
+                                        <span class="comment-counter">3 comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="recipe-card" data-recipe-id="103">
+                        <div class="card recipe-detail-card h-100">
+                            <div class="card-body p-4">
+                                <div class="top-meta">
+                                    <div class="author-link">
+                                        <img src="https://images.unsplash.com/photo-1502685104226-ee32379fefbe?auto=format&fit=crop&w=300&q=80" alt="Noor Khan" class="recipe-author-image">
+                                        <div>
+                                            <p class="author-name">Noor Khan</p>
+                                            <p class="author-role">Fresh food explorer</p>
+                                        </div>
+                                    </div>
+                                    <div class="chip-group">
+                                        <span class="info-chip">Salad</span>
+                                        <span class="info-chip">15 Minutes</span>
+                                        <span class="info-chip">3 Servings</span>
+                                    </div>
+                                </div>
+
+                                <div class="title-block">
+                                    <p class="eyebrow">Community Recipe</p>
+                                    <h3 class="recipe-page-title recipe-card-title">
+                                        <a href="#" class="recipe-detail-link">Crunchy Garden Bowl</a>
+                                    </h3>
+                                    <p class="recipe-page-subtitle recipe-card-summary">A colorful salad bowl with cucumber, chickpeas, greens, toasted seeds, and a tangy yogurt dressing.</p>
+                                </div>
+
+                                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=80" alt="Crunchy garden bowl" class="recipe-hero-image">
+
+                                <div class="recipe-card-toolbar">
+                                    <span class="recipe-date">05 Apr 2026</span>
+                                    <a href="#" class="btn btn-outline-success btn-sm">View recipe</a>
+                                </div>
+
+                                <div class="share-box">
+                                    <div class="recipe-actions">
+                                        <button class="btn btn-action like-btn" data-recipe-id="103">Like Recipe <span class="like-count">35</span></button>
+                                        <button class="btn btn-action save-btn" data-recipe-id="103">Save Recipe <span class="save-count">21</span></button>
+                                        <span class="comment-counter">4 comments</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
             </div>
-
-            <h5 class="card-title recipe-list-title">
-              <a
-                href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
-                class="recipe-title-link"
-              >
-                {{ recipe.title }}
-              </a>
-            </h5>
-
-            <p class="card-text text-muted recipe-list-desc">
-              {{ recipe.description }}
-            </p>
-
-            <div class="recipe-meta mt-auto">
-              <div class="d-flex justify-content-between align-items-center">
-                <a
-                  href="{{ url_for('main.profile', user_id=recipe.author.id) }}"
-                  class="recipe-author-link"
-                >
-                  <div class="author-avatar-sm">
-                    {{ recipe.author.initials }}
-                  </div>
-                  <div>
-                    <p class="mb-0 fw-semibold text-dark">{{ recipe.author.name }}</p>
-                    <small class="text-muted">View profile</small>
-                  </div>
-                </a>
-
-                <a
-                  href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
-                  class="btn btn-outline-success btn-sm"
-                >
-                  View Recipe
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
-      {% else %}
-      <div class="col-12">
-        <div class="empty-state-box text-center">
-          <h4 class="fw-bold mb-2">No recipes found</h4>
-          <p class="text-muted mb-0">
-            Try searching with a different keyword or explore another category.
-          </p>
-        </div>
-      </div>
-      {% endfor %}
     </div>
-  </div>
 </section>
 {% endblock %}
