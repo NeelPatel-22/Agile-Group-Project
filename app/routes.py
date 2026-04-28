@@ -308,8 +308,8 @@ def get_recipes_by_user(user_id):
 
 
 @main.route("/")
-def home():
-    return render_template("index.html")
+def cover():
+    return render_template("cover.html")
 
 
 @main.route("/recipes")
