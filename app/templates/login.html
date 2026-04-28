@@ -2,23 +2,38 @@
 
 {% block title %}Login | RecipeHub{% endblock %}
 
+{% block page_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container page-section">
-    <div class="form-container">
-        <h2 class="text-center mb-4">Login</h2>
-        <form>
+<div class="login-page">
+    <div class="login-card">
+        <h2>Login</h2>
+        <p>Sign in to continue using RecipeHub.</p>
+
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-control" placeholder="Enter your email">
+                <input type="email" name="email" class="form-control" required>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Password</label>
-                <input type="password" class="form-control" placeholder="Enter your password">
+                <input type="password" name="password" class="form-control" required>
             </div>
 
             <button class="btn btn-success w-100">Login</button>
         </form>
+
+        <div class="login-links">
+            <a href="{{ url_for('main.signup') }}">Create an account</a>
+            <a href="{{ url_for('main.cover') }}">Return to home page</a>
+        </div>
     </div>
 </div>
 {% endblock %}
