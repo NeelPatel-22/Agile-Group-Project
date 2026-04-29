@@ -1,0 +1,56 @@
+<article class="recipe-card" data-recipe-id="101">
+    <div class="card recipe-detail-card h-100">
+        <div class="card-body p-4">
+            <div class="top-meta">
+                <div class="author-link">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Ava Patel" class="recipe-author-image">
+                    <div>
+                        <p class="author-name">Ava Patel</p>
+                        <p class="author-role">Home cook and meal prep fan</p>
+                    </div>
+                </div>
+
+                <div class="chip-group">
+                    <span class="info-chip">Comfort Food</span>
+                    <span class="info-chip">30 Minutes</span>
+                    <span class="info-chip">4 Servings</span>
+                </div>
+            </div>
+
+            <div class="title-block">
+                <p class="eyebrow">Community Recipe</p>
+                <h3 class="recipe-page-title recipe-card-title">
+                    <a href="#" class="recipe-detail-link">Creamy Garlic Pasta</a>
+                </h3>
+                <p class="recipe-page-subtitle recipe-card-summary">A smooth, cozy pasta with garlic, parmesan, and a bright lemon finish for quick weeknight dinners.</p>
+            </div>
+
+            <img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=80" alt="Creamy garlic pasta" class="recipe-hero-image">
+
+            <div class="recipe-card-toolbar">
+                <span class="recipe-date">18 Apr 2026</span>
+                <a href="#" class="btn btn-outline-success btn-sm">View recipe</a>
+            </div>
+
+            <div class="share-box">
+                <div class="recipe-actions">
+                    <button class="btn btn-action like-btn active" data-recipe-id="101">Like Recipe <span class="like-count">42</span></button>
+                    <button class="btn btn-action save-btn" data-recipe-id="101">Save Recipe <span class="save-count">18</span></button>
+                    <span class="comment-counter">6 comments</span>
+                </div>
+            </div>
+
+            <div class="comment-section">
+                <form class="comment-form" data-recipe-id="101">
+                    <div class="input-group">
+                        <input type="text" name="content" class="form-control" placeholder="Write a comment">
+                        <button class="btn btn-dark">Post</button>
+                    </div>
+                </form>
+                <div class="comment-list mt-3">
+                    {% include "partials/comment_item.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
