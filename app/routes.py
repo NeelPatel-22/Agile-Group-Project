@@ -1,205 +1,21 @@
-import re
-import smtplib
-import socket
-from email.message import EmailMessage
-from html import escape
-
-from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, abort, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user
-from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from itsdangerous import BadSignature, SignatureExpired
 
 from . import db
+from .helpers.email_helpers import (
+    get_email_from_confirmation_token,
+    is_valid_email,
+    send_confirmation_email,
+)
+from .helpers.recipe_helpers import (
+    get_more_recipes_by_author,
+    get_recipe_by_id,
+    get_recipes_by_user,
+    get_user_by_id,
+)
 from .models import User
 main = Blueprint("main", __name__)
-
-users = [
-    {
-        "id": 1,
-        "name": "Mia Lee",
-        "initials": "ML",
-        "bio": "Home Cook and Weekend Baker",
-        "location": "Perth, Australia",
-        "email": "mia.lee@example.com",
-        "avatar_url": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80",
-        "followers": 128,
-        "likes_received": 342,
-    },
-    {
-        "id": 2,
-        "name": "Daniel Wong",
-        "initials": "DW",
-        "bio": "Food lover sharing quick and easy meals",
-        "location": "Sydney, Australia",
-        "email": "daniel.wong@example.com",
-        "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
-        "followers": 96,
-        "likes_received": 221,
-    },
-]
-
-recipes_data = [
-    {
-        "id": 1,
-        "title": "Creamy Roasted Pumpkin Pasta",
-        "description": "A silky pumpkin sauce with roasted garlic and crispy sage.",
-        "category": "Dinner",
-        "cook_time": 35,
-        "image_url": "https://images.unsplash.com/photo-1516100882582-96c3a05fe590?auto=format&fit=crop&w=1200&q=80",
-        "author_id": 1,
-    },
-    {
-        "id": 2,
-        "title": "Berry Yogurt Pancakes",
-        "description": "Soft and fluffy pancakes topped with yogurt and fresh berries.",
-        "category": "Breakfast",
-        "cook_time": 20,
-        "image_url": "https://images.unsplash.com/photo-1482049016688-2d3e1b311543?auto=format&fit=crop&w=1200&q=80",
-        "author_id": 1,
-    },
-    {
-        "id": 3,
-        "title": "Honey Soy Chicken Bowl",
-        "description": "A quick rice bowl with glazed chicken and steamed greens.",
-        "category": "Lunch",
-        "cook_time": 30,
-        "image_url": "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80",
-        "author_id": 2,
-    },
-]
-
-EMAIL_PATTERN = re.compile(r"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$", re.IGNORECASE)
-CONFIRM_EMAIL_SALT = "confirm-email"
-
-
-def get_user_by_id(user_id):
-    for user in users:
-        if user["id"] == user_id:
-            return user
-    return None
-
-
-def get_recipe_by_id(recipe_id):
-    for recipe in recipes_data:
-        if recipe["id"] == recipe_id:
-            return recipe
-    return None
-
-
-def get_recipes_by_user(user_id):
-    return [recipe for recipe in recipes_data if recipe["author_id"] == user_id]
-
-
-def is_valid_email(email):
-    if not email or not EMAIL_PATTERN.match(email):
-        return False
-
-    domain = email.rsplit("@", 1)[1]
-
-    try:
-        import dns.resolver
-
-        dns.resolver.resolve(domain, "MX")
-        return True
-    except ImportError:
-        pass
-    except Exception:
-        return False
-
-    try:
-        socket.getaddrinfo(domain, None)
-        return True
-    except socket.gaierror:
-        return False
-
-
-def generate_confirmation_token(email):
-    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
-    return serializer.dumps(email, salt=CONFIRM_EMAIL_SALT)
-
-
-def get_email_from_confirmation_token(token, max_age=86400):
-    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
-    return serializer.loads(token, salt=CONFIRM_EMAIL_SALT, max_age=max_age)
-
-
-def send_confirmation_email(user):
-    token = generate_confirmation_token(user.email)
-    confirmation_url = url_for("main.confirm_email", token=token, _external=True)
-    subject = "Confirm your RecipeHub email"
-    safe_username = escape(user.username)
-    safe_confirmation_url = escape(confirmation_url, quote=True)
-    html_body = f"""
-    <!doctype html>
-    <html lang="en">
-    <body style="margin:0; padding:0; background:#f4f7f2; font-family:Arial, sans-serif; color:#203126;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f7f2; padding:32px 12px;">
-            <tr>
-                <td align="center">
-                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px; background:#ffffff; border-radius:12px; overflow:hidden; border:1px solid #dfe8db;">
-                        <tr>
-                            <td style="background:#2f7d46; padding:28px 32px; color:#ffffff;">
-                                <div style="font-size:14px; letter-spacing:1px; text-transform:uppercase;">RecipeHub</div>
-                                <h1 style="margin:10px 0 0; font-size:28px; line-height:1.25;">Confirm your email</h1>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding:32px;">
-                                <p style="margin:0 0 16px; font-size:16px; line-height:1.6;">Hi {safe_username},</p>
-                                <p style="margin:0 0 24px; font-size:16px; line-height:1.6;">
-                                    Welcome to RecipeHub. Confirm your email address to finish setting up your account and start exploring recipes.
-                                </p>
-                                <p style="margin:0 0 28px;">
-                                    <a href="{safe_confirmation_url}" style="display:inline-block; background:#2f7d46; color:#ffffff; text-decoration:none; padding:14px 22px; border-radius:8px; font-weight:bold;">
-                                        Confirm email
-                                    </a>
-                                </p>
-                                <p style="margin:0 0 12px; font-size:14px; line-height:1.6; color:#5d6b61;">
-                                    This link expires in 24 hours. If the button does not work, copy and paste this link into your browser:
-                                </p>
-                                <p style="margin:0; font-size:13px; line-height:1.6; word-break:break-all;">
-                                    <a href="{safe_confirmation_url}" style="color:#2f7d46;">{safe_confirmation_url}</a>
-                                </p>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </body>
-    </html>
-    """
-
-    body = (
-        f"Hi {user.username},\n\n"
-        "Welcome to RecipeHub. Please confirm your account by opening this link:\n"
-        f"{confirmation_url}\n\n"
-        "This link expires in 24 hours.\n\n"
-        "If you did not create this account, you can ignore this email."
-    )
-
-    mail_server = current_app.config.get("MAIL_SERVER")
-    mail_username = current_app.config.get("MAIL_USERNAME")
-    mail_password = current_app.config.get("MAIL_PASSWORD")
-
-    if not mail_server:
-        print(f"Email confirmation link for {user.email}: {confirmation_url}")
-        return confirmation_url
-
-    message = EmailMessage()
-    message["Subject"] = subject
-    message["From"] = current_app.config["MAIL_DEFAULT_SENDER"]
-    message["To"] = user.email
-    message.set_content(body)
-    message.add_alternative(html_body, subtype="html")
-
-    with smtplib.SMTP(mail_server, current_app.config["MAIL_PORT"]) as smtp:
-        if current_app.config["MAIL_USE_TLS"]:
-            smtp.starttls()
-        if mail_username and mail_password:
-            smtp.login(mail_username, mail_password)
-        smtp.send_message(message)
-
-    return confirmation_url
  
 @main.route("/")
 def cover():
@@ -219,7 +35,9 @@ def recipe_detail(recipe_id):
     recipe = get_recipe_by_id(recipe_id)
     if not recipe:
         abort(404)
-    return render_template("recipe_detail.html", recipe=recipe)
+
+    more_recipes = get_more_recipes_by_author(recipe["author"]["id"], recipe["id"])
+    return render_template("recipe_detail.html", recipe=recipe, more_recipes=more_recipes)
  
  
 @main.route("/login", methods=["GET", "POST"])
