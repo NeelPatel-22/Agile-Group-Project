@@ -87,13 +87,21 @@
             <p class="card-text text-muted recipe-list-desc">
               {{ recipe.description }}
             </p>
-            <div class="mt-auto d-flex justify-content-between align-items-center">
-              <span class="text-muted small">{{ recipe.cook_time }} mins</span>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted small">{{ recipe.cook_time }} mins</span>
+                <a
+                  href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
+                  class="btn btn-outline-success btn-sm"
+                >
+                  View Recipe
+                </a>
+              </div>
               <a
-                href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
-                class="btn btn-outline-success btn-sm"
+                href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}"
+                class="btn btn-success btn-sm w-100"
               >
-                View Recipe
+                Edit Recipe
               </a>
             </div>
           </div>

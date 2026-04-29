@@ -27,14 +27,102 @@ def cover():
  
 @main.route("/recipes")
 def recipes():
-    return render_template("recipes.html", recipes=[])
+      return render_template("recipes.html", recipes=[])
  
  
 @main.route("/recipes/<int:recipe_id>")
 def recipe_detail(recipe_id):
-    recipe = get_recipe_by_id(recipe_id)
+    recipe = get_recipe_with_author(recipe_id)
     if not recipe:
         abort(404)
+
+    more_recipes = [
+        attach_author(item)
+        for item in recipes_data
+        if item["author_id"] == recipe["author"]["id"] and item["id"] != recipe_id
+    ]
+    return render_template(
+        "recipe_detail.html",
+        recipe=recipe,
+        more_recipes=more_recipes,
+    )
+
+
+@main.route("/recipes/<int:recipe_id>/edit", methods=["GET", "POST"])
+def edit_recipe(recipe_id):
+    recipe = get_recipe_by_id(recipe_id)
+
+    if not recipe:
+        abort(404)
+
+    error = None
+    success = None
+    form_recipe = recipe_to_form(recipe)
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        category = request.form.get("category", "").strip()
+        cook_time_raw = request.form.get("cook_time", "").strip()
+        servings_raw = request.form.get("servings", "").strip()
+        description = request.form.get("description", "").strip()
+        ingredients_raw = request.form.get("ingredients", "").strip()
+        steps_raw = request.form.get("steps", "").strip()
+
+        form_recipe = {
+            "id": recipe["id"],
+            "title": title,
+            "category": category,
+            "cook_time": cook_time_raw,
+            "servings": servings_raw,
+            "description": description,
+            "why_people_love_it": request.form.get("why_people_love_it", "").strip(),
+            "flavor_notes": request.form.get("flavor_notes", "").strip(),
+            "skill_level": request.form.get("skill_level", "").strip(),
+            "best_for": request.form.get("best_for", "").strip(),
+            "pair_with": request.form.get("pair_with", "").strip(),
+            "spice_level": request.form.get("spice_level", "").strip(),
+            "dietary_cautions": request.form.get("dietary_cautions", "").strip(),
+            "ingredients": ingredients_raw,
+            "steps": steps_raw,
+            "image_url": request.form.get("image_url", "").strip() or recipe.get("image_url", ""),
+        }
+
+        if not title or not description or not ingredients_raw or not steps_raw:
+            error = "Title, description, ingredients, and steps are required."
+        else:
+            ingredient_lines = [line.strip() for line in ingredients_raw.splitlines() if line.strip()]
+            step_lines = [line.strip() for line in steps_raw.splitlines() if line.strip()]
+
+            recipe["title"] = title
+            recipe["category"] = category or recipe.get("category", "")
+            recipe["cook_time"] = int(cook_time_raw) if cook_time_raw.isdigit() else cook_time_raw
+            recipe["servings"] = int(servings_raw) if servings_raw.isdigit() else servings_raw
+            recipe["description"] = description
+            recipe["overview"] = description
+            recipe["why_people_love_it"] = form_recipe["why_people_love_it"]
+            recipe["flavor_notes"] = form_recipe["flavor_notes"]
+            recipe["skill_level"] = form_recipe["skill_level"]
+            recipe["difficulty"] = form_recipe["skill_level"] or recipe.get("difficulty", "")
+            recipe["best_for"] = form_recipe["best_for"]
+            recipe["pair_with"] = form_recipe["pair_with"]
+            recipe["spice_level"] = form_recipe["spice_level"]
+            recipe["dietary_cautions"] = form_recipe["dietary_cautions"]
+            recipe["ingredients"] = ingredient_lines
+            recipe["steps"] = [
+                {"title": f"Step {index}", "description": step}
+                for index, step in enumerate(step_lines, start=1)
+            ]
+            recipe["image_url"] = form_recipe["image_url"]
+            form_recipe = recipe_to_form(recipe)
+            success = "Recipe changes saved."
+
+    return render_template(
+        "edit_recipe.html",
+        recipe=form_recipe,
+        error=error,
+        success=success,
+    )
+
 
     more_recipes = get_more_recipes_by_author(recipe["author"]["id"], recipe["id"])
     return render_template("recipe_detail.html", recipe=recipe, more_recipes=more_recipes)
