@@ -13,7 +13,11 @@
     {% block navbar %}
     <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
         <div class="container">
+            {% if current_user.is_authenticated %}
+            <span class="navbar-brand fw-bold brand-mark">RecipeHub</span>
+            {% else %}
             <a class="navbar-brand fw-bold brand-mark" href="{{ url_for('main.cover') }}">RecipeHub</a>
+            {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,7 +26,6 @@
                     {% if current_user.is_authenticated %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.recipes') }}">Recipes</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.profile', user_id=current_user.id) }}">Profile</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.logout') }}">Logout</a></li>
                     {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('main.login') }}">Login</a></li>
                     <li class="nav-item"><a class="btn btn-success ms-lg-2" href="{{ url_for('main.signup') }}">Sign up</a></li>
