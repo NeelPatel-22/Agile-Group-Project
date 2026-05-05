@@ -103,6 +103,27 @@
   box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.14);
 }
 
+.upload-preview {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background: var(--white);
+}
+
+.upload-preview img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+#recipe-create-message.success {
+  color: var(--primary-dark);
+}
+
+#recipe-create-message.error {
+  color: #b02a37;
+}
+
 @media (max-width: 768px) {
   .meta-grid {
     grid-template-columns: 1fr;
