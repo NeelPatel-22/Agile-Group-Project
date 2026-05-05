@@ -2,6 +2,11 @@
 {% block title %}Edit Profile | RecipeHub{% endblock %}
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_profile.css') }}">{% endblock %}
 {% block content %}
+{% set mock_profile = {
+  "username": "ChefMia",
+  "email": "chefmia@example.com",
+  "bio": "Home cook focused on simple comfort food, fresh ingredients, and easy weeknight recipes."
+} %}
 <section class="page-section profile-page">
   <div class="container">
     <div class="add-recipe-shell">
@@ -12,29 +17,22 @@
               <h2 class="section-title">Edit Profile</h2>
               <p class="profile-bio mb-0">Update your username, bio, email, and profile image.</p>
             </div>
-            <a href="{{ url_for('main.profile', user_id=user.id) }}" class="btn btn-outline">Back to Profile</a>
+            <a href="#" class="btn btn-outline">Back to Profile</a>
           </div>
-
-          {% if error %}
-          <div class="alert alert-danger">{{ error }}</div>
-          {% endif %}
-          {% if success %}
-          <div class="alert alert-success">{{ success }}</div>
-          {% endif %}
 
           <form method="POST" enctype="multipart/form-data">
             <div class="meta-grid form-grid">
               <div>
                 <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" value="{{ user.name }}" required>
+                <input type="text" name="username" class="form-control" value="{{ mock_profile.username }}" required>
               </div>
               <div>
                 <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                <input type="email" name="email" class="form-control" value="{{ mock_profile.email }}" required>
               </div>
               <div class="full-span">
                 <label class="form-label">Description</label>
-                <textarea name="bio" class="form-control" rows="4" placeholder="Tell people about your cooking style">{{ user.bio }}</textarea>
+                <textarea name="bio" class="form-control" rows="4" placeholder="Tell people about your cooking style">{{ mock_profile.bio }}</textarea>
               </div>
               <div class="full-span">
                 <label class="form-label">Profile image</label>
