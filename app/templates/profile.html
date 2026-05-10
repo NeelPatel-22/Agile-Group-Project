@@ -59,6 +59,21 @@
               <h3>Recipes Shared</h3>
               <p>{{ own_recipes|length }} Recipes</p>
             </div>
+            {% if current_user.id == user.id %}
+              <a href="{{ url_for('main.saved_recipes', user_id=user.id) }}" class="profile-meta-card profile-meta-link">
+                <h3>Saved Recipes</h3>
+                <p>{{ saved_recipes_count }} Saved</p>
+              </a>
+            {% else %}
+              <div class="profile-meta-card">
+                <h3>Saved Recipes</h3>
+                <p>{{ saved_recipes_count }} Saved</p>
+              </div>
+            {% endif %}
+            <div class="profile-meta-card">
+              <h3>Recipe Likes</h3>
+              <p>{{ likes_received }} Likes</p>
+            </div>
           </div>
 
           <div class="profile-summary-card">
@@ -98,6 +113,7 @@
                   {% if recipe.category %}<span>{{ recipe.category }}</span>{% endif %}
                   {% if recipe.cook_time %}<span>{{ recipe.cook_time }}</span>{% endif %}
                   {% if recipe.servings %}<span>{{ recipe.servings }}</span>{% endif %}
+                  <span>{{ recipe.likes|length }} Likes</span>
                 </div>
                 <h3>{{ recipe.title }}</h3>
                 <p>{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
