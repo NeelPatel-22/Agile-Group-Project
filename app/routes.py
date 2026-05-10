@@ -18,7 +18,7 @@ from .helpers.recipe_helpers import (
     get_recipes_by_user,
     get_user_by_id,
 )
-from .models import User
+from .models import Recipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -232,9 +232,63 @@ def logout():
     return redirect(url_for("main.cover"))
  
  
-@main.route("/add-recipe")
+@main.route("/add-recipe", methods=["GET", "POST"])
+@login_required
 def add_recipe():
-    return render_template("add_recipe.html")
+    error = None
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        category = request.form.get("category", "").strip()
+        cook_time = request.form.get("cook_time", "").strip()
+        servings = request.form.get("servings", "").strip()
+        description = request.form.get("description", "").strip()
+        why_people_love_it = request.form.get("why_people_love_it", "").strip()
+        flavor_notes = request.form.get("flavor_notes", "").strip()
+        skill_level = request.form.get("skill_level", "").strip()
+        best_for = request.form.get("best_for", "").strip()
+        pair_with = request.form.get("pair_with", "").strip()
+        spice_level = request.form.get("spice_level", "").strip()
+        dietary_cautions = request.form.get("dietary_cautions", "").strip()
+        ingredients = request.form.get("ingredients", "").strip()
+        steps = request.form.get("steps", "").strip()
+        image_url = request.form.get("image_url", "").strip()
+        image_file = request.files.get("image_file")
+
+        if not title or not description or not ingredients or not steps:
+            error = "Please complete all required recipe fields."
+        else:
+            if image_file and image_file.filename:
+                uploaded_image = save_uploaded_image(image_file)
+                if uploaded_image is None:
+                    error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
+                else:
+                    image_url = uploaded_image
+
+            if error is None:
+                recipe = Recipe(
+                    title=title,
+                    category=category,
+                    cook_time=cook_time,
+                    servings=servings,
+                    description=description,
+                    why_people_love_it=why_people_love_it,
+                    flavor_notes=flavor_notes,
+                    skill_level=skill_level,
+                    best_for=best_for,
+                    pair_with=pair_with,
+                    spice_level=spice_level,
+                    dietary_cautions=dietary_cautions,
+                    ingredients=ingredients,
+                    steps=steps,
+                    image_url=image_url,
+                    user_id=current_user.id,
+                )
+                db.session.add(recipe)
+                db.session.commit()
+                return redirect(url_for("main.profile", user_id=current_user.id))
+
+    return render_template("add_recipe.html", error=error)
  
  
 @main.route("/profile/<int:user_id>")
@@ -242,11 +296,13 @@ def add_recipe():
 def profile(user_id):
     user = User.query.get_or_404(user_id)
     member_since = user.created_at.strftime("%B %Y")
+    own_recipes = Recipe.query.filter_by(user_id=user.id).order_by(Recipe.created_at.desc()).all()
 
     return render_template(
         "profile.html",
         user=user,
         member_since=member_since,
+        own_recipes=own_recipes,
     )
 
 
