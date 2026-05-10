@@ -102,8 +102,8 @@
                 <h3>{{ recipe.title }}</h3>
                 <p>{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
                 <div class="recipe-card-actions">
-                  <a href="#" class="btn btn-primary btn-small disabled" aria-disabled="true">View Recipe</a>
-                  <a href="#" class="btn btn-outline btn-small disabled" aria-disabled="true">Edit</a>
+                  <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-primary btn-small">View Recipe</a>
+                  <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline btn-small">Edit</a>
                 </div>
               </div>
             </article>

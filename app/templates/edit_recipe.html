@@ -12,7 +12,7 @@
               <h2 class="section-title">Edit Recipe</h2>
               <p class="profile-bio mb-0">Update your recipe details, image, ingredients, and method from one place.</p>
             </div>
-            <a href="{{ url_for('main.profile', user_id=recipe.author_id) }}" class="btn btn-outline">Back to Profile</a>
+            <a href="{{ url_for('main.profile', user_id=recipe.user_id) }}" class="btn btn-outline">Back to Profile</a>
           </div>
 
           {% if error %}
