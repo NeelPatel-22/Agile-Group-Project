@@ -22,6 +22,12 @@ def run_sqlite_migrations():
     inspector = inspect(db.engine)
     tables = inspector.get_table_names()
     statements = []
+    if "comment" in tables:
+        comment_columns = {column["name"] for column in inspector.get_columns("comment")}
+
+        if "is_hidden" not in comment_columns:
+            statements.append("ALTER TABLE comment ADD COLUMN is_hidden BOOLEAN DEFAULT 0 NOT NULL")
+
     if "user" in tables:
         user_columns = {column["name"] for column in inspector.get_columns("user")}
 
@@ -61,6 +67,7 @@ def create_app(config=None):
 
     db.init_app(app)
     login_manager.init_app(app)
+    socketio.init_app(app)
     login_manager.login_view = "main.login"
 
     from app.models import User
