@@ -12,10 +12,14 @@
               <h2 class="section-title">Add Recipe</h2>
               <p class="profile-bio mb-0">Create a richer recipe post with quick details, flavor notes, ingredients, and step-by-step instructions.</p>
             </div>
-            <a href="{{ url_for('main.profile') }}" class="btn btn-outline">Back to Profile</a>
+            <a href="{{ url_for('main.profile', user_id=current_user.id) }}" class="btn btn-outline">Back to Profile</a>
           </div>
 
-          <form id="recipe-create-form" enctype="multipart/form-data">
+          {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+
+          <form method="POST" enctype="multipart/form-data">
             <div class="meta-grid form-grid">
               <div>
                 <label class="form-label">Recipe title</label>
@@ -87,7 +91,6 @@
             </div>
             <button class="btn btn-primary mt-3">Post Recipe</button>
           </form>
-          <div id="recipe-create-message" class="small mt-3"></div>
         </div>
       </div>
     </div>
