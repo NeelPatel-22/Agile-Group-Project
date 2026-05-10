@@ -1,6 +1,10 @@
-from flask import Blueprint, abort, redirect, render_template, request, url_for
-from flask_login import current_user, login_user, logout_user
+import os
+import uuid
+
+from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import BadSignature, SignatureExpired
+from werkzeug.utils import secure_filename
 
 from . import db
 from .helpers.email_helpers import (
@@ -16,6 +20,26 @@ from .helpers.recipe_helpers import (
 )
 from .models import User
 main = Blueprint("main", __name__)
+
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+
+
+def is_allowed_image(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+
+def save_uploaded_image(file_storage):
+    if not file_storage or not file_storage.filename:
+        return ""
+
+    if not is_allowed_image(file_storage.filename):
+        return None
+
+    filename = secure_filename(file_storage.filename)
+    unique_name = f"{uuid.uuid4().hex}_{filename}"
+    upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique_name)
+    file_storage.save(upload_path)
+    return f"uploads/{unique_name}"
  
 @main.route("/")
 def cover():
@@ -214,54 +238,57 @@ def add_recipe():
  
  
 @main.route("/profile/<int:user_id>")
+@login_required
 def profile(user_id):
-    user = get_user_by_id(user_id)
-
-    if not user:
-        abort(404)
-
-    user_recipes = get_recipes_by_user(user_id)
-    user_with_count = user.copy()
-    user_with_count["recipe_count"] = len(user_recipes)
+    user = User.query.get_or_404(user_id)
+    member_since = user.created_at.strftime("%B %Y")
 
     return render_template(
         "profile.html",
-        user=user_with_count,
-        user_recipes=user_recipes,
+        user=user,
+        member_since=member_since,
     )
 
 
 @main.route("/profile/<int:user_id>/edit", methods=["GET", "POST"])
+@login_required
 def edit_profile(user_id):
-    user = get_user_by_id(user_id)
-
-    if not user:
-        abort(404)
+    if user_id != current_user.id:
+        abort(403)
 
     error = None
     success = None
-    form_user = user.copy()
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
         bio = request.form.get("bio", "").strip()
+        profile_image_file = request.files.get("profile_image")
+        existing_user = User.query.filter(
+            ((User.email == email) | (User.username == username)) & (User.id != current_user.id)
+        ).first()
 
         if not username or not email:
             error = "Username and email are required."
-            form_user["name"] = username
-            form_user["email"] = email
-            form_user["bio"] = bio
+        elif not is_valid_email(email):
+            error = "Please enter a real email address."
+        elif existing_user:
+            error = "That username or email is already in use."
         else:
-            user["name"] = username
-            user["email"] = email
-            user["bio"] = bio
-            form_user = user.copy()
-            success = "Profile changes saved."
+            profile_image = save_uploaded_image(profile_image_file)
+            if profile_image is None:
+                error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
+            else:
+                current_user.username = username
+                current_user.email = email
+                current_user.bio = bio
+                if profile_image:
+                    current_user.profile_image = profile_image
+                db.session.commit()
+                return redirect(url_for("main.profile", user_id=current_user.id))
 
     return render_template(
         "edit_profile.html",
-        user=form_user,
         error=error,
         success=success,
     )
