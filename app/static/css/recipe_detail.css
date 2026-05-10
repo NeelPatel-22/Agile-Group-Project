@@ -1,0 +1,102 @@
+.content-panel {
+  background: var(--white);
+  border: 1px solid var(--border-soft-alt);
+  border-radius: 18px;
+  padding: 1.4rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-panel);
+}
+
+.ingredients-list .list-group-item {
+  border: 1px solid var(--border-soft-muted);
+  background: var(--soft-surface-4);
+  margin-bottom: 8px;
+  border-radius: 12px !important;
+}
+
+.recipe-highlight {
+  background: var(--soft-surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 1rem;
+  height: 100%;
+}
+
+.step-card {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 1rem;
+  align-items: center;
+  background: var(--white);
+  border: 1px solid var(--border-soft-alt);
+  border-radius: 20px;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 1rem;
+}
+
+.step-photo {
+  height: 110px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #edf8f1, #dff2e6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(25, 135, 84, 0.12);
+}
+
+.step-number {
+  display: inline-block;
+  background: var(--soft-surface);
+  color: var(--primary-dark);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.popular-link {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 14px;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.popular-link:hover {
+  background: var(--soft-surface-4);
+  transform: translateX(3px);
+}
+
+.popular-thumb {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background-size: cover;
+  background-position: center;
+}
+
+@media (max-width: 768px) {
+  .step-card {
+    grid-template-columns: 1fr;
+  }
+}
