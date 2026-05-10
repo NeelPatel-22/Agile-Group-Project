@@ -40,6 +40,11 @@ def save_uploaded_image(file_storage):
     upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique_name)
     file_storage.save(upload_path)
     return f"uploads/{unique_name}"
+
+
+def distinct_recipe_values(column):
+    rows = db.session.query(column).filter(column.isnot(None), column != "").distinct().order_by(column.asc()).all()
+    return [value for (value,) in rows if value]
  
 @main.route("/")
 def cover():
@@ -50,8 +55,65 @@ def cover():
  
  
 @main.route("/recipes")
+@login_required
 def recipes():
-      return render_template("recipes.html", recipes=[])
+    filters = {
+        "q": request.args.get("q", "").strip(),
+        "category": request.args.get("category", "").strip(),
+        "skill_level": request.args.get("skill_level", "").strip(),
+        "spice_level": request.args.get("spice_level", "").strip(),
+        "best_for": request.args.get("best_for", "").strip(),
+        "cook_time": request.args.get("cook_time", "").strip(),
+        "servings": request.args.get("servings", "").strip(),
+    }
+
+    recipe_query = Recipe.query.order_by(Recipe.created_at.desc())
+
+    if filters["q"]:
+        like_term = f"%{filters['q']}%"
+        recipe_query = recipe_query.filter(
+            (Recipe.title.ilike(like_term))
+            | (Recipe.description.ilike(like_term))
+            | (Recipe.ingredients.ilike(like_term))
+            | (Recipe.category.ilike(like_term))
+            | (Recipe.flavor_notes.ilike(like_term))
+            | (Recipe.best_for.ilike(like_term))
+            | (Recipe.pair_with.ilike(like_term))
+        )
+
+    if filters["category"]:
+        recipe_query = recipe_query.filter(Recipe.category == filters["category"])
+
+    if filters["skill_level"]:
+        recipe_query = recipe_query.filter(Recipe.skill_level == filters["skill_level"])
+
+    if filters["spice_level"]:
+        recipe_query = recipe_query.filter(Recipe.spice_level == filters["spice_level"])
+
+    if filters["best_for"]:
+        recipe_query = recipe_query.filter(Recipe.best_for.ilike(f"%{filters['best_for']}%"))
+
+    if filters["cook_time"]:
+        recipe_query = recipe_query.filter(Recipe.cook_time.ilike(f"%{filters['cook_time']}%"))
+
+    if filters["servings"]:
+        recipe_query = recipe_query.filter(Recipe.servings.ilike(f"%{filters['servings']}%"))
+
+    all_recipes = recipe_query.all()
+    filter_options = {
+        "categories": distinct_recipe_values(Recipe.category),
+        "skill_levels": distinct_recipe_values(Recipe.skill_level),
+        "spice_levels": distinct_recipe_values(Recipe.spice_level),
+    }
+    active_filter_count = sum(1 for value in filters.values() if value)
+
+    return render_template(
+        "recipes.html",
+        recipes=all_recipes,
+        filters=filters,
+        filter_options=filter_options,
+        active_filter_count=active_filter_count,
+    )
  
  
 @main.route("/recipes/<int:recipe_id>")
