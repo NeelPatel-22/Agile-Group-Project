@@ -44,3 +44,12 @@ class Recipe(db.Model):
     image_url = db.Column(db.String(255), default="")
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+
+    def ingredient_list(self):
+        return [item.strip() for item in self.ingredients.splitlines() if item.strip()]
+
+    def step_list(self):
+        return [item.strip() for item in self.steps.splitlines() if item.strip()]
+
+    def short_author_role(self):
+        return self.author.bio if self.author and self.author.bio else "Recipe creator"
