@@ -350,12 +350,37 @@
 }
  
 .comment-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
   padding: 0.7rem 0;
   border-bottom: 1px solid var(--border-soft-muted);
 }
  
 .comment-item:last-child {
   border-bottom: none;
+}
+
+.comment-date {
+  display: block;
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  margin-top: 0.15rem;
+}
+
+.hide-comment-btn {
+  border: 0;
+  background: transparent;
+  color: #b42331;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0;
+}
+
+.hide-comment-btn:hover {
+  color: #8f1825;
+  text-decoration: underline;
 }
  
 .reply-list {
