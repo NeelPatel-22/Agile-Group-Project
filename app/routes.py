@@ -1,12 +1,12 @@
 import os
 import uuid
 
-from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.utils import secure_filename
 
-from . import db
+from . import db, socketio
 from .helpers.email_helpers import (
     get_email_from_confirmation_token,
     is_valid_email,
@@ -18,7 +18,7 @@ from .helpers.recipe_helpers import (
     get_recipes_by_user,
     get_user_by_id,
 )
-from .models import Recipe, User
+from .models import Comment, Recipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -45,6 +45,10 @@ def save_uploaded_image(file_storage):
 def distinct_recipe_values(column):
     rows = db.session.query(column).filter(column.isnot(None), column != "").distinct().order_by(column.asc()).all()
     return [value for (value,) in rows if value]
+
+
+def visible_comment_count(recipe):
+    return len([comment for comment in recipe.comments if not comment.is_hidden])
  
 @main.route("/")
 def cover():
@@ -195,6 +199,50 @@ def edit_recipe(recipe_id):
         recipe=recipe,
         error=error,
     )
+
+
+@main.route("/recipes/<int:recipe_id>/comment", methods=["POST"])
+@login_required
+def add_comment(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    content = request.form.get("content", "").strip()
+
+    if not content:
+        return jsonify({"success": False, "message": "Comment cannot be empty."}), 400
+
+    comment = Comment(content=content, recipe_id=recipe.id, user_id=current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+
+    payload = {
+        "recipe_id": recipe.id,
+        "comment_id": comment.id,
+        "comment_html": render_template("partials/comment_item.html", comment=comment, recipe=recipe),
+        "comments_count": visible_comment_count(recipe),
+    }
+    socketio.emit("comment_added", payload)
+    socketio.emit("recipe_updated", {"id": recipe.id, "comments_count": payload["comments_count"]})
+    return jsonify({"success": True, **payload})
+
+
+@main.route("/comments/<int:comment_id>/hide", methods=["POST"])
+@login_required
+def hide_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can hide comments."}), 403
+
+    comment.is_hidden = True
+    db.session.commit()
+    payload = {
+        "recipe_id": comment.recipe_id,
+        "comment_id": comment.id,
+        "comments_count": visible_comment_count(comment.recipe),
+    }
+    socketio.emit("comment_hidden", payload)
+    socketio.emit("recipe_updated", {"id": comment.recipe_id, "comments_count": payload["comments_count"]})
+    return jsonify({"success": True, **payload})
  
  
 @main.route("/login", methods=["GET", "POST"])
