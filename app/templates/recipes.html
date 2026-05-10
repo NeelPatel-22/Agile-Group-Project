@@ -135,11 +135,17 @@
                                 </div>
 
                                 {% set visible_comments = recipe.comments|rejectattr('is_hidden')|list %}
+                                {% set liked = recipe.likes|selectattr('user_id', 'equalto', current_user.id)|list|length > 0 %}
+                                {% set saved = recipe.saves|selectattr('user_id', 'equalto', current_user.id)|list|length > 0 %}
 
                                 <div class="share-box">
                                     <div class="recipe-actions">
-                                        <button class="btn btn-action" type="button" disabled>Like Recipe <span class="like-count">0</span></button>
-                                        <button class="btn btn-action" type="button" disabled>Save Recipe <span class="save-count">0</span></button>
+                                        <button class="btn btn-action like-btn {% if liked %}active{% endif %}" type="button" data-recipe-id="{{ recipe.id }}">
+                                            Like Recipe <span class="like-count">{{ recipe.likes|length }}</span>
+                                        </button>
+                                        <button class="btn btn-action save-btn {% if saved %}active{% endif %}" type="button" data-recipe-id="{{ recipe.id }}">
+                                            <span class="save-label">{{ "Unsave Recipe" if saved else "Save Recipe" }}</span>
+                                        </button>
                                         <span class="comment-counter">{{ visible_comments|length }} comments</span>
                                     </div>
                                 </div>
