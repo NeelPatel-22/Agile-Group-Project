@@ -73,6 +73,7 @@ def create_app(config=None):
     app.register_blueprint(main)
 
     with app.app_context():
+        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
         db.create_all()
         run_sqlite_migrations()
 
