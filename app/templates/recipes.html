@@ -3,7 +3,7 @@
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/recipes.css') }}">{% endblock %}
 {% block body_class %}recipe-feed-page{% endblock %}
 {% block content %}
-<section class="page-section recipe-detail-main">
+<section class="page-section recipe-detail-main" data-current-user-id="{{ current_user.id }}">
     <div class="container">
         <div class="recipe-discovery-layout">
             <aside class="recipe-search-column">
@@ -101,7 +101,7 @@
                         {% set image_source = 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=1200&q=80' %}
                     {% endif %}
                     {% set initials = recipe.author.username[:2]|upper %}
-                    <article class="recipe-card" data-recipe-id="{{ recipe.id }}">
+                    <article class="recipe-card" data-recipe-id="{{ recipe.id }}" data-recipe-owner-id="{{ recipe.user_id }}">
                         <div class="card recipe-detail-card h-100">
                             <div class="card-body p-4">
                                 <div class="top-meta">
@@ -134,23 +134,29 @@
                                     <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-outline-success btn-sm">View recipe</a>
                                 </div>
 
+                                {% set visible_comments = recipe.comments|rejectattr('is_hidden')|list %}
+
                                 <div class="share-box">
                                     <div class="recipe-actions">
                                         <button class="btn btn-action" type="button" disabled>Like Recipe <span class="like-count">0</span></button>
                                         <button class="btn btn-action" type="button" disabled>Save Recipe <span class="save-count">0</span></button>
-                                        <span class="comment-counter">0 comments</span>
+                                        <span class="comment-counter">{{ visible_comments|length }} comments</span>
                                     </div>
                                 </div>
 
                                 <div class="comment-section">
-                                    <form class="comment-form">
+                                    <form class="comment-form" method="POST" action="{{ url_for('main.add_comment', recipe_id=recipe.id) }}" data-recipe-id="{{ recipe.id }}">
                                         <div class="input-group">
-                                            <input type="text" name="content" class="form-control" placeholder="Write a comment" disabled>
-                                            <button class="btn btn-dark" type="button" disabled>Post</button>
+                                            <input type="text" name="content" class="form-control" placeholder="Write a comment">
+                                            <button class="btn btn-dark" type="submit">Post</button>
                                         </div>
                                     </form>
                                     <div class="comment-list mt-3">
-                                        <p class="comment-empty mb-0">Comments will be added in a later step.</p>
+                                        {% for comment in visible_comments %}
+                                        {% include "partials/comment_item.html" %}
+                                        {% else %}
+                                        <p class="comment-empty mb-0">No comments yet.</p>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>

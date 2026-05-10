@@ -1,0 +1,10 @@
+<div class="comment-item" data-comment-id="{{ comment.id }}">
+    <div>
+        <strong>{{ comment.author.username }}</strong>
+        <span>{{ comment.content }}</span>
+        <small class="comment-date">{{ comment.created_at.strftime('%d %b %Y') }}</small>
+    </div>
+    {% if current_user.id == recipe.user_id %}
+    <button class="hide-comment-btn" type="button" data-comment-id="{{ comment.id }}">Hide</button>
+    {% endif %}
+</div>
