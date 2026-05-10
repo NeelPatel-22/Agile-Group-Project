@@ -459,12 +459,38 @@ def profile(user_id):
     user = User.query.get_or_404(user_id)
     member_since = user.created_at.strftime("%B %Y")
     own_recipes = Recipe.query.filter_by(user_id=user.id).order_by(Recipe.created_at.desc()).all()
+    saved_recipes_count = SavedRecipe.query.filter_by(user_id=user.id).count()
+    likes_received = sum(len(recipe.likes) for recipe in own_recipes)
 
     return render_template(
         "profile.html",
         user=user,
         member_since=member_since,
         own_recipes=own_recipes,
+        saved_recipes_count=saved_recipes_count,
+        likes_received=likes_received,
+    )
+
+
+@main.route("/profile/<int:user_id>/saved-recipes")
+@login_required
+def saved_recipes(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.id != current_user.id:
+        abort(403)
+
+    saved_recipes_list = (
+        Recipe.query.join(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
+        .filter(SavedRecipe.user_id == user.id)
+        .order_by(SavedRecipe.created_at.desc())
+        .all()
+    )
+
+    return render_template(
+        "saved_recipes.html",
+        user=user,
+        saved_recipes=saved_recipes_list,
     )
 
 

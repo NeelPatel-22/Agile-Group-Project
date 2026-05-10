@@ -77,6 +77,25 @@ $(function () {
         updateRecipeCardState({ id: data.recipe_id, comments_count: data.comments_count });
     }
 
+    function removeUnsavedRecipeCard(data) {
+        if (!window.location.pathname.includes("/saved-recipes") || data.action !== "removed") {
+            return;
+        }
+
+        const card = $(`.saved-recipes-grid .recipe-card[data-recipe-id="${data.id}"]`);
+        card.slideUp(180, function () {
+            $(this).remove();
+            const remainingCards = $(".saved-recipes-grid .recipe-card").length;
+            $(".saved-recipes-total").text(remainingCards);
+
+            if (remainingCards === 0 && !$(".saved-recipes-empty").length) {
+                $(".saved-recipes-grid").html(
+                    '<div class="empty-profile-card saved-recipes-empty"><p class="mb-3">You have not saved any recipes yet.</p><a href="/recipes" class="btn btn-primary">Explore Recipes</a></div>'
+                );
+            }
+        });
+    }
+
     $(document).on("submit", ".comment-form", function (event) {
         event.preventDefault();
 
@@ -122,7 +141,10 @@ $(function () {
 
         button.prop("disabled", true);
         $.post(`/recipes/${recipeId}/save`)
-            .done(updateRecipeCardState)
+            .done(function (response) {
+                updateRecipeCardState(response);
+                removeUnsavedRecipeCard(response);
+            })
             .fail(function (xhr) {
                 const message = xhr.responseJSON?.message || "Could not update save.";
                 alert(message);
