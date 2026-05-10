@@ -18,7 +18,7 @@ from .helpers.recipe_helpers import (
     get_recipes_by_user,
     get_user_by_id,
 )
-from .models import Comment, Recipe, User
+from .models import Comment, Like, Recipe, SavedRecipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -49,6 +49,37 @@ def distinct_recipe_values(column):
 
 def visible_comment_count(recipe):
     return len([comment for comment in recipe.comments if not comment.is_hidden])
+
+
+def recipe_payload(recipe, user=None):
+    user = user or current_user
+    liked = False
+    saved = False
+
+    if getattr(user, "is_authenticated", False):
+        liked = any(like.user_id == user.id for like in recipe.likes)
+        saved = any(save.user_id == user.id for save in recipe.saves)
+
+    return {
+        "id": recipe.id,
+        "likes_count": len(recipe.likes),
+        "saves_count": len(recipe.saves),
+        "comments_count": visible_comment_count(recipe),
+        "liked": liked,
+        "saved": saved,
+    }
+
+
+def broadcast_recipe_update(recipe):
+    socketio.emit(
+        "recipe_updated",
+        {
+            "id": recipe.id,
+            "likes_count": len(recipe.likes),
+            "saves_count": len(recipe.saves),
+            "comments_count": visible_comment_count(recipe),
+        },
+    )
  
 @main.route("/")
 def cover():
@@ -201,6 +232,44 @@ def edit_recipe(recipe_id):
     )
 
 
+@main.route("/recipes/<int:recipe_id>/like", methods=["POST"])
+@login_required
+def toggle_like(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_like = Like.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        action = "removed"
+    else:
+        db.session.add(Like(recipe_id=recipe.id, user_id=current_user.id))
+        action = "added"
+
+    db.session.commit()
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": action, **payload})
+
+
+@main.route("/recipes/<int:recipe_id>/save", methods=["POST"])
+@login_required
+def toggle_save(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_save = SavedRecipe.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
+
+    if existing_save:
+        db.session.delete(existing_save)
+        action = "removed"
+    else:
+        db.session.add(SavedRecipe(recipe_id=recipe.id, user_id=current_user.id))
+        action = "added"
+
+    db.session.commit()
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": action, **payload})
+
+
 @main.route("/recipes/<int:recipe_id>/comment", methods=["POST"])
 @login_required
 def add_comment(recipe_id):
@@ -221,7 +290,7 @@ def add_comment(recipe_id):
         "comments_count": visible_comment_count(recipe),
     }
     socketio.emit("comment_added", payload)
-    socketio.emit("recipe_updated", {"id": recipe.id, "comments_count": payload["comments_count"]})
+    broadcast_recipe_update(recipe)
     return jsonify({"success": True, **payload})
 
 
@@ -241,7 +310,7 @@ def hide_comment(comment_id):
         "comments_count": visible_comment_count(comment.recipe),
     }
     socketio.emit("comment_hidden", payload)
-    socketio.emit("recipe_updated", {"id": comment.recipe_id, "comments_count": payload["comments_count"]})
+    broadcast_recipe_update(comment.recipe)
     return jsonify({"success": True, **payload})
  
  

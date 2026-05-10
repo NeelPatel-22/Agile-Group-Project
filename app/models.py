@@ -6,6 +6,24 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from . import db
 
 
+class SavedRecipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_saved_recipe"),)
+
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_recipe_like"),)
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -18,6 +36,8 @@ class User(UserMixin, db.Model):
 
     recipes = db.relationship("Recipe", backref="author", lazy=True, cascade="all, delete-orphan")
     comments = db.relationship("Comment", backref="author", lazy=True, cascade="all, delete-orphan")
+    likes = db.relationship("Like", backref="user", lazy=True, cascade="all, delete-orphan")
+    saved_recipes = db.relationship("SavedRecipe", backref="user", lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -53,6 +73,8 @@ class Recipe(db.Model):
         cascade="all, delete-orphan",
         order_by="desc(Comment.created_at)",
     )
+    likes = db.relationship("Like", backref="recipe", lazy=True, cascade="all, delete-orphan")
+    saves = db.relationship("SavedRecipe", backref="recipe", lazy=True, cascade="all, delete-orphan")
 
     def ingredient_list(self):
         return [item.strip() for item in self.ingredients.splitlines() if item.strip()]

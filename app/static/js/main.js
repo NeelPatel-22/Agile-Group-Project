@@ -10,6 +10,19 @@ $(function () {
         if (typeof data.comments_count !== "undefined") {
             card.find(".comment-counter").text(`${data.comments_count} comments`);
         }
+
+        if (typeof data.likes_count !== "undefined") {
+            card.find(".like-count").text(data.likes_count);
+        }
+
+        if (typeof data.liked !== "undefined") {
+            card.find(".like-btn").toggleClass("active", data.liked);
+        }
+
+        if (typeof data.saved !== "undefined") {
+            card.find(".save-btn").toggleClass("active", data.saved);
+            card.find(".save-label").text(data.saved ? "Unsave Recipe" : "Save Recipe");
+        }
     }
 
     function removeEmptyCommentState(list) {
@@ -80,6 +93,38 @@ $(function () {
             })
             .fail(function (xhr) {
                 const message = xhr.responseJSON?.message || "Could not post comment.";
+                alert(message);
+            })
+            .always(function () {
+                button.prop("disabled", false);
+            });
+    });
+
+    $(document).on("click", ".like-btn", function () {
+        const button = $(this);
+        const recipeId = button.data("recipe-id");
+
+        button.prop("disabled", true);
+        $.post(`/recipes/${recipeId}/like`)
+            .done(updateRecipeCardState)
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not update like.";
+                alert(message);
+            })
+            .always(function () {
+                button.prop("disabled", false);
+            });
+    });
+
+    $(document).on("click", ".save-btn", function () {
+        const button = $(this);
+        const recipeId = button.data("recipe-id");
+
+        button.prop("disabled", true);
+        $.post(`/recipes/${recipeId}/save`)
+            .done(updateRecipeCardState)
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not update save.";
                 alert(message);
             })
             .always(function () {
