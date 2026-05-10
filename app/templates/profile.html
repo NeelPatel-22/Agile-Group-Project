@@ -1,122 +1,70 @@
 {% extends "base.html" %}
-
-{% block title %}{{ user.name }} | RecipeHub{% endblock %}
-
+{% block title %}{{ user.username }} | RecipeHub{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">{% endblock %}
 {% block content %}
-<section class="page-section">
+<section class="page-section profile-page">
   <div class="container">
-    <div class="card profile-header-card border-0 mb-5">
-      <div class="card-body p-4 p-lg-5">
-        <div class="row align-items-center g-4">
-          <div class="col-md-auto text-center">
-            <img
-              src="{{ user.avatar_url }}"
-              alt="{{ user.name }}"
-              class="profile-avatar"
-            >
-          </div>
+    {% set avatar_source = user.profile_image %}
+    {% if user.profile_image and not user.profile_image.startswith('http://') and not user.profile_image.startswith('https://') %}
+      {% set avatar_source = url_for('static', filename=user.profile_image) %}
+    {% elif not user.profile_image %}
+      {% set avatar_source = 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=500&q=80' %}
+    {% endif %}
 
-          <div class="col">
-            <h1 class="section-title mb-2">{{ user.name }}</h1>
-            <p class="text-muted mb-2">{{ user.bio }}</p>
-            <p class="mb-3">
-              <span class="badge bg-success-subtle text-success-emphasis me-2">Recipe Author</span>
-              <span class="text-muted">{{ user.location }}</span>
-            </p>
-            <a href="{{ url_for('main.edit_profile', user_id=user.id) }}" class="btn btn-success">Edit Profile</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="profile-top-layout">
+      <div class="profile-panel profile-identity-card">
+        <div class="panel-body center">
+          <img src="{{ avatar_source }}" alt="{{ user.username }}" class="profile-avatar">
+          <h1 class="profile-name">{{ user.username }}</h1>
+          <p class="profile-bio">
+            {{ user.bio if user.bio else "Passionate home cook who loves sharing easy DIY recipes, healthy meals, and quick kitchen ideas for busy lifestyles." }}
+          </p>
 
-    <div class="row g-4 mb-5">
-      <div class="col-md-4">
-        <div class="card profile-stat-card border-0 text-center h-100">
-          <div class="card-body">
-            <h3 class="fw-bold text-success">{{ user.recipe_count }}</h3>
-            <p class="text-muted mb-0">Recipes Uploaded</p>
+          {% if current_user.id == user.id %}
+          <div class="button-stack">
+            <a href="{{ url_for('main.edit_profile', user_id=user.id) }}" class="btn btn-primary">Edit Profile</a>
+            <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
           </div>
+          {% endif %}
         </div>
       </div>
 
-      <div class="col-md-4">
-        <div class="card profile-stat-card border-0 text-center h-100">
-          <div class="card-body">
-            <h3 class="fw-bold text-success">{{ user.followers }}</h3>
-            <p class="text-muted mb-0">Followers</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4">
-        <div class="card profile-stat-card border-0 text-center h-100">
-          <div class="card-body">
-            <h3 class="fw-bold text-success">{{ user.likes_received }}</h3>
-            <p class="text-muted mb-0">Likes Received</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mb-4">
-      <h2 class="section-title mb-2">{{ user.name }}'s Recipes</h2>
-      <p class="text-muted">Browse all recipes uploaded by this author.</p>
-    </div>
-
-    <div class="row g-4">
-      {% for recipe in user_recipes %}
-      <div class="col-md-6 col-lg-4">
-        <div class="card recipe-list-card h-100">
-          <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}">
-            <img
-              src="{{ recipe.image_url }}"
-              class="card-img-top"
-              alt="{{ recipe.title }}"
-            >
-          </a>
-          <div class="card-body d-flex flex-column">
-            <span class="recipe-category-badge mb-2">{{ recipe.category }}</span>
-            <h5 class="card-title recipe-list-title">
-              <a
-                href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
-                class="recipe-title-link"
-              >
-                {{ recipe.title }}
-              </a>
-            </h5>
-            <p class="card-text text-muted recipe-list-desc">
-              {{ recipe.description }}
-            </p>
-            <div class="mt-auto">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="text-muted small">{{ recipe.cook_time }} mins</span>
-                <a
-                  href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}"
-                  class="btn btn-outline-success btn-sm"
-                >
-                  View Recipe
-                </a>
-              </div>
-              <a
-                href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}"
-                class="btn btn-success btn-sm w-100"
-              >
-                Edit Recipe
-              </a>
+      <div class="profile-panel profile-overview-panel">
+        <div class="panel-body">
+          <div class="profile-section-header">
+            <div>
+              <p class="eyebrow">Profile</p>
+              <h2 class="section-title">Account Overview</h2>
             </div>
           </div>
+
+          <div class="meta-grid">
+            <div class="profile-meta-card">
+              <h3>Name</h3>
+              <p>{{ user.username }}</p>
+            </div>
+            <div class="profile-meta-card">
+              <h3>Email</h3>
+              <p>{{ user.email }}</p>
+            </div>
+            <div class="profile-meta-card">
+              <h3>Member Since</h3>
+              <p>{{ member_since }}</p>
+            </div>
+            <div class="profile-meta-card">
+              <h3>Email Status</h3>
+              <p>{{ "Confirmed" if user.email_confirmed else "Not confirmed" }}</p>
+            </div>
+          </div>
+
+          <div class="profile-summary-card">
+            <h3>About</h3>
+            <p>
+              {{ user.bio if user.bio else "No description added yet. Add a short note about your cooking style from edit profile." }}
+            </p>
+          </div>
         </div>
       </div>
-      {% else %}
-      <div class="col-12">
-        <div class="empty-state-box text-center">
-          <h4 class="fw-bold mb-2">No recipes uploaded yet</h4>
-          <p class="text-muted mb-0">
-            This author has not shared any recipes so far.
-          </p>
-        </div>
-      </div>
-      {% endfor %}
     </div>
   </div>
 </section>

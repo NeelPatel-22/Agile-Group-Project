@@ -20,7 +20,6 @@
   --border-soft: #dcefe3;
   --border-soft-alt: #ebf1ed;
   --border-soft-muted: #e8ecea;
-  --profile-ring: #d1e7dd;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-strong: 0 14px 34px rgba(0, 0, 0, 0.08);
   --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.04);
@@ -183,8 +182,6 @@ main,
 
 /* Shared cards */
 .recipe-card,
-.profile-header-card,
-.profile-stat-card,
 .sidebar-card,
 .recipe-list-card {
   border: none;
@@ -198,7 +195,6 @@ main,
 }
 
 .recipe-card:hover,
-.profile-stat-card:hover,
 .recipe-list-card:hover,
 .sidebar-card:hover {
   transform: translateY(-6px);
@@ -541,16 +537,6 @@ textarea:focus {
   padding: 2rem;
 }
 
-/* Profile */
-.profile-avatar {
-  width: 130px;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 4px solid var(--primary-color);
-  box-shadow: 0 8px 20px rgba(244, 197, 66, 0.18);
-}
-
 /* Minor text helpers */
 .text-success {
   color: #9a7400 !important;
@@ -583,10 +569,6 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
-  .profile-avatar {
-    width: 110px;
-    height: 110px;
-  }
 }
 
 @media (max-width: 576px) {
