@@ -1,12 +1,12 @@
 import os
 import uuid
 
-from flask import Blueprint, abort, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.utils import secure_filename
 
-from . import db
+from . import db, socketio
 from .helpers.email_helpers import (
     get_email_from_confirmation_token,
     is_valid_email,
@@ -18,7 +18,7 @@ from .helpers.recipe_helpers import (
     get_recipes_by_user,
     get_user_by_id,
 )
-from .models import Recipe, User
+from .models import Comment, Like, Recipe, SavedRecipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -40,6 +40,46 @@ def save_uploaded_image(file_storage):
     upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique_name)
     file_storage.save(upload_path)
     return f"uploads/{unique_name}"
+
+
+def distinct_recipe_values(column):
+    rows = db.session.query(column).filter(column.isnot(None), column != "").distinct().order_by(column.asc()).all()
+    return [value for (value,) in rows if value]
+
+
+def visible_comment_count(recipe):
+    return len([comment for comment in recipe.comments if not comment.is_hidden])
+
+
+def recipe_payload(recipe, user=None):
+    user = user or current_user
+    liked = False
+    saved = False
+
+    if getattr(user, "is_authenticated", False):
+        liked = any(like.user_id == user.id for like in recipe.likes)
+        saved = any(save.user_id == user.id for save in recipe.saves)
+
+    return {
+        "id": recipe.id,
+        "likes_count": len(recipe.likes),
+        "saves_count": len(recipe.saves),
+        "comments_count": visible_comment_count(recipe),
+        "liked": liked,
+        "saved": saved,
+    }
+
+
+def broadcast_recipe_update(recipe):
+    socketio.emit(
+        "recipe_updated",
+        {
+            "id": recipe.id,
+            "likes_count": len(recipe.likes),
+            "saves_count": len(recipe.saves),
+            "comments_count": visible_comment_count(recipe),
+        },
+    )
  
 @main.route("/")
 def cover():
@@ -50,8 +90,65 @@ def cover():
  
  
 @main.route("/recipes")
+@login_required
 def recipes():
-      return render_template("recipes.html", recipes=[])
+    filters = {
+        "q": request.args.get("q", "").strip(),
+        "category": request.args.get("category", "").strip(),
+        "skill_level": request.args.get("skill_level", "").strip(),
+        "spice_level": request.args.get("spice_level", "").strip(),
+        "best_for": request.args.get("best_for", "").strip(),
+        "cook_time": request.args.get("cook_time", "").strip(),
+        "servings": request.args.get("servings", "").strip(),
+    }
+
+    recipe_query = Recipe.query.order_by(Recipe.created_at.desc())
+
+    if filters["q"]:
+        like_term = f"%{filters['q']}%"
+        recipe_query = recipe_query.filter(
+            (Recipe.title.ilike(like_term))
+            | (Recipe.description.ilike(like_term))
+            | (Recipe.ingredients.ilike(like_term))
+            | (Recipe.category.ilike(like_term))
+            | (Recipe.flavor_notes.ilike(like_term))
+            | (Recipe.best_for.ilike(like_term))
+            | (Recipe.pair_with.ilike(like_term))
+        )
+
+    if filters["category"]:
+        recipe_query = recipe_query.filter(Recipe.category == filters["category"])
+
+    if filters["skill_level"]:
+        recipe_query = recipe_query.filter(Recipe.skill_level == filters["skill_level"])
+
+    if filters["spice_level"]:
+        recipe_query = recipe_query.filter(Recipe.spice_level == filters["spice_level"])
+
+    if filters["best_for"]:
+        recipe_query = recipe_query.filter(Recipe.best_for.ilike(f"%{filters['best_for']}%"))
+
+    if filters["cook_time"]:
+        recipe_query = recipe_query.filter(Recipe.cook_time.ilike(f"%{filters['cook_time']}%"))
+
+    if filters["servings"]:
+        recipe_query = recipe_query.filter(Recipe.servings.ilike(f"%{filters['servings']}%"))
+
+    all_recipes = recipe_query.all()
+    filter_options = {
+        "categories": distinct_recipe_values(Recipe.category),
+        "skill_levels": distinct_recipe_values(Recipe.skill_level),
+        "spice_levels": distinct_recipe_values(Recipe.spice_level),
+    }
+    active_filter_count = sum(1 for value in filters.values() if value)
+
+    return render_template(
+        "recipes.html",
+        recipes=all_recipes,
+        filters=filters,
+        filter_options=filter_options,
+        active_filter_count=active_filter_count,
+    )
  
  
 @main.route("/recipes/<int:recipe_id>")
@@ -133,6 +230,88 @@ def edit_recipe(recipe_id):
         recipe=recipe,
         error=error,
     )
+
+
+@main.route("/recipes/<int:recipe_id>/like", methods=["POST"])
+@login_required
+def toggle_like(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_like = Like.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
+
+    if existing_like:
+        db.session.delete(existing_like)
+        action = "removed"
+    else:
+        db.session.add(Like(recipe_id=recipe.id, user_id=current_user.id))
+        action = "added"
+
+    db.session.commit()
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": action, **payload})
+
+
+@main.route("/recipes/<int:recipe_id>/save", methods=["POST"])
+@login_required
+def toggle_save(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_save = SavedRecipe.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
+
+    if existing_save:
+        db.session.delete(existing_save)
+        action = "removed"
+    else:
+        db.session.add(SavedRecipe(recipe_id=recipe.id, user_id=current_user.id))
+        action = "added"
+
+    db.session.commit()
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": action, **payload})
+
+
+@main.route("/recipes/<int:recipe_id>/comment", methods=["POST"])
+@login_required
+def add_comment(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    content = request.form.get("content", "").strip()
+
+    if not content:
+        return jsonify({"success": False, "message": "Comment cannot be empty."}), 400
+
+    comment = Comment(content=content, recipe_id=recipe.id, user_id=current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+
+    payload = {
+        "recipe_id": recipe.id,
+        "comment_id": comment.id,
+        "comment_html": render_template("partials/comment_item.html", comment=comment, recipe=recipe),
+        "comments_count": visible_comment_count(recipe),
+    }
+    socketio.emit("comment_added", payload)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, **payload})
+
+
+@main.route("/comments/<int:comment_id>/hide", methods=["POST"])
+@login_required
+def hide_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can hide comments."}), 403
+
+    comment.is_hidden = True
+    db.session.commit()
+    payload = {
+        "recipe_id": comment.recipe_id,
+        "comment_id": comment.id,
+        "comments_count": visible_comment_count(comment.recipe),
+    }
+    socketio.emit("comment_hidden", payload)
+    broadcast_recipe_update(comment.recipe)
+    return jsonify({"success": True, **payload})
  
  
 @main.route("/login", methods=["GET", "POST"])
