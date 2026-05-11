@@ -4,6 +4,7 @@ import uuid
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import BadSignature, SignatureExpired
+from sqlalchemy import or_
 from werkzeug.utils import secure_filename
 
 from . import db, socketio
@@ -40,6 +41,17 @@ def save_uploaded_image(file_storage):
     upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique_name)
     file_storage.save(upload_path)
     return f"uploads/{unique_name}"
+
+
+def save_uploaded_images(file_list):
+    image_paths = []
+    for file_storage in file_list:
+        saved_path = save_uploaded_image(file_storage)
+        if saved_path is None:
+            return None
+        if saved_path:
+            image_paths.append(saved_path)
+    return image_paths
 
 
 def distinct_recipe_values(column):
@@ -102,7 +114,9 @@ def recipes():
         "servings": request.args.get("servings", "").strip(),
     }
 
-    recipe_query = Recipe.query.order_by(Recipe.created_at.desc())
+    recipe_query = Recipe.query.filter(or_(Recipe.is_public.is_(True), Recipe.user_id == current_user.id)).order_by(
+        Recipe.created_at.desc()
+    )
 
     if filters["q"]:
         like_term = f"%{filters['q']}%"
@@ -155,8 +169,14 @@ def recipes():
 @login_required
 def recipe_detail(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if not recipe.is_public and recipe.user_id != current_user.id:
+        abort(403)
     more_recipes = (
-        Recipe.query.filter(Recipe.user_id == recipe.user_id, Recipe.id != recipe.id)
+        Recipe.query.filter(
+            Recipe.user_id == recipe.user_id,
+            Recipe.id != recipe.id,
+            or_(Recipe.is_public.is_(True), Recipe.user_id == current_user.id),
+        )
         .order_by(Recipe.created_at.desc())
         .limit(5)
         .all()
@@ -236,6 +256,8 @@ def edit_recipe(recipe_id):
 @login_required
 def toggle_like(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if not recipe.is_public and recipe.user_id != current_user.id:
+        abort(403)
     existing_like = Like.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
 
     if existing_like:
@@ -255,6 +277,8 @@ def toggle_like(recipe_id):
 @login_required
 def toggle_save(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if not recipe.is_public and recipe.user_id != current_user.id:
+        abort(403)
     existing_save = SavedRecipe.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
 
     if existing_save:
@@ -274,6 +298,8 @@ def toggle_save(recipe_id):
 @login_required
 def add_comment(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if not recipe.is_public and recipe.user_id != current_user.id:
+        abort(403)
     content = request.form.get("content", "").strip()
 
     if not content:
@@ -403,6 +429,7 @@ def add_recipe():
         title = request.form.get("title", "").strip()
         category = request.form.get("category", "").strip()
         cook_time = request.form.get("cook_time", "").strip()
+        cook_time_custom = request.form.get("cook_time_custom", "").strip()
         servings = request.form.get("servings", "").strip()
         description = request.form.get("description", "").strip()
         why_people_love_it = request.form.get("why_people_love_it", "").strip()
@@ -415,7 +442,12 @@ def add_recipe():
         ingredients = request.form.get("ingredients", "").strip()
         steps = request.form.get("steps", "").strip()
         image_url = request.form.get("image_url", "").strip()
-        image_file = request.files.get("image_file")
+        image_file = request.files.get("cover_image_file") or request.files.get("image_file")
+        gallery_files = request.files.getlist("gallery_images")
+        is_public = request.form.get("visibility", "public") == "public"
+
+        if cook_time == "custom":
+            cook_time = cook_time_custom
 
         if not title or not description or not ingredients or not steps:
             error = "Please complete all required recipe fields."
@@ -426,6 +458,11 @@ def add_recipe():
                     error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
                 else:
                     image_url = uploaded_image
+
+            if error is None:
+                gallery_images = save_uploaded_images(gallery_files)
+                if gallery_images is None:
+                    error = "Upload PNG, JPG, JPEG, GIF, or WEBP images only."
 
             if error is None:
                 recipe = Recipe(
@@ -444,6 +481,8 @@ def add_recipe():
                     ingredients=ingredients,
                     steps=steps,
                     image_url=image_url,
+                    gallery_images="\n".join(gallery_images),
+                    is_public=is_public,
                     user_id=current_user.id,
                 )
                 db.session.add(recipe)
@@ -458,7 +497,10 @@ def add_recipe():
 def profile(user_id):
     user = User.query.get_or_404(user_id)
     member_since = user.created_at.strftime("%B %Y")
-    own_recipes = Recipe.query.filter_by(user_id=user.id).order_by(Recipe.created_at.desc()).all()
+    own_recipes_query = Recipe.query.filter_by(user_id=user.id)
+    if user.id != current_user.id:
+        own_recipes_query = own_recipes_query.filter(Recipe.is_public.is_(True))
+    own_recipes = own_recipes_query.order_by(Recipe.created_at.desc()).all()
     saved_recipes_count = SavedRecipe.query.filter_by(user_id=user.id).count()
     likes_received = sum(len(recipe.likes) for recipe in own_recipes)
 
@@ -483,6 +525,7 @@ def saved_recipes(user_id):
     saved_recipes_list = (
         Recipe.query.join(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
         .filter(SavedRecipe.user_id == user.id)
+        .filter(or_(Recipe.is_public.is_(True), Recipe.user_id == current_user.id))
         .order_by(SavedRecipe.created_at.desc())
         .all()
     )
@@ -491,6 +534,26 @@ def saved_recipes(user_id):
         "saved_recipes.html",
         user=user,
         saved_recipes=saved_recipes_list,
+    )
+
+
+@main.route("/recipes/<int:recipe_id>/visibility", methods=["POST"])
+@login_required
+def toggle_recipe_visibility(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can change visibility."}), 403
+
+    recipe.is_public = not recipe.is_public
+    db.session.commit()
+    return jsonify(
+        {
+            "success": True,
+            "id": recipe.id,
+            "is_public": recipe.is_public,
+            "label": "Public" if recipe.is_public else "Only me",
+        }
     )
 
 

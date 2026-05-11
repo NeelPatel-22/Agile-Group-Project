@@ -45,6 +45,19 @@
 
             <img src="{{ image_source }}" alt="{{ recipe.title }}" class="recipe-hero-image">
 
+            {% set gallery_images = recipe.gallery_image_list() %}
+            {% if gallery_images %}
+            <div class="recipe-gallery">
+              {% for gallery_image in gallery_images %}
+                {% set gallery_source = gallery_image %}
+                {% if gallery_image and not gallery_image.startswith('http://') and not gallery_image.startswith('https://') %}
+                  {% set gallery_source = url_for('static', filename=gallery_image) %}
+                {% endif %}
+                <img src="{{ gallery_source }}" alt="{{ recipe.title }} photo {{ loop.index }}">
+              {% endfor %}
+            </div>
+            {% endif %}
+
             <div class="content-panel">
               <div class="row g-4">
                 <div class="col-md-5">

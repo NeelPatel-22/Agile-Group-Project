@@ -168,6 +168,26 @@ $(function () {
             });
     });
 
+    $(document).on("click", ".visibility-toggle-btn", function () {
+        const button = $(this);
+        const recipeId = button.data("recipe-id");
+        const card = button.closest(".profile-recipe-card");
+
+        button.prop("disabled", true);
+        $.post(`/recipes/${recipeId}/visibility`)
+            .done(function (response) {
+                card.find(".visibility-badge").text(response.label);
+                button.text(response.is_public ? "Make Only Me" : "Make Public");
+            })
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not update visibility.";
+                alert(message);
+            })
+            .always(function () {
+                button.prop("disabled", false);
+            });
+    });
+
     if (socket) {
         socket.on("recipe_updated", updateRecipeCardState);
         socket.on("comment_added", addCommentToCard);

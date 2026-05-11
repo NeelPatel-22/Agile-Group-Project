@@ -63,6 +63,8 @@ class Recipe(db.Model):
     ingredients = db.Column(db.Text, nullable=False)
     steps = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255), default="")
+    gallery_images = db.Column(db.Text, default="")
+    is_public = db.Column(db.Boolean, default=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
@@ -81,6 +83,9 @@ class Recipe(db.Model):
 
     def step_list(self):
         return [item.strip() for item in self.steps.splitlines() if item.strip()]
+
+    def gallery_image_list(self):
+        return [item.strip() for item in (self.gallery_images or "").splitlines() if item.strip()]
 
     def short_author_role(self):
         return self.author.bio if self.author and self.author.bio else "Recipe creator"

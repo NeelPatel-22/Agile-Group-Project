@@ -113,6 +113,7 @@
                   {% if recipe.category %}<span>{{ recipe.category }}</span>{% endif %}
                   {% if recipe.cook_time %}<span>{{ recipe.cook_time }}</span>{% endif %}
                   {% if recipe.servings %}<span>{{ recipe.servings }}</span>{% endif %}
+                  <span class="visibility-badge">{{ "Public" if recipe.is_public else "Only me" }}</span>
                   <span>{{ recipe.likes|length }} Likes</span>
                 </div>
                 <h3>{{ recipe.title }}</h3>
@@ -120,6 +121,9 @@
                 <div class="recipe-card-actions">
                   <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-primary btn-small">View Recipe</a>
                   <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline btn-small">Edit</a>
+                  <button class="btn btn-outline btn-small visibility-toggle-btn" type="button" data-recipe-id="{{ recipe.id }}">
+                    {{ "Make Only Me" if recipe.is_public else "Make Public" }}
+                  </button>
                 </div>
               </div>
             </article>

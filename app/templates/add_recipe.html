@@ -2,98 +2,399 @@
 {% block title %}Add Recipe | RecipeHub{% endblock %}
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/add_recipe.css') }}">{% endblock %}
 {% block content %}
-<section class="page-section profile-page">
+<section class="page-section profile-page add-recipe-page">
   <div class="container">
     <div class="add-recipe-shell">
-      <div class="profile-summary-card section-card">
-        <div class="panel-body">
-          <div class="add-recipe-header">
+      <div class="add-recipe-header">
+        <div>
+          <p class="eyebrow">Recipe Studio</p>
+          <h1 class="section-title">Add Recipe</h1>
+          <p class="profile-bio mb-0">Build a polished recipe with a cover, photo set, template support, and a quick preview before publishing.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-outline" type="button" id="preview-recipe-btn">Browse Preview</button>
+          <a href="{{ url_for('main.profile', user_id=current_user.id) }}" class="btn btn-outline draft-aware-link">Back to Profile</a>
+        </div>
+      </div>
+
+      {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" enctype="multipart/form-data" id="add-recipe-form" class="recipe-builder-form">
+        <section class="form-module">
+          <div class="module-heading">
             <div>
-              <h2 class="section-title">Add Recipe</h2>
-              <p class="profile-bio mb-0">Create a richer recipe post with quick details, flavor notes, ingredients, and step-by-step instructions.</p>
+              <span class="module-kicker">01</span>
+              <h2>Basics</h2>
             </div>
-            <a href="{{ url_for('main.profile', user_id=current_user.id) }}" class="btn btn-outline">Back to Profile</a>
+            <div class="visibility-control" aria-label="Recipe visibility">
+              <input type="radio" name="visibility" id="visibility-public" value="public" checked>
+              <label for="visibility-public">Public</label>
+              <input type="radio" name="visibility" id="visibility-private" value="private">
+              <label for="visibility-private">Only me</label>
+            </div>
           </div>
 
-          {% if error %}
-          <div class="alert alert-danger">{{ error }}</div>
-          {% endif %}
+          <div class="meta-grid form-grid">
+            <div class="full-span">
+              <label class="form-label" for="recipe-title">Recipe title</label>
+              <input id="recipe-title" type="text" name="title" class="form-control" placeholder="Creamy garlic mushroom pasta" required>
+            </div>
+            <div>
+              <label class="form-label" for="recipe-category">Category</label>
+              <input id="recipe-category" type="text" name="category" class="form-control" placeholder="Dinner, Breakfast, Dessert">
+            </div>
+            <div>
+              <label class="form-label" for="recipe-servings">Servings</label>
+              <input id="recipe-servings" type="text" name="servings" class="form-control" placeholder="4 servings">
+            </div>
+            <div>
+              <label class="form-label" for="cook-time-select">Cook time</label>
+              <select id="cook-time-select" name="cook_time" class="form-select">
+                <option value="">Choose time</option>
+                <option value="Under 10 minutes">Under 10 minutes</option>
+                <option value="10-20 minutes">10 - 20 minutes</option>
+                <option value="20-30 minutes">20 - 30 minutes</option>
+                <option value="30-60 minutes">30 - 60 minutes</option>
+                <option value="60+ minutes">60+ minutes</option>
+                <option value="custom">Custom time</option>
+              </select>
+            </div>
+            <div id="custom-cook-time-wrap" class="custom-time-wrap">
+              <label class="form-label" for="custom-cook-time">Custom time</label>
+              <input id="custom-cook-time" type="text" name="cook_time_custom" class="form-control" placeholder="About 45 minutes">
+            </div>
+          </div>
+        </section>
 
-          <form method="POST" enctype="multipart/form-data">
-            <div class="meta-grid form-grid">
-              <div>
-                <label class="form-label">Recipe title</label>
-                <input type="text" name="title" class="form-control" required>
-              </div>
-              <div>
-                <label class="form-label">Category</label>
-                <input type="text" name="category" class="form-control" placeholder="Comfort Food, Salad, Dinner">
-              </div>
-              <div>
-                <label class="form-label">Cook time</label>
-                <input type="text" name="cook_time" class="form-control" placeholder="35 Minutes">
-              </div>
-              <div>
-                <label class="form-label">Servings</label>
-                <input type="text" name="servings" class="form-control" placeholder="4 Servings">
-              </div>
-              <div>
-                <label class="form-label">Upload image</label>
-                <input type="file" name="image_file" id="image-file-input" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
-              </div>
-              <div class="full-span">
-                <label class="form-label">Recipe introduction</label>
-                <textarea name="description" class="form-control" rows="3" placeholder="Write the short subtitle shown under the recipe title." required></textarea>
-              </div>
-              <div class="full-span">
-                <label class="form-label">Why people love it</label>
-                <textarea name="why_people_love_it" class="form-control" rows="3" placeholder="Explain what makes this recipe special or easy to make."></textarea>
-              </div>
-              <div>
-                <label class="form-label">Flavor</label>
-                <input type="text" name="flavor_notes" class="form-control" placeholder="Creamy, sweet, and savory">
-              </div>
-              <div>
-                <label class="form-label">Skill level</label>
-                <input type="text" name="skill_level" class="form-control" placeholder="Beginner friendly">
-              </div>
-              <div>
-                <label class="form-label">Best for</label>
-                <input type="text" name="best_for" class="form-control" placeholder="Family dinner or meal prep">
-              </div>
-              <div>
-                <label class="form-label">Pair with</label>
-                <input type="text" name="pair_with" class="form-control" placeholder="Lemon salad and sparkling water">
-              </div>
-              <div>
-                <label class="form-label">Spice level</label>
-                <input type="text" name="spice_level" class="form-control" placeholder="Mild by default">
-              </div>
-              <div>
-                <label class="form-label">Dietary cautions</label>
-                <input type="text" name="dietary_cautions" class="form-control" placeholder="Contains dairy and gluten">
-              </div>
-              <div>
-                <label class="form-label">Ingredients</label>
-                <textarea name="ingredients" class="form-control" rows="6" placeholder="One ingredient per line" required></textarea>
-              </div>
-              <div>
-                <label class="form-label">Steps</label>
-                <textarea name="steps" class="form-control" rows="6" placeholder="One step per line" required></textarea>
-              </div>
-              <div class="full-span">
-                <label class="form-label">Or image URL</label>
-                <input type="url" name="image_url" class="form-control" placeholder="Optional external image link">
-              </div>
+        <section class="form-module">
+          <div class="module-heading">
+            <div>
+              <span class="module-kicker">02</span>
+              <h2>AI Templates</h2>
             </div>
-            <div class="upload-preview d-none mt-3" id="upload-preview">
-              <img id="upload-preview-image" src="" alt="Recipe preview">
+            <span class="module-note">Pick a starter and edit anything you like.</span>
+          </div>
+          <div class="template-grid" id="ai-template-grid">
+            <button type="button" class="template-card" data-template="quick-dinner">
+              <strong>Quick Dinner</strong>
+              <span>Fast, practical, weeknight friendly.</span>
+            </button>
+            <button type="button" class="template-card" data-template="healthy-meal">
+              <strong>Healthy Meal</strong>
+              <span>Fresh, balanced, prep-focused.</span>
+            </button>
+            <button type="button" class="template-card" data-template="dessert">
+              <strong>Dessert</strong>
+              <span>Sweet, cozy, shareable steps.</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="form-module">
+          <div class="module-heading">
+            <div>
+              <span class="module-kicker">03</span>
+              <h2>Images</h2>
             </div>
-            <button class="btn btn-primary mt-3">Post Recipe</button>
-          </form>
+            <span class="module-note">Cover accepts one image. Batch upload accepts multiple recipe photos.</span>
+          </div>
+          <div class="media-grid">
+            <div class="media-upload-panel">
+              <label class="form-label" for="cover-image-file">Add Cover</label>
+              <input type="file" name="cover_image_file" id="cover-image-file" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+              <small>One cover image only.</small>
+            </div>
+            <div class="media-upload-panel">
+              <label class="form-label" for="gallery-images">Batch Upload Photos</label>
+              <input type="file" name="gallery_images" id="gallery-images" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp" multiple>
+              <small>Upload process photos or final dish photos.</small>
+            </div>
+            <div class="media-upload-panel full-span">
+              <label class="form-label" for="image-url">Or cover image URL</label>
+              <input id="image-url" type="url" name="image_url" class="form-control" placeholder="Optional external image link">
+            </div>
+          </div>
+          <div class="upload-preview d-none mt-3" id="upload-preview">
+            <img id="upload-preview-image" src="" alt="Recipe cover preview">
+          </div>
+          <div class="gallery-preview" id="gallery-preview"></div>
+        </section>
+
+        <section class="form-module">
+          <div class="module-heading">
+            <div>
+              <span class="module-kicker">04</span>
+              <h2>Recipe Content</h2>
+            </div>
+          </div>
+          <div class="meta-grid form-grid">
+            <div class="full-span">
+              <label class="form-label" for="recipe-description">Recipe introduction</label>
+              <textarea id="recipe-description" name="description" class="form-control" rows="3" placeholder="Write the short subtitle shown under the recipe title." required></textarea>
+            </div>
+            <div class="full-span">
+              <label class="form-label" for="why-people-love-it">Why people love it</label>
+              <textarea id="why-people-love-it" name="why_people_love_it" class="form-control" rows="3" placeholder="Explain what makes this recipe special or easy to make."></textarea>
+            </div>
+            <div>
+              <label class="form-label" for="flavor-notes">Flavor</label>
+              <input id="flavor-notes" type="text" name="flavor_notes" class="form-control" placeholder="Creamy, sweet, and savory">
+            </div>
+            <div>
+              <label class="form-label" for="skill-level">Skill level</label>
+              <input id="skill-level" type="text" name="skill_level" class="form-control" placeholder="Beginner friendly">
+            </div>
+            <div>
+              <label class="form-label" for="best-for">Best for</label>
+              <input id="best-for" type="text" name="best_for" class="form-control" placeholder="Family dinner or meal prep">
+            </div>
+            <div>
+              <label class="form-label" for="pair-with">Pair with</label>
+              <input id="pair-with" type="text" name="pair_with" class="form-control" placeholder="Lemon salad and sparkling water">
+            </div>
+            <div>
+              <label class="form-label" for="spice-level">Spice level</label>
+              <input id="spice-level" type="text" name="spice_level" class="form-control" placeholder="Mild by default">
+            </div>
+            <div>
+              <label class="form-label" for="dietary-cautions">Dietary cautions</label>
+              <input id="dietary-cautions" type="text" name="dietary_cautions" class="form-control" placeholder="Contains dairy and gluten">
+            </div>
+            <div>
+              <label class="form-label" for="ingredients">Ingredients</label>
+              <textarea id="ingredients" name="ingredients" class="form-control" rows="7" placeholder="One ingredient per line" required></textarea>
+            </div>
+            <div>
+              <label class="form-label" for="steps">Steps</label>
+              <textarea id="steps" name="steps" class="form-control" rows="7" placeholder="One step per line" required></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-action-bar">
+          <button class="btn btn-outline" type="button" id="save-draft-btn">Save Draft</button>
+          <button class="btn btn-outline" type="button" id="preview-recipe-btn-bottom">Browse Preview</button>
+          <button class="btn btn-primary" type="submit">Post Recipe</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<div class="recipe-preview-modal" id="recipe-preview-modal" aria-hidden="true">
+  <div class="recipe-preview-dialog" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+    <button class="preview-close" type="button" id="preview-close-btn" aria-label="Close preview">&times;</button>
+    <div class="preview-cover" id="preview-cover"></div>
+    <div class="preview-body">
+      <span class="preview-status" id="preview-status">Public</span>
+      <h2 id="preview-title">Untitled recipe</h2>
+      <p id="preview-description">Your recipe introduction will appear here.</p>
+      <div class="preview-meta" id="preview-meta"></div>
+      <div class="preview-columns">
+        <div>
+          <h3>Ingredients</h3>
+          <ul id="preview-ingredients"></ul>
+        </div>
+        <div>
+          <h3>Steps</h3>
+          <ol id="preview-steps"></ol>
         </div>
       </div>
     </div>
   </div>
-</section>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+$(function () {
+  const form = $("#add-recipe-form");
+  const draftKey = "recipehub-add-recipe-draft";
+  let submitted = false;
+
+  const templates = {
+    "quick-dinner": {
+      category: "Dinner",
+      cook_time: "20-30 minutes",
+      description: "A quick dinner recipe designed for busy nights with simple prep and satisfying flavor.",
+      why_people_love_it: "It is fast, flexible, and uses everyday ingredients without making the method feel rushed.",
+      flavor_notes: "Savory, bright, and balanced",
+      skill_level: "Beginner friendly",
+      best_for: "Weeknight dinner",
+      pair_with: "A crisp salad or steamed greens",
+      spice_level: "Mild",
+      dietary_cautions: "Check packaged sauces for allergens",
+      ingredients: "Main protein or vegetables\nOlive oil\nGarlic\nSalt and pepper\nFresh herbs",
+      steps: "Prepare and season the ingredients\nCook over medium heat until tender\nAdjust seasoning and serve warm"
+    },
+    "healthy-meal": {
+      category: "Healthy",
+      cook_time: "30-60 minutes",
+      description: "A balanced recipe with colorful ingredients, clear prep, and a fresh finish.",
+      why_people_love_it: "It feels light but filling, and it is easy to adapt for meal prep.",
+      flavor_notes: "Fresh, clean, and lightly zesty",
+      skill_level: "Easy",
+      best_for: "Meal prep or lunch",
+      pair_with: "Herbal tea or sparkling water",
+      spice_level: "Low",
+      dietary_cautions: "Adjust nuts, dairy, or gluten as needed",
+      ingredients: "Whole grains\nLean protein or beans\nMixed vegetables\nLemon juice\nOlive oil",
+      steps: "Cook the grain base\nPrepare the vegetables and protein\nCombine with dressing and serve"
+    },
+    dessert: {
+      category: "Dessert",
+      cook_time: "60+ minutes",
+      description: "A comforting dessert with a clear method, rich flavor, and a polished finish.",
+      why_people_love_it: "It is cozy, shareable, and looks impressive without requiring advanced technique.",
+      flavor_notes: "Sweet, warm, and buttery",
+      skill_level: "Intermediate",
+      best_for: "Family gatherings",
+      pair_with: "Coffee or vanilla ice cream",
+      spice_level: "None",
+      dietary_cautions: "Contains sugar and may contain dairy, eggs, or gluten",
+      ingredients: "Flour\nSugar\nButter\nEggs\nVanilla\nPinch of salt",
+      steps: "Prepare the batter or dough\nBake until golden and set\nCool slightly before serving"
+    }
+  };
+
+  function formHasContent() {
+    return form.find("input[type='text'], input[type='url'], textarea").toArray().some((field) => field.value.trim());
+  }
+
+  function collectDraft() {
+    const draft = {};
+    form.serializeArray().forEach((item) => {
+      draft[item.name] = item.value;
+    });
+    return draft;
+  }
+
+  function saveDraft() {
+    localStorage.setItem(draftKey, JSON.stringify(collectDraft()));
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(draftKey);
+  }
+
+  function restoreDraft() {
+    const rawDraft = localStorage.getItem(draftKey);
+    if (!rawDraft) {
+      return;
+    }
+    try {
+      const draft = JSON.parse(rawDraft);
+      Object.entries(draft).forEach(([name, value]) => {
+        const field = form.find(`[name="${name}"]`);
+        if (field.attr("type") === "radio") {
+          form.find(`[name="${name}"][value="${value}"]`).prop("checked", true);
+        } else {
+          field.val(value);
+        }
+      });
+      toggleCustomTime();
+    } catch (error) {
+      clearDraft();
+    }
+  }
+
+  function toggleCustomTime() {
+    $("#custom-cook-time-wrap").toggleClass("active", $("#cook-time-select").val() === "custom");
+  }
+
+  function setFields(data) {
+    Object.entries(data).forEach(([name, value]) => {
+      form.find(`[name="${name}"]`).val(value);
+    });
+    toggleCustomTime();
+  }
+
+  function listItems(value, fallback) {
+    const lines = value.split(/\n+/).map((item) => item.trim()).filter(Boolean);
+    return lines.length ? lines : [fallback];
+  }
+
+  function currentCookTime() {
+    return $("#cook-time-select").val() === "custom" ? $("#custom-cook-time").val() : $("#cook-time-select").val();
+  }
+
+  function openPreview() {
+    const title = $('[name="title"]').val().trim() || "Untitled recipe";
+    const description = $('[name="description"]').val().trim() || "Your recipe introduction will appear here.";
+    const coverSrc = $("#upload-preview-image").attr("src") || $('[name="image_url"]').val().trim();
+    $("#preview-title").text(title);
+    $("#preview-description").text(description);
+    $("#preview-status").text($('[name="visibility"]:checked').val() === "public" ? "Public" : "Only me");
+    $("#preview-cover").css("background-image", coverSrc ? `url("${coverSrc}")` : "none").toggleClass("empty", !coverSrc);
+
+    const meta = [$('[name="category"]').val(), currentCookTime(), $('[name="servings"]').val()].filter(Boolean);
+    $("#preview-meta").html(meta.map((item) => `<span>${$("<div>").text(item).html()}</span>`).join(""));
+    $("#preview-ingredients").html(listItems($('[name="ingredients"]').val(), "Ingredients will appear here.").map((item) => `<li>${$("<div>").text(item).html()}</li>`).join(""));
+    $("#preview-steps").html(listItems($('[name="steps"]').val(), "Steps will appear here.").map((item) => `<li>${$("<div>").text(item).html()}</li>`).join(""));
+    $("#recipe-preview-modal").attr("aria-hidden", "false").addClass("active");
+  }
+
+  $("#cook-time-select").on("change", toggleCustomTime);
+  $("#ai-template-grid").on("click", ".template-card", function () {
+    setFields(templates[$(this).data("template")]);
+  });
+
+  $("#cover-image-file").on("change", function () {
+    const file = this.files[0];
+    if (!file) {
+      $("#upload-preview").addClass("d-none");
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    $("#upload-preview-image").attr("src", url);
+    $("#upload-preview").removeClass("d-none");
+  });
+
+  $("#gallery-images").on("change", function () {
+    const preview = $("#gallery-preview").empty();
+    Array.from(this.files).forEach((file) => {
+      const image = $("<img>").attr("src", URL.createObjectURL(file)).attr("alt", file.name);
+      preview.append(image);
+    });
+  });
+
+  $("#save-draft-btn").on("click", function () {
+    saveDraft();
+    $(this).text("Draft Saved");
+    setTimeout(() => $(this).text("Save Draft"), 1400);
+  });
+
+  $("#preview-recipe-btn, #preview-recipe-btn-bottom").on("click", openPreview);
+  $("#preview-close-btn, #recipe-preview-modal").on("click", function (event) {
+    if (event.target === this) {
+      $("#recipe-preview-modal").attr("aria-hidden", "true").removeClass("active");
+    }
+  });
+
+  $(".draft-aware-link").on("click", function (event) {
+    if (!submitted && formHasContent()) {
+      const shouldSave = window.confirm("You have unfinished edits. Save them as a draft before leaving?");
+      if (shouldSave) {
+        saveDraft();
+      }
+    }
+  });
+
+  window.addEventListener("beforeunload", function (event) {
+    if (!submitted && formHasContent()) {
+      event.preventDefault();
+      event.returnValue = "You have unfinished edits. Save them as a draft?";
+    }
+  });
+
+  form.on("submit", function () {
+    submitted = true;
+    clearDraft();
+  });
+
+  restoreDraft();
+});
+</script>
 {% endblock %}

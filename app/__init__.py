@@ -40,6 +40,15 @@ def run_sqlite_migrations():
         if "email_confirmed" not in user_columns:
             statements.append("ALTER TABLE user ADD COLUMN email_confirmed BOOLEAN DEFAULT 0 NOT NULL")
 
+    if "recipe" in tables:
+        recipe_columns = {column["name"] for column in inspector.get_columns("recipe")}
+
+        if "gallery_images" not in recipe_columns:
+            statements.append("ALTER TABLE recipe ADD COLUMN gallery_images TEXT DEFAULT ''")
+
+        if "is_public" not in recipe_columns:
+            statements.append("ALTER TABLE recipe ADD COLUMN is_public BOOLEAN DEFAULT 1 NOT NULL")
+
     for statement in statements:
         db.session.execute(text(statement))
 
