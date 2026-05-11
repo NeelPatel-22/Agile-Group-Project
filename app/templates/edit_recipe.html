@@ -76,13 +76,16 @@
                 <label class="form-label">Dietary cautions</label>
                 <input type="text" name="dietary_cautions" class="form-control" value="{{ recipe.dietary_cautions }}" placeholder="Contains dairy and gluten">
               </div>
-              <div>
+              <div class="full-span">
                 <label class="form-label">Ingredients</label>
                 <textarea name="ingredients" class="form-control" rows="6" required>{{ recipe.ingredients }}</textarea>
               </div>
-              <div>
-                <label class="form-label">Steps</label>
-                <textarea name="steps" class="form-control" rows="6" required>{{ recipe.steps }}</textarea>
+              <div class="full-span">
+                <div class="step-editor" data-step-editor>
+                  <label class="form-label">Steps</label>
+                  <textarea name="steps" class="form-control step-editor-source" rows="6">{{ recipe.steps }}</textarea>
+                  <div class="step-editor-list" data-step-list></div>
+                </div>
               </div>
               <div class="full-span">
                 <label class="form-label">Or image URL</label>
@@ -96,4 +99,78 @@
     </div>
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  $(function () {
+    const editor = $("[data-step-editor]");
+    if (!editor.length) {
+      return;
+    }
+
+    const source = editor.find(".step-editor-source");
+    const list = editor.find("[data-step-list]");
+
+    function stepValues() {
+      return list.find(".step-editor-input").map(function () {
+        return $(this).val().trim();
+      }).get().filter(Boolean);
+    }
+
+    function syncSteps() {
+      source.val(stepValues().join("\n"));
+    }
+
+    function addStep(value) {
+      const row = $(`
+        <div class="step-editor-row">
+          <input type="text" class="form-control step-editor-input" placeholder="Write one step">
+          <button type="button" class="step-add-btn" aria-label="Add step">+</button>
+        </div>
+      `);
+
+      row.find(".step-editor-input").val(value || "");
+      list.append(row);
+      moveAddButton(row);
+      syncSteps();
+      return row;
+    }
+
+    function moveAddButton(row) {
+      list.find(".step-add-btn").addClass("d-none");
+      row.find(".step-add-btn").removeClass("d-none");
+    }
+
+    const initialSteps = source.val().split(/\r?\n/).filter(function (step) {
+      return step.trim().length > 0;
+    });
+
+    source.addClass("d-none").prop("required", false);
+    if (initialSteps.length) {
+      initialSteps.forEach(addStep);
+    } else {
+      addStep("");
+    }
+
+    list.on("focus", ".step-editor-input", function () {
+      moveAddButton($(this).closest(".step-editor-row"));
+    });
+
+    list.on("input", ".step-editor-input", syncSteps);
+
+    list.on("keydown", ".step-editor-input", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    });
+
+    list.on("click", ".step-add-btn", function () {
+      const row = addStep("");
+      row.find(".step-editor-input").trigger("focus");
+    });
+
+    editor.closest("form").on("submit", syncSteps);
+  });
+</script>
 {% endblock %}

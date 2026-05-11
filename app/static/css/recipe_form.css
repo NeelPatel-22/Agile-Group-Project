@@ -103,6 +103,45 @@
   box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.14);
 }
 
+.step-editor-list {
+  display: grid;
+  gap: 10px;
+}
+
+.step-editor-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+}
+
+.step-editor-input {
+  min-height: 48px;
+}
+
+.step-add-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  background: #f9fdfa;
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.step-add-btn:hover,
+.step-add-btn:focus {
+  background: var(--primary-color);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
 .upload-preview {
   border-radius: 16px;
   overflow: hidden;
