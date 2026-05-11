@@ -83,9 +83,6 @@ def broadcast_recipe_update(recipe):
  
 @main.route("/")
 def cover():
-    if current_user.is_authenticated:
-        return redirect(url_for("main.recipes"))
-
     return render_template("cover.html")
  
  
