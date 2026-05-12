@@ -252,6 +252,19 @@ def edit_recipe(recipe_id):
     )
 
 
+@main.route("/recipes/<int:recipe_id>/delete", methods=["POST"])
+@login_required
+def delete_recipe(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if recipe.user_id != current_user.id:
+        abort(403)
+
+    db.session.delete(recipe)
+    db.session.commit()
+    return redirect(url_for("main.profile", user_id=current_user.id))
+
+
 @main.route("/recipes/<int:recipe_id>/like", methods=["POST"])
 @login_required
 def toggle_like(recipe_id):

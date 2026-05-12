@@ -110,6 +110,23 @@
   background-position: center;
 }
 
+.recipe-owner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.recipe-delete-form {
+  margin: 0;
+}
+
+.recipe-delete-btn {
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 @media (max-width: 768px) {
   .recipe-gallery {
     grid-template-columns: 1fr;
