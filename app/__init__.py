@@ -46,6 +46,17 @@ def run_sqlite_migrations():
     if statements:
         db.session.commit()
 
+
+def configure_sqlite_connection():
+    if db.engine.url.get_backend_name() != "sqlite":
+        return
+
+    db.session.execute(text("PRAGMA journal_mode=MEMORY"))
+    db.session.execute(text("PRAGMA synchronous=NORMAL"))
+    db.session.execute(text("PRAGMA foreign_keys=ON"))
+    db.session.commit()
+
+
 def create_app(config=None):
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "recipes123")
@@ -74,13 +85,14 @@ def create_app(config=None):
 
     @login_manager.user_loader
     def load_user(user_id):
-        return User.query.get(int(user_id))
+        return db.session.get(User, int(user_id))
 
     from app.routes import main
     app.register_blueprint(main)
 
     with app.app_context():
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        configure_sqlite_connection()
         db.create_all()
         run_sqlite_migrations()
 

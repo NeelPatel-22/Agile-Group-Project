@@ -4,13 +4,18 @@ import uuid
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from itsdangerous import BadSignature, SignatureExpired
+from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 
 from . import db, socketio
 from .helpers.email_helpers import (
-    get_email_from_confirmation_token,
+    get_payload_from_confirmation_token,
+    get_payload_from_email_change_token,
+    get_payload_from_password_reset_token,
     is_valid_email,
-    send_confirmation_email,
+    send_email_change_confirmation,
+    send_password_reset_email,
+    send_signup_confirmation_email,
 )
 from .helpers.recipe_helpers import (
     get_more_recipes_by_author,
@@ -18,7 +23,7 @@ from .helpers.recipe_helpers import (
     get_recipes_by_user,
     get_user_by_id,
 )
-from .models import Comment, Like, Recipe, SavedRecipe, User
+from .models import Comment, Like, PendingSignup, Recipe, SavedRecipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
@@ -327,8 +332,8 @@ def login():
 
         if user and user.check_password(password):
             if not user.email_confirmed:
-                send_confirmation_email(user)
-                return render_template("check_email.html", email=user.email)
+                error = "Please confirm your email before logging in."
+                return render_template("login.html", error=error)
 
             login_user(user)
             return redirect(url_for("main.recipes"))
@@ -349,6 +354,7 @@ def signup():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         bio = request.form.get("bio", "").strip()
+        profile_image_file = request.files.get("profile_image")
 
         if not username or not email or not password:
             error = "Please fill in all fields."
@@ -357,12 +363,26 @@ def signup():
         elif User.query.filter((User.email == email) | (User.username == username)).first():
             error = "A user with that email or username already exists."
         else:
-            user = User(username=username, email=email, bio=bio)
-            user.set_password(password)
-            db.session.add(user)
-            db.session.commit()
-            send_confirmation_email(user)
-            return render_template("check_email.html", email=user.email)
+            profile_image = save_uploaded_image(profile_image_file)
+            if profile_image is None:
+                error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
+            else:
+                pending_signup = PendingSignup(
+                    username=username,
+                    email=email,
+                    password_hash=generate_password_hash(password),
+                    bio=bio,
+                    profile_image=profile_image or "",
+                )
+                db.session.add(pending_signup)
+                db.session.commit()
+
+                confirmation_url = send_signup_confirmation_email(pending_signup)
+                return render_template(
+                    "check_email.html",
+                    email=email,
+                    development_confirmation_url=confirmation_url if not current_app.config.get("MAIL_SERVER") else None,
+                )
 
     return render_template("signup.html", error=error)
 
@@ -370,23 +390,128 @@ def signup():
 @main.route("/confirm-email/<token>")
 def confirm_email(token):
     try:
-        email = get_email_from_confirmation_token(token)
+        payload = get_payload_from_confirmation_token(token)
     except SignatureExpired:
         return render_template(
-            "login.html",
-            error="That confirmation link has expired. Log in to receive a new one.",
+            "signup.html",
+            error="That confirmation link has expired. Please sign up again.",
         )
     except BadSignature:
-        return render_template("login.html", error="That confirmation link is invalid.")
+        return render_template("signup.html", error="That confirmation link is invalid.")
 
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return render_template("login.html", error="No account was found for that confirmation link.")
+    if not isinstance(payload, dict) or "pending_signup_id" not in payload:
+        return render_template("signup.html", error="That confirmation link is invalid.")
 
-    user.email_confirmed = True
+    pending_signup = db.session.get(PendingSignup, payload["pending_signup_id"])
+    if not pending_signup:
+        return render_template("signup.html", error="That confirmation link is invalid or has already been used.")
+
+    email = pending_signup.email.strip().lower()
+    username = pending_signup.username.strip()
+
+    if User.query.filter((User.email == email) | (User.username == username)).first():
+        db.session.delete(pending_signup)
+        db.session.commit()
+        return render_template("login.html", error="That account already exists. Please log in.")
+
+    user = User(
+        username=username,
+        email=email,
+        password_hash=pending_signup.password_hash,
+        email_confirmed=True,
+        bio=pending_signup.bio,
+        profile_image=pending_signup.profile_image,
+    )
+
+    db.session.add(user)
+    db.session.delete(pending_signup)
     db.session.commit()
     logout_user()
     return redirect(url_for("main.login"))
+
+
+@main.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.recipes"))
+
+    error = None
+    sent = False
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+
+        if not email:
+            error = "Please enter your email address."
+        elif not is_valid_email(email):
+            error = "Please enter a real email address."
+        else:
+            user = User.query.filter_by(email=email).first()
+            if user:
+                send_password_reset_email(user)
+            sent = True
+
+    return render_template("forgot_password.html", error=error, sent=sent)
+
+
+@main.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    if current_user.is_authenticated:
+        logout_user()
+
+    error = None
+
+    try:
+        payload = get_payload_from_password_reset_token(token)
+    except SignatureExpired:
+        return render_template("forgot_password.html", error="That reset link has expired.", sent=False)
+    except BadSignature:
+        return render_template("forgot_password.html", error="That reset link is invalid.", sent=False)
+
+    user = db.session.get(User, payload.get("user_id")) if isinstance(payload, dict) else None
+    if not user:
+        return render_template("forgot_password.html", error="That reset link is invalid.", sent=False)
+
+    if request.method == "POST":
+        password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not password:
+            error = "Please enter a new password."
+        elif password != confirm_password:
+            error = "Passwords do not match."
+        else:
+            user.set_password(password)
+            db.session.commit()
+            return render_template("login.html", error=None, success="Your password has been reset. Please log in.")
+
+    return render_template("reset_password.html", error=error)
+
+
+@main.route("/confirm-email-change/<token>")
+def confirm_email_change(token):
+    try:
+        payload = get_payload_from_email_change_token(token)
+    except SignatureExpired:
+        return render_template("login.html", error="That email change link has expired.")
+    except BadSignature:
+        return render_template("login.html", error="That email change link is invalid.")
+
+    user = db.session.get(User, payload.get("user_id")) if isinstance(payload, dict) else None
+    new_email = payload.get("email", "").strip().lower() if isinstance(payload, dict) else ""
+
+    if not user or not new_email:
+        return render_template("login.html", error="That email change link is invalid.")
+
+    existing_user = User.query.filter((User.email == new_email) & (User.id != user.id)).first()
+    if existing_user:
+        return render_template("login.html", error="That email address is already in use.")
+
+    user.email = new_email
+    user.email_confirmed = True
+    db.session.commit()
+    logout_user()
+    return render_template("login.html", error=None, success="Your email has been updated. Please log in again.")
 
 @main.route("/logout")
 def logout():
@@ -509,27 +634,34 @@ def edit_profile(user_id):
         bio = request.form.get("bio", "").strip()
         profile_image_file = request.files.get("profile_image")
         existing_user = User.query.filter(
-            ((User.email == email) | (User.username == username)) & (User.id != current_user.id)
+            (User.username == username) & (User.id != current_user.id)
         ).first()
+        email_owner = User.query.filter((User.email == email) & (User.id != current_user.id)).first()
 
         if not username or not email:
             error = "Username and email are required."
         elif not is_valid_email(email):
             error = "Please enter a real email address."
         elif existing_user:
-            error = "That username or email is already in use."
+            error = "That username is already in use."
+        elif email_owner:
+            error = "That email is already in use."
         else:
             profile_image = save_uploaded_image(profile_image_file)
             if profile_image is None:
                 error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
             else:
                 current_user.username = username
-                current_user.email = email
                 current_user.bio = bio
                 if profile_image:
                     current_user.profile_image = profile_image
                 db.session.commit()
-                return redirect(url_for("main.profile", user_id=current_user.id))
+
+                if email != current_user.email:
+                    send_email_change_confirmation(current_user, email)
+                    success = "Profile saved. Check your new email address to confirm the email change."
+                else:
+                    return redirect(url_for("main.profile", user_id=current_user.id))
 
     return render_template(
         "edit_profile.html",
