@@ -130,7 +130,12 @@
                   View {{ recipe.author.username }}'s Profile
                 </a>
                 {% if current_user.id == recipe.user_id %}
-                <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn custom-btn">Edit Recipe</a>
+                <div class="recipe-owner-actions">
+                  <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn custom-btn">Edit Recipe</a>
+                  <form action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" method="post" class="recipe-delete-form" onsubmit="return confirm('Delete this recipe? This cannot be undone.');">
+                    <button type="submit" class="btn btn-danger recipe-delete-btn">Delete Recipe</button>
+                  </form>
+                </div>
                 {% endif %}
               </div>
             </div>
