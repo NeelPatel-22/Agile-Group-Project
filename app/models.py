@@ -24,6 +24,16 @@ class Like(db.Model):
     __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_recipe_like"),)
 
 
+class PendingSignup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    bio = db.Column(db.String(255), default="")
+    profile_image = db.Column(db.String(255), default="")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
