@@ -5,14 +5,32 @@
 {% block content %}
 <section class="page-section recipe-detail-main" data-current-user-id="{{ current_user.id }}">
     <div class="container">
+        <header class="recipes-hero">
+            <div class="recipes-hero-content">
+                <p class="eyebrow">RecipeHub Community</p>
+                <h1>Discover practical recipes for every table.</h1>
+                <p>Browse community favorites, narrow your search, and save the dishes you want to cook next.</p>
+            </div>
+            <div class="recipes-hero-actions">
+                <div class="recipes-hero-stat">
+                    <strong>{{ recipes|length }}</strong>
+                    <span>recipes found</span>
+                </div>
+                <div class="recipes-hero-stat">
+                    <strong>{{ active_filter_count }}</strong>
+                    <span>filters active</span>
+                </div>
+            </div>
+        </header>
+
         <div class="recipe-discovery-layout">
             <aside class="recipe-search-column">
                 <div class="recipe-detail-card recipe-page-panel recipe-search-panel">
                     <div class="card-body p-4">
                         <div class="recipe-page-intro">
                             <div class="title-block mb-0">
-                                <p class="eyebrow">Advanced Search</p>
-                                <h1 class="recipe-page-title recipe-search-title mb-1">Find recipes faster</h1>
+                                <p class="eyebrow">Search</p>
+                                <h2 class="recipe-page-title recipe-search-title mb-1">Find recipes faster</h2>
                                 <p class="recipe-page-subtitle mb-0">Filter by type, difficulty, spice, and cooking details.</p>
                             </div>
 
@@ -69,7 +87,14 @@
                                 </div>
 
                                 <div class="recipe-search-actions">
-                                    <button class="btn btn-success" type="submit">Apply filters</button>
+                                    <button class="btn btn-success" type="submit">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M3 5h18"></path>
+                                            <path d="M6 12h12"></path>
+                                            <path d="M10 19h4"></path>
+                                        </svg>
+                                        Apply
+                                    </button>
                                     <a href="{{ url_for('main.recipes') }}" class="btn btn-outline-secondary">Clear</a>
                                 </div>
                             </form>
@@ -88,8 +113,8 @@
                     <div>
                         <p class="eyebrow">Recipe Feed</p>
                         <h2 class="recipe-feed-title mb-1">Explore recipes from the community</h2>
-                        <p class="recipe-feed-copy mb-0">Scroll the feed, open recipes, and preview community interaction tools.</p>
                     </div>
+                    <p class="recipe-feed-copy mb-0">Fresh ideas, saved favorites, and quick ways to join the conversation.</p>
                 </div>
 
                 <div class="recipe-list">
@@ -103,7 +128,7 @@
                     {% set initials = recipe.author.username[:2]|upper %}
                     <article class="recipe-card" data-recipe-id="{{ recipe.id }}" data-recipe-owner-id="{{ recipe.user_id }}">
                         <div class="card recipe-detail-card h-100">
-                            <div class="card-body p-4">
+                            <div class="card-body">
                                 <div class="top-meta">
                                     <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="author-link">
                                         <div class="author-avatar">{{ initials }}</div>
@@ -120,7 +145,6 @@
                                 </div>
 
                                 <div class="title-block">
-                                    <p class="eyebrow">Community Recipe</p>
                                     <h3 class="recipe-page-title recipe-card-title">
                                         <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="recipe-detail-link">{{ recipe.title }}</a>
                                     </h3>
@@ -131,7 +155,13 @@
 
                                 <div class="recipe-card-toolbar">
                                     <span class="recipe-date">{{ recipe.created_at.strftime('%d %b %Y') }}</span>
-                                    <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-outline-success btn-sm">View recipe</a>
+                                    <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-outline-success btn-sm">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        View recipe
+                                    </a>
                                 </div>
 
                                 {% set visible_comments = recipe.comments|rejectattr('is_hidden')|list %}
@@ -141,9 +171,16 @@
                                 <div class="share-box">
                                     <div class="recipe-actions">
                                         <button class="btn btn-action like-btn {% if liked %}active{% endif %}" type="button" data-recipe-id="{{ recipe.id }}">
-                                            Like Recipe <span class="like-count">{{ recipe.likes|length }}</span>
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z"></path>
+                                                <path d="M7 11l4-8a3 3 0 0 1 3 3v5h4a2 2 0 0 1 2 2l-1 6a2 2 0 0 1-2 2H7"></path>
+                                            </svg>
+                                            Like <span class="like-count">{{ recipe.likes|length }}</span>
                                         </button>
                                         <button class="btn btn-action save-btn {% if saved %}active{% endif %}" type="button" data-recipe-id="{{ recipe.id }}">
+                                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                            </svg>
                                             <span class="save-label">{{ "Unsave Recipe" if saved else "Save Recipe" }}</span>
                                         </button>
                                         <span class="comment-counter">{{ visible_comments|length }} comments</span>
@@ -154,7 +191,13 @@
                                     <form class="comment-form" method="POST" action="{{ url_for('main.add_comment', recipe_id=recipe.id) }}" data-recipe-id="{{ recipe.id }}">
                                         <div class="input-group">
                                             <input type="text" name="content" class="form-control" placeholder="Write a comment">
-                                            <button class="btn btn-dark" type="submit">Post</button>
+                                            <button class="btn btn-dark" type="submit">
+                                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                                    <path d="M22 2L11 13"></path>
+                                                    <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                                                </svg>
+                                                Post
+                                            </button>
                                         </div>
                                     </form>
                                     <div class="comment-list mt-3">
