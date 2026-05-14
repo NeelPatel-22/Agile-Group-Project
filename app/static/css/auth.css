@@ -1,6 +1,8 @@
 .auth-split-page {
   min-height: 100%;
-  background: var(--light-bg);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(244, 185, 66, 0.16), transparent 28rem),
+    linear-gradient(135deg, #ffffff 0%, #f6faf7 100%);
 }
 
 .auth-split-layout {
@@ -12,15 +14,17 @@
 .auth-visual-panel {
   display: flex;
   align-items: end;
-  padding: 2.2rem;
+  padding: clamp(1.5rem, 4vw, 3.4rem);
   background:
-    linear-gradient(rgba(20, 108, 67, 0.52), rgba(20, 108, 67, 0.52)),
+    linear-gradient(135deg, rgba(18, 63, 42, 0.72), rgba(37, 111, 69, 0.48)),
     url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80") center/cover;
+  position: relative;
+  overflow: hidden;
 }
 
 .auth-signup-visual {
   background:
-    linear-gradient(rgba(20, 108, 67, 0.52), rgba(20, 108, 67, 0.52)),
+    linear-gradient(135deg, rgba(18, 63, 42, 0.72), rgba(37, 111, 69, 0.48)),
     url("https://images.unsplash.com/photo-1466637574441-749b8f19452f?auto=format&fit=crop&w=1400&q=80") center/cover;
 }
 
@@ -36,11 +40,12 @@
   letter-spacing: 0.14em;
   font-size: 0.78rem;
   font-weight: 700;
+  color: var(--accent-color);
 }
 
 .auth-visual-overlay h1 {
-  font-size: 2.4rem;
-  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
   line-height: 1.15;
   margin-bottom: 0.8rem;
 }
@@ -55,17 +60,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.75rem 2rem;
-  background: #f3f6f4;
+  padding: clamp(1.25rem, 4vw, 3rem);
+  background: rgba(248, 250, 246, 0.86);
 }
 
 .auth-form-card {
   width: 100%;
   max-width: 460px;
-  padding: 2rem;
-  background: var(--white);
-  border-radius: 18px;
+  padding: clamp(1.35rem, 4vw, 2.2rem);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(217, 234, 223, 0.9);
+  border-radius: 20px;
   box-shadow: var(--shadow-strong);
+  backdrop-filter: blur(18px);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.auth-form-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px rgba(18, 63, 42, 0.14);
 }
 
 .auth-form-wrap {
@@ -75,8 +90,8 @@
 }
 
 .auth-form-wrap h2 {
-  font-size: 1.85rem;
-  font-weight: 700;
+  font-size: 1.9rem;
+  font-weight: 800;
   color: var(--primary-dark);
   margin-bottom: 0.35rem;
 }
@@ -112,10 +127,14 @@
   text-decoration: none;
   font-weight: 600;
   font-size: 0.94rem;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .auth-links-row a:hover {
   color: var(--primary-hover);
+  transform: translateY(-1px);
 }
 
 .auth-page-body .site-main {

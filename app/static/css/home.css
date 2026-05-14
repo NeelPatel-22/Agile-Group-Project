@@ -5,21 +5,40 @@
 }
 
 .hero-section {
-  min-height: 80vh;
+  min-height: min(780px, calc(100vh - 72px));
   display: flex;
   align-items: center;
   text-align: center;
   background:
-    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+    linear-gradient(135deg, rgba(18, 63, 42, 0.78), rgba(18, 63, 42, 0.45)),
     url("https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=80");
   background-size: cover;
   background-position: center;
   color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 140px;
+  background: linear-gradient(transparent, rgba(248, 250, 246, 0.96));
+  pointer-events: none;
+}
+
+.hero-section .container {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-title {
-  font-size: 3rem;
+  font-size: clamp(2.35rem, 6vw, 4.8rem);
   font-weight: 800;
+  line-height: 1.05;
+  max-width: 920px;
+  margin-inline: auto;
 }
 
 .hero-title span {
@@ -27,9 +46,10 @@
 }
 
 .hero-subtitle {
-  margin: 15px auto 25px;
-  max-width: 700px;
-  color: #eeeeee;
+  margin: 18px auto 28px;
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: clamp(1rem, 2vw, 1.18rem);
 }
 
 .custom-btn {
@@ -53,6 +73,10 @@
   border-radius: 8px;
   color: var(--white) !important;
   font-weight: 600;
+  transition:
+    transform 0.22s ease,
+    background-color 0.22s ease,
+    color 0.22s ease;
 }
 
 .hero-outline-btn:hover {
@@ -61,16 +85,19 @@
 }
 
 .recipe-card {
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  transition: 0.3s;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
   background: var(--white);
   border: none;
 }
 
 .recipe-card:hover {
   transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
 }
 
 .recipe-img {
@@ -80,7 +107,7 @@
 }
 
 .recipe-card-body {
-  padding: 18px;
+  padding: 20px;
 }
 
 .recipe-card-title {
@@ -101,7 +128,7 @@
 }
 
 .about-section {
-  background: var(--white);
+  background: linear-gradient(180deg, var(--white), var(--light-bg));
 }
 
 .about-image {
@@ -125,7 +152,18 @@
 }
 
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.2rem;
+  .hero-section {
+    min-height: 620px;
+    padding: 4rem 0;
+  }
+
+  .hero-section .d-flex {
+    align-items: stretch;
+  }
+
+  .about-image {
+    max-height: 320px;
+    width: 100%;
+    object-fit: cover;
   }
 }

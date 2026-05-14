@@ -21,23 +21,23 @@
           <div class="alert alert-success">{{ success }}</div>
           {% endif %}
 
-          <form method="POST" enctype="multipart/form-data">
+          <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
             <div class="meta-grid form-grid">
               <div>
-                <label class="form-label">Username</label>
-                <input type="text" name="username" class="form-control" value="{{ current_user.username }}" required>
+                <label class="form-label" for="profile-username">Username</label>
+                <input id="profile-username" type="text" name="username" class="form-control" value="{{ current_user.username }}" autocomplete="username" minlength="3" maxlength="80" required data-label="Username">
               </div>
               <div>
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="{{ current_user.email }}" required>
+                <label class="form-label" for="profile-email">Email</label>
+                <input id="profile-email" type="email" name="email" class="form-control" value="{{ current_user.email }}" autocomplete="email" required data-label="Email">
               </div>
               <div class="full-span">
-                <label class="form-label">Description</label>
-                <textarea name="bio" class="form-control" rows="4" placeholder="Tell people about your cooking style">{{ current_user.bio }}</textarea>
+                <label class="form-label" for="profile-bio">Bio</label>
+                <textarea id="profile-bio" name="bio" class="form-control" rows="4" maxlength="255" placeholder="Tell people about your cooking style">{{ current_user.bio }}</textarea>
               </div>
               <div class="full-span">
-                <label class="form-label">Profile image</label>
-                <input type="file" name="profile_image" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+                <label class="form-label" for="profile-image">Profile image</label>
+                <input id="profile-image" type="file" name="profile_image" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp" data-allowed-extensions="png,jpg,jpeg,gif,webp">
               </div>
             </div>
             <button class="btn btn-primary mt-3">Save Changes</button>

@@ -2,6 +2,7 @@
 {% block title %}Edit Recipe | RecipeHub{% endblock %}
 {% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/edit_recipe.css') }}">{% endblock %}
 {% block content %}
+{% set values = form_values or recipe %}
 <section class="page-section profile-page">
   <div class="container">
     <div class="add-recipe-shell">
@@ -12,7 +13,6 @@
               <h2 class="section-title">Edit Recipe</h2>
               <p class="profile-bio mb-0">Update your recipe details, image, ingredients, and method from one place.</p>
             </div>
-            <a href="{{ url_for('main.profile', user_id=recipe.user_id) }}" class="btn btn-outline">Back to Profile</a>
           </div>
 
           {% if error %}
@@ -22,71 +22,71 @@
           <div class="alert alert-success">{{ success }}</div>
           {% endif %}
 
-          <form method="POST" enctype="multipart/form-data">
+          <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
             <div class="meta-grid form-grid">
               <div>
                 <label class="form-label">Recipe title</label>
-                <input type="text" name="title" class="form-control" value="{{ recipe.title }}" required>
+                <input type="text" name="title" class="form-control" value="{{ values.title }}" maxlength="150" required data-label="Recipe title">
               </div>
               <div>
                 <label class="form-label">Category</label>
-                <input type="text" name="category" class="form-control" value="{{ recipe.category }}" placeholder="Comfort Food, Salad, Dinner">
+                <input type="text" name="category" class="form-control" value="{{ values.category }}" maxlength="80" placeholder="Comfort Food, Salad, Dinner">
               </div>
               <div>
                 <label class="form-label">Cook time</label>
-                <input type="text" name="cook_time" class="form-control" value="{{ recipe.cook_time }}" placeholder="35 Minutes">
+                <input type="number" name="cook_time" class="form-control" value="{{ values.cook_time }}" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="35" data-label="Cook time">
               </div>
               <div>
                 <label class="form-label">Servings</label>
-                <input type="text" name="servings" class="form-control" value="{{ recipe.servings }}" placeholder="4 Servings">
+                <input type="number" name="servings" class="form-control" value="{{ values.servings }}" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="4" data-label="Servings">
               </div>
               <div>
                 <label class="form-label">Upload new image</label>
-                <input type="file" name="image_file" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+                <input type="file" name="image_file" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp" data-allowed-extensions="png,jpg,jpeg,gif,webp">
               </div>
               <div class="full-span">
                 <label class="form-label">Recipe introduction</label>
-                <textarea name="description" class="form-control" rows="3" required>{{ recipe.description }}</textarea>
+                <textarea name="description" class="form-control" rows="3" maxlength="1200" required data-label="Recipe introduction">{{ values.description }}</textarea>
               </div>
               <div class="full-span">
                 <label class="form-label">Why people love it</label>
-                <textarea name="why_people_love_it" class="form-control" rows="3">{{ recipe.why_people_love_it }}</textarea>
+                <textarea name="why_people_love_it" class="form-control" rows="3">{{ values.why_people_love_it }}</textarea>
               </div>
               <div>
                 <label class="form-label">Flavor</label>
-                <input type="text" name="flavor_notes" class="form-control" value="{{ recipe.flavor_notes }}" placeholder="Creamy, sweet, and savory">
+                <input type="text" name="flavor_notes" class="form-control" value="{{ values.flavor_notes }}" placeholder="Creamy, sweet, and savory">
               </div>
               <div>
                 <label class="form-label">Skill level</label>
-                <input type="text" name="skill_level" class="form-control" value="{{ recipe.skill_level }}" placeholder="Beginner friendly">
+                <input type="text" name="skill_level" class="form-control" value="{{ values.skill_level }}" placeholder="Beginner friendly">
               </div>
               <div>
                 <label class="form-label">Best for</label>
-                <input type="text" name="best_for" class="form-control" value="{{ recipe.best_for }}" placeholder="Family dinner or meal prep">
+                <input type="text" name="best_for" class="form-control" value="{{ values.best_for }}" placeholder="Family dinner or meal prep">
               </div>
               <div>
                 <label class="form-label">Pair with</label>
-                <input type="text" name="pair_with" class="form-control" value="{{ recipe.pair_with }}" placeholder="Lemon salad and sparkling water">
+                <input type="text" name="pair_with" class="form-control" value="{{ values.pair_with }}" placeholder="Lemon salad and sparkling water">
               </div>
               <div>
                 <label class="form-label">Spice level</label>
-                <input type="text" name="spice_level" class="form-control" value="{{ recipe.spice_level }}" placeholder="Mild by default">
+                <input type="text" name="spice_level" class="form-control" value="{{ values.spice_level }}" placeholder="Mild by default">
               </div>
               <div>
                 <label class="form-label">Dietary cautions</label>
-                <input type="text" name="dietary_cautions" class="form-control" value="{{ recipe.dietary_cautions }}" placeholder="Contains dairy and gluten">
+                <input type="text" name="dietary_cautions" class="form-control" value="{{ values.dietary_cautions }}" placeholder="Contains dairy and gluten">
               </div>
               <div>
                 <label class="form-label">Ingredients</label>
-                <textarea name="ingredients" class="form-control" rows="6" required>{{ recipe.ingredients }}</textarea>
+                <textarea name="ingredients" class="form-control" rows="6" required data-label="Ingredients">{{ values.ingredients }}</textarea>
               </div>
               <div>
                 <label class="form-label">Steps</label>
-                <textarea name="steps" class="form-control" rows="6" required>{{ recipe.steps }}</textarea>
+                <textarea name="steps" class="form-control" rows="6" required data-label="Steps">{{ values.steps }}</textarea>
               </div>
               <div class="full-span">
                 <label class="form-label">Or image URL</label>
-                <input type="url" name="image_url" class="form-control" value="{{ recipe.image_url }}" placeholder="Optional external image link">
+                <input type="url" name="image_url" class="form-control" value="{{ values.image_url }}" placeholder="Optional external image link">
               </div>
             </div>
             <button class="btn btn-primary mt-3">Save Changes</button>
