@@ -12,38 +12,37 @@
               <h2 class="section-title">Add Recipe</h2>
               <p class="profile-bio mb-0">Create a richer recipe post with quick details, flavor notes, ingredients, and step-by-step instructions.</p>
             </div>
-            <a href="{{ url_for('main.profile', user_id=current_user.id) }}" class="btn btn-outline">Back to Profile</a>
           </div>
 
           {% if error %}
           <div class="alert alert-danger">{{ error }}</div>
           {% endif %}
 
-          <form method="POST" enctype="multipart/form-data">
+          <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
             <div class="meta-grid form-grid">
               <div>
-                <label class="form-label">Recipe title</label>
-                <input type="text" name="title" class="form-control" required>
+                <label class="form-label" for="recipe-title">Recipe title</label>
+                <input id="recipe-title" type="text" name="title" class="form-control" maxlength="150" required data-label="Recipe title">
               </div>
               <div>
-                <label class="form-label">Category</label>
-                <input type="text" name="category" class="form-control" placeholder="Comfort Food, Salad, Dinner">
+                <label class="form-label" for="recipe-category">Category</label>
+                <input id="recipe-category" type="text" name="category" class="form-control" maxlength="80" placeholder="Comfort Food, Salad, Dinner">
               </div>
               <div>
-                <label class="form-label">Cook time</label>
-                <input type="text" name="cook_time" class="form-control" placeholder="35 Minutes">
+                <label class="form-label" for="recipe-cook-time">Cook time</label>
+                <input id="recipe-cook-time" type="text" name="cook_time" class="form-control" maxlength="80" placeholder="35 minutes" data-format="cook-time">
               </div>
               <div>
-                <label class="form-label">Servings</label>
-                <input type="text" name="servings" class="form-control" placeholder="4 Servings">
+                <label class="form-label" for="recipe-servings">Servings</label>
+                <input id="recipe-servings" type="text" name="servings" class="form-control" maxlength="80" placeholder="4 servings" data-format="servings">
               </div>
               <div>
                 <label class="form-label">Upload image</label>
-                <input type="file" name="image_file" id="image-file-input" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+                <input type="file" name="image_file" id="image-file-input" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp" data-allowed-extensions="png,jpg,jpeg,gif,webp">
               </div>
               <div class="full-span">
                 <label class="form-label">Recipe introduction</label>
-                <textarea name="description" class="form-control" rows="3" placeholder="Write the short subtitle shown under the recipe title." required></textarea>
+                <textarea name="description" class="form-control" rows="3" maxlength="1200" placeholder="Write the short subtitle shown under the recipe title." required data-label="Recipe introduction"></textarea>
               </div>
               <div class="full-span">
                 <label class="form-label">Why people love it</label>
@@ -75,11 +74,11 @@
               </div>
               <div>
                 <label class="form-label">Ingredients</label>
-                <textarea name="ingredients" class="form-control" rows="6" placeholder="One ingredient per line" required></textarea>
+                <textarea name="ingredients" class="form-control" rows="6" placeholder="One ingredient per line" required data-label="Ingredients"></textarea>
               </div>
               <div>
                 <label class="form-label">Steps</label>
-                <textarea name="steps" class="form-control" rows="6" placeholder="One step per line" required></textarea>
+                <textarea name="steps" class="form-control" rows="6" placeholder="One step per line" required data-label="Steps"></textarea>
               </div>
               <div class="full-span">
                 <label class="form-label">Or image URL</label>

@@ -4,56 +4,59 @@
 {% block content %}
 <section class="page-section profile-page saved-recipes-page">
   <div class="container">
-    <div class="profile-summary-card section-card">
-      <div class="panel-body">
-        <div class="posted-recipes-header">
-          <div>
-            <p class="eyebrow">Saved Recipes</p>
-            <h1 class="section-title mb-1">{{ user.username }}'s Saved Recipes</h1>
-            <p class="posted-recipes-copy mb-0">
-              <span class="saved-recipes-total">{{ saved_recipes|length }}</span> recipes saved for later.
-            </p>
-          </div>
-          <a href="{{ url_for('main.profile', user_id=user.id) }}" class="btn btn-outline">Back to Profile</a>
-        </div>
-
-        <div class="recipes-grid saved-recipes-grid">
-          {% for recipe in saved_recipes %}
-            {% set recipe_image = recipe.image_url %}
-            {% if recipe.image_url and not recipe.image_url.startswith('http://') and not recipe.image_url.startswith('https://') %}
-              {% set recipe_image = url_for('static', filename=recipe.image_url) %}
-            {% elif not recipe.image_url %}
-              {% set recipe_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80' %}
-            {% endif %}
-
-            <article class="profile-recipe-card recipe-card" data-recipe-id="{{ recipe.id }}">
-              <img src="{{ recipe_image }}" alt="{{ recipe.title }}" class="recipe-image">
-              <div class="recipe-body">
-                <div class="recipe-card-meta">
-                  {% if recipe.category %}<span>{{ recipe.category }}</span>{% endif %}
-                  {% if recipe.cook_time %}<span>{{ recipe.cook_time }}</span>{% endif %}
-                  {% if recipe.servings %}<span>{{ recipe.servings }}</span>{% endif %}
-                  <span>{{ recipe.likes|length }} Likes</span>
-                </div>
-                <h3>{{ recipe.title }}</h3>
-                <p>{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
-                <div class="recipe-card-actions">
-                  <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-primary btn-small">View Recipe</a>
-                  <button class="btn btn-outline btn-small save-btn active" type="button" data-recipe-id="{{ recipe.id }}">
-                    <span class="save-label">Unsave Recipe</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          {% else %}
-            <div class="empty-profile-card saved-recipes-empty">
-              <p class="mb-3">You have not saved any recipes yet.</p>
-              <a href="{{ url_for('main.recipes') }}" class="btn btn-primary">Explore Recipes</a>
-            </div>
-          {% endfor %}
+    <section class="profile-recipes-section">
+      <div class="profile-recipes-header">
+        <div>
+          <h1 class="section-title mb-1">My Saved Recipes</h1>
+          <p class="posted-recipes-copy mb-0">A compact list of everything you have saved.</p>
         </div>
       </div>
-    </div>
+
+      <div class="profile-recipe-list saved-recipes-list">
+        {% for recipe in saved_recipes %}
+          {% set recipe_image = recipe.image_url %}
+          {% if recipe.image_url and not recipe.image_url.startswith('http://') and not recipe.image_url.startswith('https://') %}
+            {% set recipe_image = url_for('static', filename=recipe.image_url) %}
+          {% elif not recipe.image_url %}
+            {% set recipe_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80' %}
+          {% endif %}
+
+          <article class="profile-recipe-row recipe-card" data-recipe-id="{{ recipe.id }}">
+            <img src="{{ recipe_image }}" alt="{{ recipe.title }}" class="recipe-image">
+            <div class="recipe-body">
+              <div class="recipe-card-meta">
+                {% if recipe.category %}<span>{{ recipe.category }}</span>{% endif %}
+                {% if recipe.cook_time %}<span>{{ recipe.cook_time }}</span>{% endif %}
+                {% if recipe.servings %}<span>{{ recipe.servings }}</span>{% endif %}
+                <span>{{ recipe.likes|length }} Likes</span>
+              </div>
+              <h3>{{ recipe.title }}</h3>
+              <p>{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
+            </div>
+            <div class="recipe-card-actions">
+              <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="recipe-icon-action view-action" aria-label="View recipe" title="View recipe">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </a>
+              <button class="recipe-icon-action unsave-action save-btn active" type="button" data-recipe-id="{{ recipe.id }}" aria-label="Unsave recipe" title="Unsave recipe">
+                <span class="save-label visually-hidden">Unsave Recipe</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  <path d="M9 10h6"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+        {% else %}
+          <div class="empty-profile-card saved-recipes-empty">
+            <p class="mb-3">You have not saved any recipes yet.</p>
+            <a href="{{ url_for('main.recipes') }}" class="btn btn-primary">Explore Recipes</a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 </section>
 {% endblock %}

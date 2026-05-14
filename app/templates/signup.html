@@ -22,26 +22,28 @@
                     {% if error %}
                     <div class="alert alert-danger">{{ error }}</div>
                     {% endif %}
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
                         <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" class="form-control" required>
+                            <label class="form-label" for="signup-username">Username</label>
+                            <input id="signup-username" type="text" name="username" class="form-control" autocomplete="username" minlength="3" maxlength="80" required data-label="Username">
+                            <span class="field-hint">Use at least 3 characters.</span>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" required>
+                            <label class="form-label" for="signup-email">Email</label>
+                            <input id="signup-email" type="email" name="email" class="form-control" autocomplete="email" required data-label="Email">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" name="password" class="form-control" required>
+                            <label class="form-label" for="signup-password">Password</label>
+                            <input id="signup-password" type="password" name="password" class="form-control" autocomplete="new-password" minlength="8" required data-label="Password">
+                            <span class="field-hint">Use at least 8 characters.</span>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <textarea name="bio" class="form-control" rows="3" placeholder="Tell people a little about your cooking style"></textarea>
+                            <label class="form-label" for="signup-bio">Bio</label>
+                            <textarea id="signup-bio" name="bio" class="form-control" rows="3" maxlength="255" placeholder="Tell people a little about your cooking style"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Profile image</label>
-                            <input type="file" name="profile_image" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp">
+                            <label class="form-label" for="signup-profile-image">Profile image</label>
+                            <input id="signup-profile-image" type="file" name="profile_image" class="form-control" accept=".png,.jpg,.jpeg,.gif,.webp" data-allowed-extensions="png,jpg,jpeg,gif,webp">
                         </div>
                         <button class="btn btn-success w-100">Sign Up</button>
                     </form>

@@ -27,6 +27,7 @@ from .models import Comment, Like, PendingSignup, Recipe, SavedRecipe, User
 main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+MIN_PASSWORD_LENGTH = 8
 
 
 def is_allowed_image(filename):
@@ -356,12 +357,20 @@ def signup():
         bio = request.form.get("bio", "").strip()
         profile_image_file = request.files.get("profile_image")
 
+        existing_pending = PendingSignup.query.filter(
+            (PendingSignup.email == email) | (PendingSignup.username == username)
+        ).first()
+
         if not username or not email or not password:
             error = "Please fill in all fields."
         elif not is_valid_email(email):
             error = "Please enter a real email address."
+        elif len(password) < MIN_PASSWORD_LENGTH:
+            error = f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
         elif User.query.filter((User.email == email) | (User.username == username)).first():
             error = "A user with that email or username already exists."
+        elif existing_pending:
+            error = "A confirmation email has already been sent for that email or username."
         else:
             profile_image = save_uploaded_image(profile_image_file)
             if profile_image is None:
@@ -478,6 +487,8 @@ def reset_password(token):
 
         if not password:
             error = "Please enter a new password."
+        elif len(password) < MIN_PASSWORD_LENGTH:
+            error = f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
         elif password != confirm_password:
             error = "Passwords do not match."
         else:
