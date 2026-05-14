@@ -61,6 +61,26 @@ def is_whole_number(value):
     return not value or value.isdigit()
 
 
+def recipe_form_values_from_request(default_image_url=""):
+    return {
+        "title": request.form.get("title", "").strip(),
+        "category": request.form.get("category", "").strip(),
+        "cook_time": request.form.get("cook_time", "").strip(),
+        "servings": request.form.get("servings", "").strip(),
+        "description": request.form.get("description", "").strip(),
+        "why_people_love_it": request.form.get("why_people_love_it", "").strip(),
+        "flavor_notes": request.form.get("flavor_notes", "").strip(),
+        "skill_level": request.form.get("skill_level", "").strip(),
+        "best_for": request.form.get("best_for", "").strip(),
+        "pair_with": request.form.get("pair_with", "").strip(),
+        "spice_level": request.form.get("spice_level", "").strip(),
+        "dietary_cautions": request.form.get("dietary_cautions", "").strip(),
+        "ingredients": request.form.get("ingredients", "").strip(),
+        "steps": request.form.get("steps", "").strip(),
+        "image_url": request.form.get("image_url", "").strip() or default_image_url,
+    }
+
+
 def recipe_payload(recipe, user=None):
     user = user or current_user
     liked = False
@@ -184,33 +204,20 @@ def edit_recipe(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
 
     error = None
+    form_values = None
 
     if recipe.user_id != current_user.id:
         abort(403)
 
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        category = request.form.get("category", "").strip()
-        cook_time = request.form.get("cook_time", "").strip()
-        servings = request.form.get("servings", "").strip()
-        description = request.form.get("description", "").strip()
-        why_people_love_it = request.form.get("why_people_love_it", "").strip()
-        flavor_notes = request.form.get("flavor_notes", "").strip()
-        skill_level = request.form.get("skill_level", "").strip()
-        best_for = request.form.get("best_for", "").strip()
-        pair_with = request.form.get("pair_with", "").strip()
-        spice_level = request.form.get("spice_level", "").strip()
-        dietary_cautions = request.form.get("dietary_cautions", "").strip()
-        ingredients = request.form.get("ingredients", "").strip()
-        steps = request.form.get("steps", "").strip()
-        image_url = request.form.get("image_url", "").strip() or recipe.image_url
+        form_values = recipe_form_values_from_request(recipe.image_url)
         image_file = request.files.get("image_file")
 
-        if not title or not description or not ingredients or not steps:
+        if not form_values["title"] or not form_values["description"] or not form_values["ingredients"] or not form_values["steps"]:
             error = "Please complete all required recipe fields."
-        elif not is_whole_number(cook_time):
+        elif not is_whole_number(form_values["cook_time"]):
             error = "Cook time must be a number only."
-        elif not is_whole_number(servings):
+        elif not is_whole_number(form_values["servings"]):
             error = "Servings must be a number only."
         else:
             if image_file and image_file.filename:
@@ -218,24 +225,24 @@ def edit_recipe(recipe_id):
                 if uploaded_image is None:
                     error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
                 else:
-                    image_url = uploaded_image
+                    form_values["image_url"] = uploaded_image
 
             if error is None:
-                recipe.title = title
-                recipe.category = category
-                recipe.cook_time = cook_time
-                recipe.servings = servings
-                recipe.description = description
-                recipe.why_people_love_it = why_people_love_it
-                recipe.flavor_notes = flavor_notes
-                recipe.skill_level = skill_level
-                recipe.best_for = best_for
-                recipe.pair_with = pair_with
-                recipe.spice_level = spice_level
-                recipe.dietary_cautions = dietary_cautions
-                recipe.ingredients = ingredients
-                recipe.steps = steps
-                recipe.image_url = image_url
+                recipe.title = form_values["title"]
+                recipe.category = form_values["category"]
+                recipe.cook_time = form_values["cook_time"]
+                recipe.servings = form_values["servings"]
+                recipe.description = form_values["description"]
+                recipe.why_people_love_it = form_values["why_people_love_it"]
+                recipe.flavor_notes = form_values["flavor_notes"]
+                recipe.skill_level = form_values["skill_level"]
+                recipe.best_for = form_values["best_for"]
+                recipe.pair_with = form_values["pair_with"]
+                recipe.spice_level = form_values["spice_level"]
+                recipe.dietary_cautions = form_values["dietary_cautions"]
+                recipe.ingredients = form_values["ingredients"]
+                recipe.steps = form_values["steps"]
+                recipe.image_url = form_values["image_url"]
                 db.session.commit()
                 return redirect(url_for("main.recipe_detail", recipe_id=recipe.id))
 
@@ -243,6 +250,7 @@ def edit_recipe(recipe_id):
         "edit_recipe.html",
         recipe=recipe,
         error=error,
+        form_values=form_values,
     )
 
 
@@ -542,30 +550,17 @@ def logout():
 @login_required
 def add_recipe():
     error = None
+    form_values = {}
 
     if request.method == "POST":
-        title = request.form.get("title", "").strip()
-        category = request.form.get("category", "").strip()
-        cook_time = request.form.get("cook_time", "").strip()
-        servings = request.form.get("servings", "").strip()
-        description = request.form.get("description", "").strip()
-        why_people_love_it = request.form.get("why_people_love_it", "").strip()
-        flavor_notes = request.form.get("flavor_notes", "").strip()
-        skill_level = request.form.get("skill_level", "").strip()
-        best_for = request.form.get("best_for", "").strip()
-        pair_with = request.form.get("pair_with", "").strip()
-        spice_level = request.form.get("spice_level", "").strip()
-        dietary_cautions = request.form.get("dietary_cautions", "").strip()
-        ingredients = request.form.get("ingredients", "").strip()
-        steps = request.form.get("steps", "").strip()
-        image_url = request.form.get("image_url", "").strip()
+        form_values = recipe_form_values_from_request()
         image_file = request.files.get("image_file")
 
-        if not title or not description or not ingredients or not steps:
+        if not form_values["title"] or not form_values["description"] or not form_values["ingredients"] or not form_values["steps"]:
             error = "Please complete all required recipe fields."
-        elif not is_whole_number(cook_time):
+        elif not is_whole_number(form_values["cook_time"]):
             error = "Cook time must be a number only."
-        elif not is_whole_number(servings):
+        elif not is_whole_number(form_values["servings"]):
             error = "Servings must be a number only."
         else:
             if image_file and image_file.filename:
@@ -573,32 +568,32 @@ def add_recipe():
                 if uploaded_image is None:
                     error = "Upload a PNG, JPG, JPEG, GIF, or WEBP image."
                 else:
-                    image_url = uploaded_image
+                    form_values["image_url"] = uploaded_image
 
             if error is None:
                 recipe = Recipe(
-                    title=title,
-                    category=category,
-                    cook_time=cook_time,
-                    servings=servings,
-                    description=description,
-                    why_people_love_it=why_people_love_it,
-                    flavor_notes=flavor_notes,
-                    skill_level=skill_level,
-                    best_for=best_for,
-                    pair_with=pair_with,
-                    spice_level=spice_level,
-                    dietary_cautions=dietary_cautions,
-                    ingredients=ingredients,
-                    steps=steps,
-                    image_url=image_url,
+                    title=form_values["title"],
+                    category=form_values["category"],
+                    cook_time=form_values["cook_time"],
+                    servings=form_values["servings"],
+                    description=form_values["description"],
+                    why_people_love_it=form_values["why_people_love_it"],
+                    flavor_notes=form_values["flavor_notes"],
+                    skill_level=form_values["skill_level"],
+                    best_for=form_values["best_for"],
+                    pair_with=form_values["pair_with"],
+                    spice_level=form_values["spice_level"],
+                    dietary_cautions=form_values["dietary_cautions"],
+                    ingredients=form_values["ingredients"],
+                    steps=form_values["steps"],
+                    image_url=form_values["image_url"],
                     user_id=current_user.id,
                 )
                 db.session.add(recipe)
                 db.session.commit()
                 return redirect(url_for("main.profile", user_id=current_user.id))
 
-    return render_template("add_recipe.html", error=error)
+    return render_template("add_recipe.html", error=error, form_values=form_values)
  
  
 @main.route("/profile/<int:user_id>")
