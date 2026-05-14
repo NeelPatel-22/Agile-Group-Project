@@ -33,11 +33,11 @@
               </div>
               <div>
                 <label class="form-label">Cook time</label>
-                <input type="text" name="cook_time" class="form-control" value="{{ recipe.cook_time }}" maxlength="80" placeholder="35 minutes" data-format="cook-time">
+                <input type="number" name="cook_time" class="form-control" value="{{ recipe.cook_time }}" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="35" data-label="Cook time">
               </div>
               <div>
                 <label class="form-label">Servings</label>
-                <input type="text" name="servings" class="form-control" value="{{ recipe.servings }}" maxlength="80" placeholder="4 servings" data-format="servings">
+                <input type="number" name="servings" class="form-control" value="{{ recipe.servings }}" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="4" data-label="Servings">
               </div>
               <div>
                 <label class="form-label">Upload new image</label>

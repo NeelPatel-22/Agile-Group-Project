@@ -30,11 +30,11 @@
               </div>
               <div>
                 <label class="form-label" for="recipe-cook-time">Cook time</label>
-                <input id="recipe-cook-time" type="text" name="cook_time" class="form-control" maxlength="80" placeholder="35 minutes" data-format="cook-time">
+                <input id="recipe-cook-time" type="number" name="cook_time" class="form-control" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="35" data-label="Cook time">
               </div>
               <div>
                 <label class="form-label" for="recipe-servings">Servings</label>
-                <input id="recipe-servings" type="text" name="servings" class="form-control" maxlength="80" placeholder="4 servings" data-format="servings">
+                <input id="recipe-servings" type="number" name="servings" class="form-control" min="1" step="1" inputmode="numeric" pattern="[0-9]*" placeholder="4" data-label="Servings">
               </div>
               <div>
                 <label class="form-label">Upload image</label>

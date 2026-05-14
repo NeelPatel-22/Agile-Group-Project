@@ -57,6 +57,10 @@ def visible_comment_count(recipe):
     return len([comment for comment in recipe.comments if not comment.is_hidden])
 
 
+def is_whole_number(value):
+    return not value or value.isdigit()
+
+
 def recipe_payload(recipe, user=None):
     user = user or current_user
     liked = False
@@ -204,6 +208,10 @@ def edit_recipe(recipe_id):
 
         if not title or not description or not ingredients or not steps:
             error = "Please complete all required recipe fields."
+        elif not is_whole_number(cook_time):
+            error = "Cook time must be a number only."
+        elif not is_whole_number(servings):
+            error = "Servings must be a number only."
         else:
             if image_file and image_file.filename:
                 uploaded_image = save_uploaded_image(image_file)
@@ -555,6 +563,10 @@ def add_recipe():
 
         if not title or not description or not ingredients or not steps:
             error = "Please complete all required recipe fields."
+        elif not is_whole_number(cook_time):
+            error = "Cook time must be a number only."
+        elif not is_whole_number(servings):
+            error = "Servings must be a number only."
         else:
             if image_file and image_file.filename:
                 uploaded_image = save_uploaded_image(image_file)

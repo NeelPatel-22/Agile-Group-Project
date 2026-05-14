@@ -23,13 +23,6 @@ $(function () {
         const normalized = smartTrim(field.val());
         field.val(type === "email" ? normalized.toLowerCase() : normalized);
 
-        if (field.data("format") === "cook-time" && /^\d+$/.test(field.val())) {
-            field.val(`${field.val()} minutes`);
-        }
-
-        if (field.data("format") === "servings" && /^\d+$/.test(field.val())) {
-            field.val(`${field.val()} servings`);
-        }
     }
 
     function setFieldError(field, message) {
@@ -65,6 +58,16 @@ $(function () {
 
         if (type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
             setFieldError(field, "Enter a valid email address.");
+            return false;
+        }
+
+        if (type === "number" && value && !/^\d+$/.test(value)) {
+            setFieldError(field, `${label} must be a number only.`);
+            return false;
+        }
+
+        if (type === "number" && value && field.attr("min") && Number(value) < Number(field.attr("min"))) {
+            setFieldError(field, `${label} must be at least ${field.attr("min")}.`);
             return false;
         }
 
