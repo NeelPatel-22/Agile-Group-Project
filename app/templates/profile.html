@@ -11,93 +11,72 @@
       {% set avatar_source = 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=500&q=80' %}
     {% endif %}
 
-    <div class="profile-top-layout">
-      <div class="profile-panel profile-identity-card">
-        <div class="panel-body center">
-          <img src="{{ avatar_source }}" alt="{{ user.username }}" class="profile-avatar">
+    <header class="profile-cover">
+      <div class="profile-cover-art"></div>
+      <div class="profile-header">
+        <img src="{{ avatar_source }}" alt="{{ user.username }}" class="profile-avatar">
+        <div class="profile-identity">
+          <p class="eyebrow">RecipeHub Profile</p>
           <h1 class="profile-name">{{ user.username }}</h1>
           <p class="profile-bio">
-            {{ user.bio if user.bio else "Passionate home cook who loves sharing easy DIY recipes, healthy meals, and quick kitchen ideas for busy lifestyles." }}
+            {{ user.bio if user.bio else "Passionate home cook sharing practical DIY recipes and quick kitchen ideas." }}
           </p>
-
-          {% if current_user.id == user.id %}
-          <div class="button-stack">
-            <a href="{{ url_for('main.edit_profile', user_id=user.id) }}" class="btn btn-primary">Edit Profile</a>
-            <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="profile-panel profile-overview-panel">
-        <div class="panel-body">
-          <div class="profile-section-header">
-            <div>
-              <p class="eyebrow">Profile</p>
-              <h2 class="section-title">Account Overview</h2>
-            </div>
-          </div>
-
-          <div class="meta-grid">
-            <div class="profile-meta-card">
-              <h3>Name</h3>
-              <p>{{ user.username }}</p>
-            </div>
-            <div class="profile-meta-card">
-              <h3>Email</h3>
-              <p>{{ user.email }}</p>
-            </div>
-            <div class="profile-meta-card">
-              <h3>Member Since</h3>
-              <p>{{ member_since }}</p>
-            </div>
-            <div class="profile-meta-card">
-              <h3>Email Status</h3>
-              <p>{{ "Confirmed" if user.email_confirmed else "Not confirmed" }}</p>
-            </div>
-            <div class="profile-meta-card">
-              <h3>Recipes Shared</h3>
-              <p>{{ own_recipes|length }} Recipes</p>
-            </div>
-            {% if current_user.id == user.id %}
-              <a href="{{ url_for('main.saved_recipes', user_id=user.id) }}" class="profile-meta-card profile-meta-link">
-                <h3>Saved Recipes</h3>
-                <p>{{ saved_recipes_count }} Saved</p>
-              </a>
-            {% else %}
-              <div class="profile-meta-card">
-                <h3>Saved Recipes</h3>
-                <p>{{ saved_recipes_count }} Saved</p>
-              </div>
-            {% endif %}
-            <div class="profile-meta-card">
-              <h3>Recipe Likes</h3>
-              <p>{{ likes_received }} Likes</p>
-            </div>
-          </div>
-
-          <div class="profile-summary-card">
-            <h3>About</h3>
-            <p>
-              {{ user.bio if user.bio else "No description added yet. Add a short note about your cooking style from edit profile." }}
-            </p>
+          <div class="profile-contact-row">
+            <span>{{ user.email }}</span>
           </div>
         </div>
+
+        {% if current_user.id == user.id %}
+        <div class="profile-actions">
+          <a href="{{ url_for('main.add_recipe') }}" class="btn btn-primary">Add Recipe</a>
+          <a href="{{ url_for('main.edit_profile', user_id=user.id) }}" class="btn btn-outline">Edit Profile</a>
+          <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
+        </div>
+        {% endif %}
       </div>
-    </div>
+    </header>
+
+    <section class="profile-dashboard">
+      <div class="profile-stat">
+        <span class="profile-stat-icon">R</span>
+        <span>Recipes</span>
+        <strong>{{ own_recipes|length }}</strong>
+      </div>
+      {% if current_user.id == user.id %}
+      <a href="{{ url_for('main.saved_recipes', user_id=user.id) }}" class="profile-stat profile-stat-link">
+        <span class="profile-stat-icon">S</span>
+        <span>Saved</span>
+        <strong>{{ saved_recipes_count }}</strong>
+      </a>
+      {% else %}
+      <div class="profile-stat">
+        <span class="profile-stat-icon">S</span>
+        <span>Saved</span>
+        <strong>{{ saved_recipes_count }}</strong>
+      </div>
+      {% endif %}
+      <div class="profile-stat">
+        <span class="profile-stat-icon">L</span>
+        <span>Likes</span>
+        <strong>{{ likes_received }}</strong>
+      </div>
+      <div class="profile-stat profile-stat-wide">
+        <span class="profile-stat-icon">M</span>
+        <span>Member since</span>
+        <strong>{{ member_since }}</strong>
+      </div>
+    </section>
 
     {% if current_user.id == user.id %}
-    <div class="profile-summary-card section-card">
-      <div class="panel-body">
-        <div class="posted-recipes-header">
+    <section class="profile-recipes-section">
+      <div class="profile-recipes-header">
           <div>
             <h2 class="section-title mb-1">My Posted Recipes</h2>
-            <p class="posted-recipes-copy mb-0">Manage every recipe you have shared from one clean list.</p>
+            <p class="posted-recipes-copy mb-0">A compact list of everything you have shared.</p>
           </div>
-          <a href="{{ url_for('main.add_recipe') }}" class="btn btn-primary">Add Recipe</a>
-        </div>
+      </div>
 
-        <div class="recipes-grid">
+      <div class="profile-recipe-list">
           {% for recipe in own_recipes %}
             {% set recipe_image = recipe.image_url %}
             {% if recipe.image_url and not recipe.image_url.startswith('http://') and not recipe.image_url.startswith('https://') %}
@@ -106,7 +85,7 @@
               {% set recipe_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80' %}
             {% endif %}
 
-            <article class="profile-recipe-card">
+            <article class="profile-recipe-row">
               <img src="{{ recipe_image }}" alt="{{ recipe.title }}" class="recipe-image">
               <div class="recipe-body">
                 <div class="recipe-card-meta">
@@ -117,10 +96,20 @@
                 </div>
                 <h3>{{ recipe.title }}</h3>
                 <p>{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
-                <div class="recipe-card-actions">
-                  <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="btn btn-primary btn-small">View Recipe</a>
-                  <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn btn-outline btn-small">Edit</a>
-                </div>
+              </div>
+              <div class="recipe-card-actions">
+                <a href="{{ url_for('main.recipe_detail', recipe_id=recipe.id) }}" class="recipe-icon-action view-action" aria-label="View recipe" title="View recipe">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </a>
+                <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="recipe-icon-action edit-action" aria-label="Edit recipe" title="Edit recipe">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 20h4l10.5-10.5-4-4L4 16v4z"></path>
+                    <path d="M13.5 6.5l4 4"></path>
+                  </svg>
+                </a>
               </div>
             </article>
           {% else %}
@@ -129,9 +118,8 @@
               <a href="{{ url_for('main.add_recipe') }}" class="btn btn-primary">Add Your First Recipe</a>
             </div>
           {% endfor %}
-        </div>
       </div>
-    </div>
+    </section>
     {% endif %}
   </div>
 </section>

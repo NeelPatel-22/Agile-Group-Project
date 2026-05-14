@@ -7,155 +7,154 @@
 {% endblock %}
 
 {% block content %}
-<section class="page-section recipe-detail-main">
+<section class="recipe-detail-page">
   <div class="container">
-    <div class="row g-4 align-items-start">
-      {% set image_source = recipe.image_url %}
-      {% if recipe.image_url and not recipe.image_url.startswith('http://') and not recipe.image_url.startswith('https://') %}
-        {% set image_source = url_for('static', filename=recipe.image_url) %}
-      {% elif not recipe.image_url %}
-        {% set image_source = 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=1200&q=80' %}
-      {% endif %}
+    {% set image_source = recipe.image_url %}
+    {% if recipe.image_url and not recipe.image_url.startswith('http://') and not recipe.image_url.startswith('https://') %}
+      {% set image_source = url_for('static', filename=recipe.image_url) %}
+    {% elif not recipe.image_url %}
+      {% set image_source = 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=1200&q=80' %}
+    {% endif %}
+    {% set initials = recipe.author.username[:2]|upper %}
 
-      <div class="col-lg-8">
-        <article class="card recipe-card">
-          <div class="card-body p-4 p-lg-5">
-            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-              <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="author-link text-decoration-none">
-                {% set initials = recipe.author.username[:2]|upper %}
-                <div class="author-avatar">{{ initials }}</div>
-                <div>
-                  <p class="mb-0 fw-semibold text-dark">{{ recipe.author.username }}</p>
-                  <p class="mb-0 text-muted small">{{ recipe.short_author_role() }}</p>
-                </div>
-              </a>
+    <article class="recipe-hero-card">
+      <div class="recipe-hero-media">
+        <img src="{{ image_source }}" alt="{{ recipe.title }}">
+        <div class="recipe-hero-overlay">
+          <div class="recipe-hero-content">
+            {% if current_user.id == recipe.user_id %}
+            <a class="hero-edit-link" href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" aria-label="Edit recipe" title="Edit recipe">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 20h4l10.5-10.5-4-4L4 16v4z"></path>
+                <path d="M13.5 6.5l4 4"></path>
+              </svg>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="hero-profile-link">
+              <span>{{ initials }}</span>{{ recipe.author.username }}
+            </a>
+            <div class="recipe-title-row">
+              <p class="eyebrow">Community Recipe</p>
+              <h1>{{ recipe.title }}</h1>
+            </div>
 
-              <div class="d-flex flex-wrap gap-2">
-                {% if recipe.category %}<span class="info-chip">{{ recipe.category }}</span>{% endif %}
-                {% if recipe.cook_time %}<span class="info-chip">{{ recipe.cook_time }}</span>{% endif %}
-                {% if recipe.servings %}<span class="info-chip">{{ recipe.servings }}</span>{% endif %}
+            <p class="recipe-lede">{{ recipe.description }}</p>
+
+            <div class="recipe-author-row">
+              <div class="recipe-hero-facts">
+                <span>{{ recipe.category if recipe.category else "Uncategorized" }}</span>
+                <span>{{ recipe.cook_time if recipe.cook_time else "Flexible timing" }}</span>
+                <span>{{ recipe.servings if recipe.servings else "Any servings" }}</span>
+                <span>{{ recipe.step_list()|length }} steps</span>
               </div>
-            </div>
-
-            <div class="mb-4">
-              <p class="text-uppercase text-muted small fw-semibold mb-1">Recipe Details</p>
-              <h1 class="recipe-page-title mb-3">{{ recipe.title }}</h1>
-              <p class="recipe-page-subtitle mb-0">{{ recipe.description }}</p>
-            </div>
-
-            <img src="{{ image_source }}" alt="{{ recipe.title }}" class="recipe-hero-image">
-
-            <div class="content-panel">
-              <div class="row g-4">
-                <div class="col-md-5">
-                  <h3 class="fw-bold mb-3">Ingredients</h3>
-                  <ul class="list-group ingredients-list">
-                    {% for ingredient in recipe.ingredient_list() %}
-                    <li class="list-group-item">{{ ingredient }}</li>
-                    {% endfor %}
-                  </ul>
-                </div>
-
-                <div class="col-md-7">
-                  <h3 class="fw-bold mb-3">Why People Love It</h3>
-                  <p class="text-muted">
-                    {{ recipe.why_people_love_it if recipe.why_people_love_it else "A simple, satisfying recipe with clear steps and approachable ingredients." }}
-                  </p>
-
-                  <div class="row g-3">
-                    <div class="col-sm-6">
-                      <div class="recipe-highlight">
-                        <small class="text-muted d-block mb-1">Flavor</small>
-                        <strong>{{ recipe.flavor_notes if recipe.flavor_notes else "Balanced and comforting" }}</strong>
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                      <div class="recipe-highlight">
-                        <small class="text-muted d-block mb-1">Skill Level</small>
-                        <strong>{{ recipe.skill_level if recipe.skill_level else "Beginner friendly" }}</strong>
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                      <div class="recipe-highlight">
-                        <small class="text-muted d-block mb-1">Best For</small>
-                        <strong>{{ recipe.best_for if recipe.best_for else "Any day cooking" }}</strong>
-                      </div>
-                    </div>
-                    <div class="col-sm-6">
-                      <div class="recipe-highlight">
-                        <small class="text-muted d-block mb-1">Uploaded By</small>
-                        <strong>{{ recipe.author.username }}</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="mb-4">
-              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                <h3 class="fw-bold mb-0">Step-by-Step Method</h3>
-                <span class="text-muted small">Follow the instructions below</span>
-              </div>
-
-              {% for step in recipe.step_list() %}
-              <div class="step-card {% if loop.last %}mb-0{% endif %}">
-                <div class="step-photo">
-                  <div class="step-icon-wrap">{{ loop.index }}</div>
-                </div>
-                <div>
-                  <span class="step-number">Step {{ loop.index }}</span>
-                  <p class="text-muted mb-0">{{ step }}</p>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-
-            <div class="share-box">
-              <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
-                <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="btn btn-outline-success">
-                  View {{ recipe.author.username }}'s Profile
-                </a>
-                {% if current_user.id == recipe.user_id %}
-                <a href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" class="btn custom-btn">Edit Recipe</a>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
-      <div class="col-lg-4">
-        <div class="card sidebar-card">
-          <div class="card-body p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h4 class="fw-bold mb-0">More From {{ recipe.author.username }}</h4>
-              <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="small text-success text-decoration-none">See profile</a>
-            </div>
-
-            <div class="d-grid gap-3">
-              {% for item in more_recipes %}
-                {% set item_image = item.image_url %}
-                {% if item.image_url and not item.image_url.startswith('http://') and not item.image_url.startswith('https://') %}
-                  {% set item_image = url_for('static', filename=item.image_url) %}
-                {% elif not item.image_url %}
-                  {% set item_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=500&q=80' %}
-                {% endif %}
-                <a href="{{ url_for('main.recipe_detail', recipe_id=item.id) }}" class="popular-link">
-                  <div class="popular-thumb" style="background-image: url('{{ item_image }}');"></div>
-                  <div>
-                    <h6 class="mb-1 text-dark">{{ item.title }}</h6>
-                    <p class="text-muted small mb-0">{{ item.description[:90] }}{% if item.description|length > 90 %}...{% endif %}</p>
-                  </div>
-                </a>
-              {% else %}
-                <p class="text-muted mb-0">No other recipes from this user yet.</p>
-              {% endfor %}
             </div>
           </div>
         </div>
       </div>
+    </article>
+
+    <div class="recipe-workspace">
+      <aside class="recipe-prep-panel">
+        <div class="panel-heading">
+          <span class="panel-kicker">Prep List</span>
+          <h2>Ingredients</h2>
+        </div>
+        <ul class="ingredient-checklist">
+          {% for ingredient in recipe.ingredient_list() %}
+          <li>{{ ingredient }}</li>
+          {% else %}
+          <li>No ingredients listed yet.</li>
+          {% endfor %}
+        </ul>
+      </aside>
+
+      <main class="recipe-story">
+        <section class="recipe-note-card">
+          <div class="panel-heading">
+            <span class="panel-kicker">Overview</span>
+            <h2>Why people love it</h2>
+          </div>
+          <p>
+            {{ recipe.why_people_love_it if recipe.why_people_love_it else "A simple, satisfying recipe with clear steps and approachable ingredients." }}
+          </p>
+        </section>
+
+        <section class="recipe-detail-metrics">
+          <div>
+            <span>Flavor</span>
+            <strong>{{ recipe.flavor_notes if recipe.flavor_notes else "Balanced" }}</strong>
+          </div>
+          <div>
+            <span>Skill level</span>
+            <strong>{{ recipe.skill_level if recipe.skill_level else "Beginner friendly" }}</strong>
+          </div>
+          <div>
+            <span>Best for</span>
+            <strong>{{ recipe.best_for if recipe.best_for else "Everyday cooking" }}</strong>
+          </div>
+          <div>
+            <span>Pair with</span>
+            <strong>{{ recipe.pair_with if recipe.pair_with else "Fresh sides" }}</strong>
+          </div>
+        </section>
+
+        <section class="recipe-method-card">
+          <div class="method-card-header">
+            <div>
+              <span class="panel-kicker">Method</span>
+              <h2>Step-by-step</h2>
+            </div>
+            <span>{{ recipe.step_list()|length }} steps</span>
+          </div>
+
+          <div class="method-timeline">
+            {% for step in recipe.step_list() %}
+            <div class="method-step">
+              <span>{{ loop.index }}</span>
+              <p>{{ step }}</p>
+            </div>
+            {% else %}
+            <div class="method-step">
+              <span>1</span>
+              <p>No method steps listed yet.</p>
+            </div>
+            {% endfor %}
+          </div>
+        </section>
+      </main>
     </div>
+
+    <section class="recipe-next-section">
+      <div class="recipe-next-copy">
+        <span class="panel-kicker">Next</span>
+        <h2>Explore more from {{ recipe.author.username }}</h2>
+      </div>
+
+      <div class="more-recipe-strip">
+        {% for item in more_recipes %}
+          {% set item_image = item.image_url %}
+          {% if item.image_url and not item.image_url.startswith('http://') and not item.image_url.startswith('https://') %}
+            {% set item_image = url_for('static', filename=item.image_url) %}
+          {% elif not item.image_url %}
+            {% set item_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=500&q=80' %}
+          {% endif %}
+          <a href="{{ url_for('main.recipe_detail', recipe_id=item.id) }}" class="more-recipe-card">
+            <img src="{{ item_image }}" alt="{{ item.title }}">
+            <span>
+              <strong>{{ item.title }}</strong>
+              <small>{{ item.description[:70] }}{% if item.description|length > 70 %}...{% endif %}</small>
+            </span>
+          </a>
+        {% else %}
+          <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="more-recipe-card empty-more-card">
+            <span>
+              <strong>View profile</strong>
+              <small>No other recipes from this creator yet.</small>
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
   </div>
 </section>
 {% endblock %}
