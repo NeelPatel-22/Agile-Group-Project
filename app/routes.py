@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+from flask_socketio import join_room
 from itsdangerous import BadSignature, SignatureExpired
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
@@ -29,6 +30,12 @@ main = Blueprint("main", __name__)
 
 ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
 MIN_PASSWORD_LENGTH = 8
+
+
+@socketio.on("connect")
+def handle_socket_connect():
+    if current_user.is_authenticated:
+        join_room(user_activity_room(current_user.id))
 
 
 def is_allowed_image(filename):
@@ -63,6 +70,18 @@ def distinct_recipe_values(column):
 
 def visible_comment_count(recipe):
     return len([comment for comment in recipe.comments if not comment.is_hidden])
+
+
+def can_view_comment(comment, user):
+    return not comment.is_hidden or comment.recipe.user_id == user.id
+
+
+def top_level_parent(comment):
+    return comment.parent if comment.parent_id and comment.parent else comment
+
+
+def user_activity_room(user_id):
+    return f"user_activity:{user_id}"
 
 
 def is_whole_number(value):
@@ -128,6 +147,65 @@ def owner_recipe_counts(user_id):
         "archived_recipes_count": Recipe.query.filter_by(user_id=user_id, is_archived=True).count(),
         "likes_received": sum(len(recipe.likes) for recipe in active_recipes),
     }
+
+
+def activity_timestamp(value):
+    return value.strftime("%d %b %Y, %I:%M %p") if value else ""
+
+
+def like_activity_payload(like):
+    return {
+        "id": f"like-{like.id}",
+        "type": "like",
+        "actor": like.user.username,
+        "action": "liked",
+        "recipe_id": like.recipe_id,
+        "recipe_title": like.recipe.title,
+        "comment_text": "",
+        "created_at": like.created_at.isoformat(),
+        "created_at_display": activity_timestamp(like.created_at),
+        "recipe_url": url_for("main.recipe_detail", recipe_id=like.recipe_id),
+    }
+
+
+def comment_activity_payload(comment):
+    action = "replied in the conversation on" if comment.parent_id else "joined the conversation on"
+    return {
+        "id": f"comment-{comment.id}",
+        "type": "comment",
+        "actor": comment.author.username,
+        "action": action,
+        "recipe_id": comment.recipe_id,
+        "recipe_title": comment.recipe.title,
+        "comment_text": comment.content,
+        "created_at": comment.created_at.isoformat(),
+        "created_at_display": activity_timestamp(comment.created_at),
+        "recipe_url": url_for("main.recipe_detail", recipe_id=comment.recipe_id),
+    }
+
+
+def user_activity_items(user_id, limit=100):
+    likes = (
+        Like.query.join(Recipe, Like.recipe_id == Recipe.id)
+        .filter(Recipe.user_id == user_id, Like.user_id != user_id)
+        .all()
+    )
+    comments = (
+        Comment.query.join(Recipe, Comment.recipe_id == Recipe.id)
+        .filter(Recipe.user_id == user_id, Comment.user_id != user_id)
+        .all()
+    )
+    activities = [like_activity_payload(like) for like in likes]
+    activities.extend(comment_activity_payload(comment) for comment in comments)
+    return sorted(activities, key=lambda item: item["created_at"], reverse=True)[:limit]
+
+
+def emit_activity(activity, owner_id):
+    socketio.emit("activity_added", activity, to=user_activity_room(owner_id))
+
+
+def emit_owner_recipe_counts(user_id):
+    socketio.emit("owner_recipe_counts_updated", owner_recipe_counts(user_id), to=user_activity_room(user_id))
  
 @main.route("/")
 def cover():
@@ -197,6 +275,18 @@ def recipes():
         filter_options=filter_options,
         active_filter_count=active_filter_count,
     )
+
+
+@main.route("/activity")
+@login_required
+def activity():
+    return render_template("activity.html")
+
+
+@main.route("/api/activity")
+@login_required
+def activity_feed():
+    return jsonify({"success": True, "activities": user_activity_items(current_user.id)})
  
  
 @main.route("/recipes/<int:recipe_id>")
@@ -291,11 +381,16 @@ def toggle_like(recipe_id):
     if existing_like:
         db.session.delete(existing_like)
         action = "removed"
+        new_like = None
     else:
-        db.session.add(Like(recipe_id=recipe.id, user_id=current_user.id))
+        new_like = Like(recipe_id=recipe.id, user_id=current_user.id)
+        db.session.add(new_like)
         action = "added"
 
     db.session.commit()
+    if new_like and recipe.user_id != current_user.id:
+        emit_activity(like_activity_payload(new_like), recipe.user_id)
+
     payload = recipe_payload(recipe)
     broadcast_recipe_update(recipe)
     return jsonify({"success": True, "action": action, **payload})
@@ -338,6 +433,7 @@ def archive_recipe(recipe_id):
 
     payload = recipe_payload(recipe)
     broadcast_recipe_update(recipe)
+    emit_owner_recipe_counts(current_user.id)
     return jsonify({"success": True, "action": "archived", **payload, **owner_recipe_counts(current_user.id)})
 
 
@@ -356,6 +452,7 @@ def unarchive_recipe(recipe_id):
 
     payload = recipe_payload(recipe)
     broadcast_recipe_update(recipe)
+    emit_owner_recipe_counts(current_user.id)
     return jsonify({"success": True, "action": "unarchived", **payload, **owner_recipe_counts(current_user.id)})
 
 
@@ -367,20 +464,39 @@ def add_comment(recipe_id):
         return jsonify({"success": False, "message": "This recipe is archived."}), 404
 
     content = request.form.get("content", "").strip()
+    parent_id = request.form.get("parent_id", type=int)
+    parent_comment = None
 
     if not content:
-        return jsonify({"success": False, "message": "Comment cannot be empty."}), 400
+        return jsonify({"success": False, "message": "Conversation entry cannot be empty."}), 400
 
-    comment = Comment(content=content, recipe_id=recipe.id, user_id=current_user.id)
+    if parent_id:
+        parent_comment = Comment.query.get_or_404(parent_id)
+        if parent_comment.recipe_id != recipe.id:
+            return jsonify({"success": False, "message": "That conversation entry belongs to another recipe."}), 400
+        if not can_view_comment(parent_comment, current_user):
+            return jsonify({"success": False, "message": "You cannot reply to a hidden conversation entry."}), 403
+        parent_comment = top_level_parent(parent_comment)
+
+    comment = Comment(
+        content=content,
+        recipe_id=recipe.id,
+        user_id=current_user.id,
+        parent_id=parent_comment.id if parent_comment else None,
+    )
     db.session.add(comment)
     db.session.commit()
 
     payload = {
         "recipe_id": recipe.id,
         "comment_id": comment.id,
+        "parent_id": comment.parent_id,
         "comment_html": render_template("partials/comment_item.html", comment=comment, recipe=recipe),
         "comments_count": visible_comment_count(recipe),
     }
+    if recipe.user_id != current_user.id:
+        emit_activity(comment_activity_payload(comment), recipe.user_id)
+
     socketio.emit("comment_added", payload)
     broadcast_recipe_update(recipe)
     return jsonify({"success": True, **payload})
@@ -392,16 +508,40 @@ def hide_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
 
     if comment.recipe.user_id != current_user.id:
-        return jsonify({"success": False, "message": "Only the recipe owner can hide comments."}), 403
+        return jsonify({"success": False, "message": "Only the recipe owner can hide conversation entries."}), 403
 
     comment.is_hidden = True
     db.session.commit()
     payload = {
         "recipe_id": comment.recipe_id,
         "comment_id": comment.id,
+        "parent_id": comment.parent_id,
+        "comment_html": render_template("partials/comment_item.html", comment=comment, recipe=comment.recipe),
         "comments_count": visible_comment_count(comment.recipe),
     }
     socketio.emit("comment_hidden", payload)
+    broadcast_recipe_update(comment.recipe)
+    return jsonify({"success": True, **payload})
+
+
+@main.route("/comments/<int:comment_id>/unhide", methods=["POST"])
+@login_required
+def unhide_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can unhide conversation entries."}), 403
+
+    comment.is_hidden = False
+    db.session.commit()
+    payload = {
+        "recipe_id": comment.recipe_id,
+        "comment_id": comment.id,
+        "parent_id": comment.parent_id,
+        "comment_html": render_template("partials/comment_item.html", comment=comment, recipe=comment.recipe),
+        "comments_count": visible_comment_count(comment.recipe),
+    }
+    socketio.emit("comment_unhidden", payload)
     broadcast_recipe_update(comment.recipe)
     return jsonify({"success": True, **payload})
  

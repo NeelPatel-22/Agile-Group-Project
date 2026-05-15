@@ -128,7 +128,8 @@ $(function () {
         }
 
         if (typeof data.comments_count !== "undefined") {
-            card.find(".comment-counter").text(`${data.comments_count} comments`);
+            const label = data.comments_count === 1 ? "entry" : "entries";
+            card.find(".comment-counter").text(`${data.comments_count} conversation ${label}`);
         }
 
         if (typeof data.likes_count !== "undefined") {
@@ -156,12 +157,16 @@ $(function () {
 
     function normalizeCommentControls(card, commentItem) {
         const commentId = commentItem.data("comment-id");
-        const existingButton = commentItem.children(".hide-comment-btn");
+        const actionSlot = commentItem.children(".comment-owner-actions").first();
+        const existingButton = actionSlot.find(".hide-comment-btn, .unhide-comment-btn");
+        const isHidden = commentItem.data("comment-hidden") === true || commentItem.data("comment-hidden") === "true";
 
         if (currentUserOwnsRecipe(card)) {
             if (!existingButton.length) {
-                commentItem.append(
-                    `<button class="hide-comment-btn" type="button" data-comment-id="${commentId}">Hide</button>`
+                const buttonClass = isHidden ? "unhide-comment-btn" : "hide-comment-btn";
+                const buttonLabel = isHidden ? "Unhide" : "Hide";
+                actionSlot.append(
+                    `<button class="${buttonClass}" type="button" data-comment-id="${commentId}">${buttonLabel}</button>`
                 );
             }
             return;
@@ -176,24 +181,67 @@ $(function () {
             return;
         }
 
-        const list = card.find(".comment-list").first();
-        removeEmptyCommentState(list);
-        if (!list.find(`[data-comment-id="${data.comment_id}"]`).length) {
-            list.prepend(data.comment_html);
+        if (card.find(`.comment-item[data-comment-id="${data.comment_id}"]`).length) {
+            return;
         }
-        normalizeCommentControls(card, list.find(`[data-comment-id="${data.comment_id}"]`).first());
+
+        const list = data.parent_id
+            ? card.find(`.reply-list[data-parent-id="${data.parent_id}"]`).first()
+            : card.find(".comment-list").first();
+
+        if (!list.length) {
+            return;
+        }
+
+        removeEmptyCommentState(card.find(".comment-list").first());
+        const item = $(data.comment_html);
+        list.prepend(item);
+        normalizeCommentControls(card, item);
         updateRecipeCardState({ id: data.recipe_id, comments_count: data.comments_count });
     }
 
     function hideCommentFromCard(data) {
         const commentItem = $(`.comment-item[data-comment-id="${data.comment_id}"]`);
+        const card = commentItem.closest(".recipe-card");
+        if (card.length && currentUserOwnsRecipe(card)) {
+            const replacement = $(data.comment_html);
+            commentItem.replaceWith(replacement);
+            normalizeCommentControls(card, replacement);
+            updateRecipeCardState({ id: data.recipe_id, comments_count: data.comments_count });
+            return;
+        }
+
         commentItem.slideUp(180, function () {
             const list = $(this).closest(".comment-list");
             $(this).remove();
             if (!list.find(".comment-item").length) {
-                list.html('<p class="comment-empty mb-0">No comments yet.</p>');
+                list.html('<p class="comment-empty mb-0">No conversation yet.</p>');
             }
         });
+        updateRecipeCardState({ id: data.recipe_id, comments_count: data.comments_count });
+    }
+
+    function unhideCommentOnCard(data) {
+        const card = $(`.recipe-card[data-recipe-id="${data.recipe_id}"]`);
+        if (!card.length) {
+            return;
+        }
+
+        const rootList = card.find(".comment-list").first();
+        const list = data.parent_id
+            ? card.find(`.reply-list[data-parent-id="${data.parent_id}"]`).first()
+            : rootList;
+        const existing = card.find(`.comment-item[data-comment-id="${data.comment_id}"]`);
+        if (existing.length) {
+            const replacement = $(data.comment_html);
+            existing.replaceWith(replacement);
+            normalizeCommentControls(card, replacement);
+        } else if (list.length) {
+            removeEmptyCommentState(rootList);
+            const item = $(data.comment_html);
+            list.prepend(item);
+            normalizeCommentControls(card, item);
+        }
         updateRecipeCardState({ id: data.recipe_id, comments_count: data.comments_count });
     }
 
@@ -278,6 +326,125 @@ $(function () {
         }
     }
 
+    function escapeHtml(value) {
+        return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function activityIcon(type) {
+        if (type === "comment") {
+            return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path></svg>';
+        }
+
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 11v10H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h3z"></path><path d="M7 11l4-8a3 3 0 0 1 3 3v5h4a2 2 0 0 1 2 2l-1 6a2 2 0 0 1-2 2H7"></path></svg>';
+    }
+
+    function activityCardHtml(activity) {
+        const commentHtml = activity.comment_text
+            ? `<p class="activity-comment">${escapeHtml(activity.comment_text)}</p>`
+            : "";
+
+        return `
+            <article class="activity-card" data-activity-id="${escapeHtml(activity.id)}" data-activity-type="${escapeHtml(activity.type)}">
+                <div class="activity-icon">${activityIcon(activity.type)}</div>
+                <div class="activity-content">
+                    <p class="activity-main">
+                        <strong>${escapeHtml(activity.actor)}</strong>
+                        ${escapeHtml(activity.action)}
+                        <span class="activity-recipe">${escapeHtml(activity.recipe_title)}</span>
+                    </p>
+                    ${commentHtml}
+                    <div class="activity-meta">
+                        <span>${escapeHtml(activity.created_at_display)}</span>
+                        <span>Recipe activity</span>
+                    </div>
+                </div>
+            </article>
+        `;
+    }
+
+    function updateActivityEmptyState() {
+        const list = $("#activity-list");
+        const count = list.find(".activity-card").length;
+        $("#activity-count").text(count);
+        $("#activity-empty").prop("hidden", count > 0);
+    }
+
+    function addActivityItem(activity, prepend) {
+        const list = $("#activity-list");
+        if (!list.length || !activity.id || list.find(`[data-activity-id="${activity.id}"]`).length) {
+            return;
+        }
+
+        list.find(".activity-loading").remove();
+        const item = $(activityCardHtml(activity));
+        if (prepend) {
+            list.prepend(item);
+        } else {
+            list.append(item);
+        }
+        updateActivityEmptyState();
+    }
+
+    function incrementActivityBadge() {
+        const badge = $(".activity-nav-badge");
+        if (!badge.length) {
+            return;
+        }
+
+        const nextCount = Number(badge.text() || 0) + 1;
+        badge.text(nextCount).prop("hidden", false);
+    }
+
+    function showActivityToast(activity) {
+        $(".activity-toast").remove();
+        const actionText = activity.type === "comment" ? "New conversation" : "New like";
+        const toast = $(`
+            <div class="activity-toast" role="status" aria-live="polite">
+                <strong>${escapeHtml(actionText)}</strong>
+                <span>${escapeHtml(activity.actor)} ${escapeHtml(activity.action)} ${escapeHtml(activity.recipe_title)}</span>
+            </div>
+        `);
+        $("body").append(toast);
+
+        window.setTimeout(function () {
+            toast.addClass("show");
+        }, 20);
+
+        window.setTimeout(function () {
+            toast.removeClass("show");
+            window.setTimeout(function () {
+                toast.remove();
+            }, 240);
+        }, 4200);
+    }
+
+    function loadActivityPage() {
+        const page = $(".activity-page");
+        if (!page.length) {
+            return;
+        }
+
+        $(".activity-nav-badge").text(0).prop("hidden", true);
+
+        $.getJSON(page.data("activity-endpoint"))
+            .done(function (response) {
+                const list = $("#activity-list");
+                list.empty();
+                (response.activities || []).forEach(function (activity) {
+                    addActivityItem(activity, false);
+                });
+                updateActivityEmptyState();
+            })
+            .fail(function () {
+                $("#activity-list").html('<div class="activity-loading">Could not load activity right now.</div>');
+            });
+    }
+
     $(document).on("submit", ".comment-form", function (event) {
         event.preventDefault();
 
@@ -293,7 +460,7 @@ $(function () {
                 input.val("");
             })
             .fail(function (xhr) {
-                const message = xhr.responseJSON?.message || "Could not post comment.";
+                const message = xhr.responseJSON?.message || "Could not update the conversation.";
                 alert(message);
             })
             .always(function () {
@@ -366,7 +533,53 @@ $(function () {
         $.post(`/comments/${commentId}/hide`)
             .done(hideCommentFromCard)
             .fail(function (xhr) {
-                const message = xhr.responseJSON?.message || "Could not hide comment.";
+                const message = xhr.responseJSON?.message || "Could not hide conversation entry.";
+                alert(message);
+                button.prop("disabled", false);
+            });
+    });
+
+    $(document).on("click", ".reply-toggle-btn", function () {
+        const form = $(this).closest(".comment-content").find(".reply-form").first();
+        form.prop("hidden", !form.prop("hidden"));
+        if (!form.prop("hidden")) {
+            form.find('input[name="content"]').trigger("focus");
+        }
+    });
+
+    $(document).on("submit", ".reply-form", function (event) {
+        event.preventDefault();
+
+        const form = $(this);
+        const recipeId = form.data("recipe-id");
+        const input = form.find('input[name="content"]');
+        const button = form.find('button[type="submit"]');
+
+        button.prop("disabled", true);
+        $.post(`/recipes/${recipeId}/comment`, form.serialize())
+            .done(function (response) {
+                addCommentToCard(response);
+                input.val("");
+                form.prop("hidden", true);
+            })
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not add reply.";
+                alert(message);
+            })
+            .always(function () {
+                button.prop("disabled", false);
+            });
+    });
+
+    $(document).on("click", ".unhide-comment-btn", function () {
+        const button = $(this);
+        const commentId = button.data("comment-id");
+
+        button.prop("disabled", true);
+        $.post(`/comments/${commentId}/unhide`)
+            .done(unhideCommentOnCard)
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not unhide conversation entry.";
                 alert(message);
                 button.prop("disabled", false);
             });
@@ -376,5 +589,14 @@ $(function () {
         socket.on("recipe_updated", updateRecipeCardState);
         socket.on("comment_added", addCommentToCard);
         socket.on("comment_hidden", hideCommentFromCard);
+        socket.on("comment_unhidden", unhideCommentOnCard);
+        socket.on("activity_added", function (activity) {
+            addActivityItem(activity, true);
+            incrementActivityBadge();
+            showActivityToast(activity);
+        });
+        socket.on("owner_recipe_counts_updated", updateProfileRecipeStats);
     }
+
+    loadActivityPage();
 });

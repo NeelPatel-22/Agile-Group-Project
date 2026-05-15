@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Activity | RecipeHub{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/activity.css') }}">{% endblock %}
+{% block body_class %}activity-page-body{% endblock %}
+{% block content %}
+<section class="activity-page" data-activity-endpoint="{{ url_for('main.activity_feed') }}">
+  <div class="container">
+    <header class="activity-hero">
+      <div>
+        <p class="eyebrow">RecipeHub Activity</p>
+        <h1>Your recipe interactions</h1>
+        <p>See likes and conversation from the community on recipes you have shared.</p>
+      </div>
+      <div class="activity-hero-badge">
+        <span id="activity-count">0</span>
+        <small>updates</small>
+      </div>
+    </header>
+
+    <section class="activity-shell">
+      <div class="activity-list-header">
+        <div>
+          <p class="eyebrow">Timeline</p>
+          <h2>Latest activity</h2>
+        </div>
+        <span class="activity-live-pill">Live</span>
+      </div>
+
+      <div id="activity-list" class="activity-list" aria-live="polite">
+        <div class="activity-loading">Loading activity...</div>
+      </div>
+
+      <div id="activity-empty" class="activity-empty" hidden>
+        <div class="activity-empty-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
+          </svg>
+        </div>
+        <h2>No activity yet</h2>
+        <p>Likes and conversation on your recipes will appear here as they happen.</p>
+        <a href="{{ url_for('main.recipes') }}" class="btn btn-primary">Explore Recipes</a>
+      </div>
+    </section>
+  </div>
+</section>
+{% endblock %}

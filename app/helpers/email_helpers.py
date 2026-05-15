@@ -1,6 +1,5 @@
 import re
 import smtplib
-import socket
 from email.message import EmailMessage
 
 from flask import current_app, url_for
@@ -15,26 +14,7 @@ PASSWORD_RESET_SALT = "reset-password"
 
 
 def is_valid_email(email):
-    if not email or not EMAIL_PATTERN.match(email):
-        return False
-
-    domain = email.rsplit("@", 1)[1]
-
-    try:
-        import dns.resolver
-
-        dns.resolver.resolve(domain, "MX")
-        return True
-    except ImportError:
-        pass
-    except Exception:
-        return False
-
-    try:
-        socket.getaddrinfo(domain, None)
-        return True
-    except socket.gaierror:
-        return False
+    return bool(email and EMAIL_PATTERN.match(email))
 
 
 def generate_confirmation_token(payload):

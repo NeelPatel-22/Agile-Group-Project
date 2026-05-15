@@ -28,6 +28,9 @@ def run_sqlite_migrations():
         if "is_hidden" not in comment_columns:
             statements.append("ALTER TABLE comment ADD COLUMN is_hidden BOOLEAN DEFAULT 0 NOT NULL")
 
+        if "parent_id" not in comment_columns:
+            statements.append("ALTER TABLE comment ADD COLUMN parent_id INTEGER")
+
     if "recipe" in tables:
         recipe_columns = {column["name"] for column in inspector.get_columns("recipe")}
 
