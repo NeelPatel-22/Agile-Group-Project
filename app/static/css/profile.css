@@ -192,7 +192,7 @@
 
 .profile-dashboard {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
   padding: 10px;
   margin-bottom: 12px;
@@ -421,6 +421,24 @@
 .saved-recipes-page .unsave-action:hover {
   background: #b42331;
   border-color: #b42331;
+  color: #ffffff;
+}
+
+.archive-action,
+.unarchive-action {
+  cursor: pointer;
+}
+
+.archive-action:hover,
+.archived-recipes-page .unarchive-action {
+  background: #fff8e6;
+  border-color: #d5971f;
+  color: #8a5a00;
+}
+
+.archived-recipes-page .unarchive-action:hover {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
   color: #ffffff;
 }
 

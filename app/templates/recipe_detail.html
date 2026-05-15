@@ -23,18 +23,33 @@
         <div class="recipe-hero-overlay">
           <div class="recipe-hero-content">
             {% if current_user.id == recipe.user_id %}
-            <a class="hero-edit-link" href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" aria-label="Edit recipe" title="Edit recipe">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 20h4l10.5-10.5-4-4L4 16v4z"></path>
-                <path d="M13.5 6.5l4 4"></path>
-              </svg>
-            </a>
+            <div class="hero-owner-actions recipe-card" data-recipe-id="{{ recipe.id }}">
+              <a class="hero-edit-link" href="{{ url_for('main.edit_recipe', recipe_id=recipe.id) }}" aria-label="Edit recipe" title="Edit recipe">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M4 20h4l10.5-10.5-4-4L4 16v4z"></path>
+                  <path d="M13.5 6.5l4 4"></path>
+                </svg>
+              </a>
+              <button class="hero-edit-link archive-btn" type="button" data-recipe-id="{{ recipe.id }}" data-archive-action="{{ 'unarchive' if recipe.is_archived else 'archive' }}" aria-label="{{ 'Unarchive recipe' if recipe.is_archived else 'Archive recipe' }}" title="{{ 'Unarchive recipe' if recipe.is_archived else 'Archive recipe' }}">
+                <span class="archive-label visually-hidden">{{ "Unarchive Recipe" if recipe.is_archived else "Archive Recipe" }}</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M21 8v13H3V8"></path>
+                  <path d="M1 3h22v5H1z"></path>
+                  {% if recipe.is_archived %}
+                  <path d="M12 17v-6"></path>
+                  <path d="M9 14l3-3 3 3"></path>
+                  {% else %}
+                  <path d="M10 12h4"></path>
+                  {% endif %}
+                </svg>
+              </button>
+            </div>
             {% endif %}
             <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="hero-profile-link">
               <span>{{ initials }}</span>{{ recipe.author.username }}
             </a>
             <div class="recipe-title-row">
-              <p class="eyebrow">Community Recipe</p>
+              <p class="eyebrow">{{ "Archived Recipe" if recipe.is_archived else "Community Recipe" }}</p>
               <h1>{{ recipe.title }}</h1>
             </div>
 
