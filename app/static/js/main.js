@@ -217,6 +217,67 @@ $(function () {
         });
     }
 
+    function removeArchivedRecipeCard(data) {
+        if (data.action !== "archived") {
+            return;
+        }
+
+        const shouldRemoveFromPage = window.location.pathname === "/recipes" || /\/profile\/\d+$/.test(window.location.pathname);
+        if (!shouldRemoveFromPage) {
+            return;
+        }
+
+        const card = $(`.recipe-card[data-recipe-id="${data.id}"]`);
+        card.slideUp(180, function () {
+            $(this).remove();
+        });
+    }
+
+    function removeUnarchivedRecipeCard(data) {
+        if (!window.location.pathname.includes("/archived-recipes") || data.action !== "unarchived") {
+            return;
+        }
+
+        const list = $(".archived-recipes-list");
+        const card = list.find(`.recipe-card[data-recipe-id="${data.id}"]`);
+        card.slideUp(180, function () {
+            $(this).remove();
+            const remainingCards = list.find(".recipe-card").length;
+
+            if (remainingCards === 0 && !$(".archived-recipes-empty").length) {
+                list.html(
+                    '<div class="empty-profile-card archived-recipes-empty"><p class="mb-3">No archived recipes yet.</p><a href="/recipes" class="btn btn-primary">Explore Recipes</a></div>'
+                );
+            }
+        });
+    }
+
+    function updateArchiveButton(button, data) {
+        if (!button.length || typeof data.archived === "undefined") {
+            return;
+        }
+
+        const nextAction = data.archived ? "unarchive" : "archive";
+        const nextLabel = data.archived ? "Unarchive Recipe" : "Archive Recipe";
+        button.data("archive-action", nextAction).attr("data-archive-action", nextAction);
+        button.attr("aria-label", nextLabel).attr("title", nextLabel);
+        button.find(".archive-label").text(nextLabel);
+    }
+
+    function updateProfileRecipeStats(data) {
+        if (typeof data.active_recipes_count !== "undefined") {
+            $('[data-stat="active-recipes-count"]').text(data.active_recipes_count);
+        }
+
+        if (typeof data.archived_recipes_count !== "undefined") {
+            $('[data-stat="archived-recipes-count"]').text(data.archived_recipes_count);
+        }
+
+        if (typeof data.likes_received !== "undefined") {
+            $('[data-stat="likes-received-count"]').text(data.likes_received);
+        }
+    }
+
     $(document).on("submit", ".comment-form", function (event) {
         event.preventDefault();
 
@@ -268,6 +329,28 @@ $(function () {
             })
             .fail(function (xhr) {
                 const message = xhr.responseJSON?.message || "Could not update save.";
+                alert(message);
+            })
+            .always(function () {
+                button.prop("disabled", false);
+            });
+    });
+
+    $(document).on("click", ".archive-btn", function () {
+        const button = $(this);
+        const recipeId = button.data("recipe-id");
+        const action = button.data("archive-action") === "unarchive" ? "unarchive" : "archive";
+
+        button.prop("disabled", true);
+        $.post(`/recipes/${recipeId}/${action}`)
+            .done(function (response) {
+                updateArchiveButton(button, response);
+                updateProfileRecipeStats(response);
+                removeArchivedRecipeCard(response);
+                removeUnarchivedRecipeCard(response);
+            })
+            .fail(function (xhr) {
+                const message = xhr.responseJSON?.message || "Could not update archive status.";
                 alert(message);
             })
             .always(function () {

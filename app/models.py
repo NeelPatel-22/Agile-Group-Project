@@ -73,6 +73,8 @@ class Recipe(db.Model):
     ingredients = db.Column(db.Text, nullable=False)
     steps = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255), default="")
+    is_archived = db.Column(db.Boolean, default=False, nullable=False)
+    archived_at = db.Column(db.DateTime)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 

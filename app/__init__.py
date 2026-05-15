@@ -28,6 +28,15 @@ def run_sqlite_migrations():
         if "is_hidden" not in comment_columns:
             statements.append("ALTER TABLE comment ADD COLUMN is_hidden BOOLEAN DEFAULT 0 NOT NULL")
 
+    if "recipe" in tables:
+        recipe_columns = {column["name"] for column in inspector.get_columns("recipe")}
+
+        if "is_archived" not in recipe_columns:
+            statements.append("ALTER TABLE recipe ADD COLUMN is_archived BOOLEAN DEFAULT 0 NOT NULL")
+
+        if "archived_at" not in recipe_columns:
+            statements.append("ALTER TABLE recipe ADD COLUMN archived_at DATETIME")
+
     if "user" in tables:
         user_columns = {column["name"] for column in inspector.get_columns("user")}
 
