@@ -1,5 +1,6 @@
 import os
 import uuid
+from datetime import datetime
 
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
@@ -49,7 +50,14 @@ def save_uploaded_image(file_storage):
 
 
 def distinct_recipe_values(column):
-    rows = db.session.query(column).filter(column.isnot(None), column != "").distinct().order_by(column.asc()).all()
+    rows = (
+        db.session.query(column)
+        .select_from(Recipe)
+        .filter(Recipe.is_archived.is_(False), column.isnot(None), column != "")
+        .distinct()
+        .order_by(column.asc())
+        .all()
+    )
     return [value for (value,) in rows if value]
 
 
@@ -97,6 +105,7 @@ def recipe_payload(recipe, user=None):
         "comments_count": visible_comment_count(recipe),
         "liked": liked,
         "saved": saved,
+        "archived": recipe.is_archived,
     }
 
 
@@ -110,6 +119,15 @@ def broadcast_recipe_update(recipe):
             "comments_count": visible_comment_count(recipe),
         },
     )
+
+
+def owner_recipe_counts(user_id):
+    active_recipes = Recipe.query.filter_by(user_id=user_id, is_archived=False).all()
+    return {
+        "active_recipes_count": len(active_recipes),
+        "archived_recipes_count": Recipe.query.filter_by(user_id=user_id, is_archived=True).count(),
+        "likes_received": sum(len(recipe.likes) for recipe in active_recipes),
+    }
  
 @main.route("/")
 def cover():
@@ -132,7 +150,7 @@ def recipes():
         "servings": request.args.get("servings", "").strip(),
     }
 
-    recipe_query = Recipe.query.order_by(Recipe.created_at.desc())
+    recipe_query = Recipe.query.filter(Recipe.is_archived.is_(False)).order_by(Recipe.created_at.desc())
 
     if filters["q"]:
         like_term = f"%{filters['q']}%"
@@ -185,8 +203,15 @@ def recipes():
 @login_required
 def recipe_detail(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if recipe.is_archived and recipe.user_id != current_user.id:
+        abort(404)
+
     more_recipes = (
-        Recipe.query.filter(Recipe.user_id == recipe.user_id, Recipe.id != recipe.id)
+        Recipe.query.filter(
+            Recipe.user_id == recipe.user_id,
+            Recipe.id != recipe.id,
+            Recipe.is_archived.is_(False),
+        )
         .order_by(Recipe.created_at.desc())
         .limit(5)
         .all()
@@ -258,6 +283,9 @@ def edit_recipe(recipe_id):
 @login_required
 def toggle_like(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if recipe.is_archived and recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "This recipe is archived."}), 404
+
     existing_like = Like.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
 
     if existing_like:
@@ -277,6 +305,9 @@ def toggle_like(recipe_id):
 @login_required
 def toggle_save(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if recipe.is_archived and recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "This recipe is archived."}), 404
+
     existing_save = SavedRecipe.query.filter_by(recipe_id=recipe.id, user_id=current_user.id).first()
 
     if existing_save:
@@ -292,10 +323,49 @@ def toggle_save(recipe_id):
     return jsonify({"success": True, "action": action, **payload})
 
 
+@main.route("/recipes/<int:recipe_id>/archive", methods=["POST"])
+@login_required
+def archive_recipe(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can archive this recipe."}), 403
+
+    if not recipe.is_archived:
+        recipe.is_archived = True
+        recipe.archived_at = datetime.utcnow()
+        db.session.commit()
+
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": "archived", **payload, **owner_recipe_counts(current_user.id)})
+
+
+@main.route("/recipes/<int:recipe_id>/unarchive", methods=["POST"])
+@login_required
+def unarchive_recipe(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+
+    if recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can unarchive this recipe."}), 403
+
+    if recipe.is_archived:
+        recipe.is_archived = False
+        recipe.archived_at = None
+        db.session.commit()
+
+    payload = recipe_payload(recipe)
+    broadcast_recipe_update(recipe)
+    return jsonify({"success": True, "action": "unarchived", **payload, **owner_recipe_counts(current_user.id)})
+
+
 @main.route("/recipes/<int:recipe_id>/comment", methods=["POST"])
 @login_required
 def add_comment(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
+    if recipe.is_archived and recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "This recipe is archived."}), 404
+
     content = request.form.get("content", "").strip()
 
     if not content:
@@ -601,17 +671,26 @@ def add_recipe():
 def profile(user_id):
     user = User.query.get_or_404(user_id)
     member_since = user.created_at.strftime("%B %Y")
-    own_recipes = Recipe.query.filter_by(user_id=user.id).order_by(Recipe.created_at.desc()).all()
-    saved_recipes_count = SavedRecipe.query.filter_by(user_id=user.id).count()
-    likes_received = sum(len(recipe.likes) for recipe in own_recipes)
+    own_recipes = (
+        Recipe.query.filter_by(user_id=user.id, is_archived=False)
+        .order_by(Recipe.created_at.desc())
+        .all()
+    )
+    recipe_counts = owner_recipe_counts(user.id)
+    saved_recipes_count = (
+        Recipe.query.join(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
+        .filter(SavedRecipe.user_id == user.id, Recipe.is_archived.is_(False))
+        .count()
+    )
 
     return render_template(
         "profile.html",
         user=user,
         member_since=member_since,
         own_recipes=own_recipes,
+        archived_recipes_count=recipe_counts["archived_recipes_count"],
         saved_recipes_count=saved_recipes_count,
-        likes_received=likes_received,
+        likes_received=recipe_counts["likes_received"],
     )
 
 
@@ -625,7 +704,7 @@ def saved_recipes(user_id):
 
     saved_recipes_list = (
         Recipe.query.join(SavedRecipe, SavedRecipe.recipe_id == Recipe.id)
-        .filter(SavedRecipe.user_id == user.id)
+        .filter(SavedRecipe.user_id == user.id, Recipe.is_archived.is_(False))
         .order_by(SavedRecipe.created_at.desc())
         .all()
     )
@@ -634,6 +713,27 @@ def saved_recipes(user_id):
         "saved_recipes.html",
         user=user,
         saved_recipes=saved_recipes_list,
+    )
+
+
+@main.route("/profile/<int:user_id>/archived-recipes")
+@login_required
+def archived_recipes(user_id):
+    user = User.query.get_or_404(user_id)
+
+    if user.id != current_user.id:
+        abort(403)
+
+    archived_recipes_list = (
+        Recipe.query.filter_by(user_id=user.id, is_archived=True)
+        .order_by(Recipe.archived_at.desc(), Recipe.created_at.desc())
+        .all()
+    )
+
+    return render_template(
+        "archived_recipes.html",
+        user=user,
+        archived_recipes=archived_recipes_list,
     )
 
 
