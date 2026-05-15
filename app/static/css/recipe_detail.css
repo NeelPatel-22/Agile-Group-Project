@@ -103,11 +103,16 @@
   text-wrap: pretty;
 }
 
-.hero-edit-link {
+.hero-owner-actions {
   position: absolute;
   top: clamp(0.85rem, 2vw, 1.25rem);
   right: clamp(0.85rem, 2vw, 1.25rem);
   z-index: 2;
+  display: flex;
+  gap: 8px;
+}
+
+.hero-edit-link {
   flex: 0 0 auto;
   width: 42px;
   height: 42px;

@@ -162,6 +162,16 @@
                                         </svg>
                                         View recipe
                                     </a>
+                                    {% if current_user.id == recipe.user_id %}
+                                    <button class="btn btn-outline-secondary btn-sm archive-btn" type="button" data-recipe-id="{{ recipe.id }}" data-archive-action="archive">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                            <path d="M21 8v13H3V8"></path>
+                                            <path d="M1 3h22v5H1z"></path>
+                                            <path d="M10 12h4"></path>
+                                        </svg>
+                                        <span class="archive-label">Archive</span>
+                                    </button>
+                                    {% endif %}
                                 </div>
 
                                 {% set visible_comments = recipe.comments|rejectattr('is_hidden')|list %}

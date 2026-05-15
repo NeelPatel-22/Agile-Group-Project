@@ -40,7 +40,7 @@
       <div class="profile-stat">
         <span class="profile-stat-icon">R</span>
         <span>Recipes</span>
-        <strong>{{ own_recipes|length }}</strong>
+        <strong data-stat="active-recipes-count">{{ own_recipes|length }}</strong>
       </div>
       {% if current_user.id == user.id %}
       <a href="{{ url_for('main.saved_recipes', user_id=user.id) }}" class="profile-stat profile-stat-link">
@@ -55,10 +55,17 @@
         <strong>{{ saved_recipes_count }}</strong>
       </div>
       {% endif %}
+      {% if current_user.id == user.id %}
+      <a href="{{ url_for('main.archived_recipes', user_id=user.id) }}" class="profile-stat profile-stat-link">
+        <span class="profile-stat-icon">A</span>
+        <span>Archived</span>
+        <strong data-stat="archived-recipes-count">{{ archived_recipes_count }}</strong>
+      </a>
+      {% endif %}
       <div class="profile-stat">
         <span class="profile-stat-icon">L</span>
         <span>Likes</span>
-        <strong>{{ likes_received }}</strong>
+        <strong data-stat="likes-received-count">{{ likes_received }}</strong>
       </div>
       <div class="profile-stat profile-stat-wide">
         <span class="profile-stat-icon">M</span>
@@ -85,7 +92,7 @@
               {% set recipe_image = 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=80' %}
             {% endif %}
 
-            <article class="profile-recipe-row">
+            <article class="profile-recipe-row recipe-card" data-recipe-id="{{ recipe.id }}">
               <img src="{{ recipe_image }}" alt="{{ recipe.title }}" class="recipe-image">
               <div class="recipe-body">
                 <div class="recipe-card-meta">
@@ -110,6 +117,14 @@
                     <path d="M13.5 6.5l4 4"></path>
                   </svg>
                 </a>
+                <button class="recipe-icon-action archive-action archive-btn" type="button" data-recipe-id="{{ recipe.id }}" data-archive-action="archive" aria-label="Archive recipe" title="Archive recipe">
+                  <span class="archive-label visually-hidden">Archive Recipe</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M21 8v13H3V8"></path>
+                    <path d="M1 3h22v5H1z"></path>
+                    <path d="M10 12h4"></path>
+                  </svg>
+                </button>
               </div>
             </article>
           {% else %}
