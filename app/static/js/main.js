@@ -631,11 +631,19 @@ $(function () {
   $(document).on("click", ".reply-toggle-btn", function () {
     const button = $(this);
     const form = button.closest(".comment-content").find(".reply-form").first();
-    const isHidden = !form.prop("hidden");
-    form.prop("hidden", isHidden);
+    const shouldOpen = form.prop("hidden");
+
+    if (shouldOpen) {
+      form.prop("hidden", false).css("display", "grid").hide().slideDown(140);
+    } else {
+      form.slideUp(120, function () {
+        form.prop("hidden", true).css("display", "");
+      });
+    }
+
     button
-      .toggleClass("is-active", !isHidden)
-      .attr("aria-expanded", String(!isHidden));
+      .toggleClass("is-active", shouldOpen)
+      .attr("aria-expanded", String(shouldOpen));
     if (!form.prop("hidden")) {
       form.find('input[name="content"]').trigger("focus");
     }
@@ -654,7 +662,9 @@ $(function () {
       .done(function (response) {
         addCommentToCard(response);
         input.val("");
-        form.prop("hidden", true);
+        form.slideUp(120, function () {
+          form.prop("hidden", true).css("display", "");
+        });
         form
           .closest(".comment-content")
           .find(".reply-toggle-btn")

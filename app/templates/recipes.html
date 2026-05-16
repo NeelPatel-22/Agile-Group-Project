@@ -202,8 +202,9 @@
                                 <div class="comment-section">
                                     <form class="comment-form" method="POST" action="{{ url_for('main.add_comment', recipe_id=recipe.id) }}" data-recipe-id="{{ recipe.id }}">
                                         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                        <div class="comment-composer-avatar" aria-hidden="true">{{ current_user.username[:1]|upper }}</div>
                                         <div class="input-group">
-                                            <input type="text" name="content" class="form-control" placeholder="Join the conversation">
+                                            <input type="text" name="content" class="form-control" placeholder="Join the conversation" maxlength="500" required>
                                             <button class="btn btn-dark" type="submit">
                                                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                                     <path d="M22 2L11 13"></path>
