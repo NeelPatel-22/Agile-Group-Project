@@ -105,3 +105,13 @@ class Comment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey("comment.id"))
+
+    replies = db.relationship(
+        "Comment",
+        backref=db.backref("parent", remote_side=[id]),
+        lazy=True,
+        cascade="all, delete-orphan",
+        single_parent=True,
+        order_by="asc(Comment.created_at)",
+    )

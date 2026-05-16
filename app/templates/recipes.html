@@ -175,6 +175,8 @@
                                 </div>
 
                                 {% set visible_comments = recipe.comments|rejectattr('is_hidden')|list %}
+                                {% set conversation_comments = recipe.comments if current_user.id == recipe.user_id else visible_comments %}
+                                {% set top_level_comments = conversation_comments|selectattr('parent_id', 'none')|list %}
                                 {% set liked = recipe.likes|selectattr('user_id', 'equalto', current_user.id)|list|length > 0 %}
                                 {% set saved = recipe.saves|selectattr('user_id', 'equalto', current_user.id)|list|length > 0 %}
 
@@ -193,14 +195,14 @@
                                             </svg>
                                             <span class="save-label">{{ "Unsave Recipe" if saved else "Save Recipe" }}</span>
                                         </button>
-                                        <span class="comment-counter">{{ visible_comments|length }} comments</span>
+                                        <span class="comment-counter">{{ visible_comments|length }} conversation {{ "entry" if visible_comments|length == 1 else "entries" }}</span>
                                     </div>
                                 </div>
 
                                 <div class="comment-section">
                                     <form class="comment-form" method="POST" action="{{ url_for('main.add_comment', recipe_id=recipe.id) }}" data-recipe-id="{{ recipe.id }}">
                                         <div class="input-group">
-                                            <input type="text" name="content" class="form-control" placeholder="Write a comment">
+                                            <input type="text" name="content" class="form-control" placeholder="Join the conversation">
                                             <button class="btn btn-dark" type="submit">
                                                 <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                                     <path d="M22 2L11 13"></path>
@@ -211,10 +213,10 @@
                                         </div>
                                     </form>
                                     <div class="comment-list mt-3">
-                                        {% for comment in visible_comments %}
+                                        {% for comment in top_level_comments %}
                                         {% include "partials/comment_item.html" %}
                                         {% else %}
-                                        <p class="comment-empty mb-0">No comments yet.</p>
+                                        <p class="comment-empty mb-0">No conversation yet.</p>
                                         {% endfor %}
                                     </div>
                                 </div>
