@@ -1,6 +1,15 @@
 $(function () {
   const socket = typeof io !== "undefined" ? io() : null;
   const allowedImageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
+  const csrfToken = $('meta[name="csrf-token"]').attr("content");
+
+  if (csrfToken) {
+    $.ajaxSetup({
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    });
+  }
 
   function smartTrim(value) {
     return value.replace(/\s+/g, " ").trim();
@@ -688,6 +697,13 @@ $(function () {
     });
     socket.on("owner_recipe_counts_updated", updateProfileRecipeStats);
   }
+
+  $(document).on("submit", ".delete-recipe-form", function (event) {
+    const title = $(this).data("recipe-title") || "this recipe";
+    if (!window.confirm(`Permanently delete ${title}? This cannot be undone.`)) {
+      event.preventDefault();
+    }
+  });
 
   loadActivityPage();
 });

@@ -23,6 +23,7 @@
           {% endif %}
 
           <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="meta-grid form-grid">
               <div>
                 <label class="form-label">Recipe title</label>
@@ -90,6 +91,10 @@
               </div>
             </div>
             <button class="btn btn-primary mt-3">Save Changes</button>
+          </form>
+          <form method="POST" action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" class="delete-recipe-form mt-3" data-recipe-title="{{ recipe.title }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger" type="submit">Delete Recipe</button>
           </form>
         </div>
       </div>

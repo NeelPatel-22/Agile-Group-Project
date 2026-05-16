@@ -4,3 +4,4 @@ Flask-SQLAlchemy==3.1.1
 Flask-SocketIO==5.6.1
 dnspython==2.8.0
 python-dotenv==1.2.1
+selenium==4.32.0

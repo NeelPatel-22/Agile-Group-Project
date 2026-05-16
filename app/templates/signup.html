@@ -23,6 +23,7 @@
                     <div class="alert alert-danger">{{ error }}</div>
                     {% endif %}
                     <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label class="form-label" for="signup-username">Username</label>
                             <input id="signup-username" type="text" name="username" class="form-control" autocomplete="username" minlength="3" maxlength="80" required data-label="Username">

@@ -36,7 +36,8 @@ SQLALCHEMY_DATABASE_URI=sqlite:///recipes.db
 SQLALCHEMY_TRACK_MODIFICATIONS=false
 UPLOAD_FOLDER=uploads
 MAX_CONTENT_LENGTH=5242880
-FLASK_DEBUG=true
+CSRF_PROTECTION_ENABLED=true
+FLASK_DEBUG=false
 FLASK_HOST=127.0.0.1
 FLASK_PORT=5001
 
@@ -61,3 +62,24 @@ instance/recipes.db
 ```
 
 Then run `python app.py` again.
+
+## Testing
+
+Run the unit and integration test suite from the project root:
+
+```powershell
+python -m unittest discover
+```
+
+The repository also includes Selenium presentation-flow tests. To run them, start the Flask app, install a compatible browser driver, then run:
+
+```powershell
+$env:RECIPEHUB_BASE_URL="http://127.0.0.1:5001"
+python -m unittest discover tests/selenium
+```
+
+If Selenium or `RECIPEHUB_BASE_URL` is not configured, those browser tests skip cleanly while the backend tests still run.
+
+## Security Notes
+
+The app stores passwords using Werkzeug salted hashes, keeps local secrets in `.env`, and protects POST requests with CSRF tokens. For presentation or deployment, keep `FLASK_DEBUG=false` and use a strong unique `SECRET_KEY`.

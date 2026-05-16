@@ -22,6 +22,7 @@
           {% endif %}
 
           <form method="POST" enctype="multipart/form-data" class="needs-smart-validation" novalidate>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
             <div class="meta-grid form-grid">
               <div>
                 <label class="form-label" for="profile-username">Username</label>

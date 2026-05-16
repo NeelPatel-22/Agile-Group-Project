@@ -112,6 +112,10 @@
   gap: 8px;
 }
 
+.hero-owner-actions form {
+  margin: 0;
+}
+
 .hero-edit-link {
   flex: 0 0 auto;
   width: 42px;

@@ -1,6 +1,6 @@
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask import Blueprint, abort, current_app, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
@@ -54,6 +54,18 @@ def save_uploaded_image(file_storage):
     upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique_name)
     file_storage.save(upload_path)
     return f"uploads/{unique_name}"
+
+
+def delete_uploaded_image(image_url):
+    if not image_url or image_url.startswith(("http://", "https://")):
+        return
+
+    normalized_path = image_url.replace("/", os.sep)
+    upload_root = os.path.abspath(current_app.config["UPLOAD_FOLDER"])
+    image_path = os.path.abspath(os.path.join(current_app.static_folder, normalized_path))
+
+    if os.path.commonpath([upload_root, image_path]) == upload_root and os.path.exists(image_path):
+        os.remove(image_path)
 
 
 def distinct_recipe_values(column):
@@ -292,7 +304,7 @@ def activity_feed():
 @main.route("/recipes/<int:recipe_id>")
 @login_required
 def recipe_detail(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
     if recipe.is_archived and recipe.user_id != current_user.id:
         abort(404)
 
@@ -316,7 +328,7 @@ def recipe_detail(recipe_id):
 @main.route("/recipes/<int:recipe_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_recipe(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
 
     error = None
     form_values = None
@@ -372,7 +384,7 @@ def edit_recipe(recipe_id):
 @main.route("/recipes/<int:recipe_id>/like", methods=["POST"])
 @login_required
 def toggle_like(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
     if recipe.is_archived and recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "This recipe is archived."}), 404
 
@@ -399,7 +411,7 @@ def toggle_like(recipe_id):
 @main.route("/recipes/<int:recipe_id>/save", methods=["POST"])
 @login_required
 def toggle_save(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
     if recipe.is_archived and recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "This recipe is archived."}), 404
 
@@ -421,14 +433,14 @@ def toggle_save(recipe_id):
 @main.route("/recipes/<int:recipe_id>/archive", methods=["POST"])
 @login_required
 def archive_recipe(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
 
     if recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "Only the recipe owner can archive this recipe."}), 403
 
     if not recipe.is_archived:
         recipe.is_archived = True
-        recipe.archived_at = datetime.utcnow()
+        recipe.archived_at = datetime.now(timezone.utc)
         db.session.commit()
 
     payload = recipe_payload(recipe)
@@ -440,7 +452,7 @@ def archive_recipe(recipe_id):
 @main.route("/recipes/<int:recipe_id>/unarchive", methods=["POST"])
 @login_required
 def unarchive_recipe(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
 
     if recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "Only the recipe owner can unarchive this recipe."}), 403
@@ -456,10 +468,25 @@ def unarchive_recipe(recipe_id):
     return jsonify({"success": True, "action": "unarchived", **payload, **owner_recipe_counts(current_user.id)})
 
 
+@main.route("/recipes/<int:recipe_id>/delete", methods=["POST"])
+@login_required
+def delete_recipe(recipe_id):
+    recipe = db.get_or_404(Recipe, recipe_id)
+
+    if recipe.user_id != current_user.id:
+        return jsonify({"success": False, "message": "Only the recipe owner can delete this recipe."}), 403
+
+    profile_url = url_for("main.profile", user_id=current_user.id)
+    delete_uploaded_image(recipe.image_url)
+    db.session.delete(recipe)
+    db.session.commit()
+    return redirect(profile_url)
+
+
 @main.route("/recipes/<int:recipe_id>/comment", methods=["POST"])
 @login_required
 def add_comment(recipe_id):
-    recipe = Recipe.query.get_or_404(recipe_id)
+    recipe = db.get_or_404(Recipe, recipe_id)
     if recipe.is_archived and recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "This recipe is archived."}), 404
 
@@ -505,7 +532,7 @@ def add_comment(recipe_id):
 @main.route("/comments/<int:comment_id>/hide", methods=["POST"])
 @login_required
 def hide_comment(comment_id):
-    comment = Comment.query.get_or_404(comment_id)
+    comment = db.get_or_404(Comment, comment_id)
 
     if comment.recipe.user_id != current_user.id:
         return jsonify({"success": False, "message": "Only the recipe owner can hide conversation entries."}), 403
@@ -809,7 +836,7 @@ def add_recipe():
 @main.route("/profile/<int:user_id>")
 @login_required
 def profile(user_id):
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
     member_since = user.created_at.strftime("%B %Y")
     own_recipes = (
         Recipe.query.filter_by(user_id=user.id, is_archived=False)
@@ -837,7 +864,7 @@ def profile(user_id):
 @main.route("/profile/<int:user_id>/saved-recipes")
 @login_required
 def saved_recipes(user_id):
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
 
     if user.id != current_user.id:
         abort(403)
@@ -859,7 +886,7 @@ def saved_recipes(user_id):
 @main.route("/profile/<int:user_id>/archived-recipes")
 @login_required
 def archived_recipes(user_id):
-    user = User.query.get_or_404(user_id)
+    user = db.get_or_404(User, user_id)
 
     if user.id != current_user.id:
         abort(403)
@@ -926,3 +953,4 @@ def edit_profile(user_id):
         error=error,
         success=success,
     )
+
