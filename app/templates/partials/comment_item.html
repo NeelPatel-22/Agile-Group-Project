@@ -1,19 +1,16 @@
 <div class="comment-item {% if comment.parent_id %}comment-reply-item{% endif %} {% if comment.is_hidden %}comment-item-hidden{% endif %}" data-comment-id="{{ comment.id }}" data-comment-hidden="{{ 'true' if comment.is_hidden else 'false' }}" data-parent-id="{{ comment.parent_id or '' }}">
-    <div class="comment-avatar" aria-hidden="true">{{ comment.author.username[:1]|upper }}</div>
     <div class="comment-content">
-        <div class="comment-bubble">
-            <div class="comment-header">
-                <strong>{{ comment.author.username }}</strong>
-                <small class="comment-date">{{ comment.created_at.strftime('%d %b %Y') }}</small>
-                {% if comment.is_hidden %}
-                <span class="comment-hidden-badge">Hidden</span>
-                {% endif %}
-            </div>
-            <p class="comment-text">{{ comment.content }}</p>
+        <div class="comment-line">
+            <strong>{{ comment.author.username }}</strong>
+            <span>{{ comment.content }}</span>
+            {% if comment.is_hidden %}
+            <span class="comment-hidden-badge">Hidden</span>
+            {% endif %}
         </div>
         <div class="comment-meta-row">
+            <small class="comment-date">{{ comment.created_at.strftime('%d %b %Y') }}</small>
             {% if not comment.parent_id and not comment.is_hidden %}
-            <button class="comment-action-btn reply-toggle-btn" type="button" data-comment-id="{{ comment.id }}" aria-expanded="false">Reply</button>
+            <button class="comment-action-btn reply-toggle-btn" type="button" data-comment-id="{{ comment.id }}">Reply</button>
             {% endif %}
         </div>
 
@@ -21,14 +18,8 @@
         <form class="reply-form" method="POST" action="{{ url_for('main.add_comment', recipe_id=recipe.id) }}" data-recipe-id="{{ recipe.id }}" data-parent-id="{{ comment.id }}" hidden>
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
             <div class="input-group">
-                <input type="text" name="content" class="form-control" placeholder="Reply to {{ comment.author.username }}">
-                <button class="btn btn-dark" type="submit" aria-label="Post reply">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M22 2L11 13"></path>
-                        <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-                    </svg>
-                    <span>Reply</span>
-                </button>
+                <input type="text" name="content" class="form-control" placeholder="Write a reply">
+                <button class="btn btn-dark" type="submit">Reply</button>
             </div>
         </form>
         {% endif %}
