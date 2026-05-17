@@ -9,6 +9,17 @@ erDiagram
         string username UK
         string email UK
         string password_hash
+        boolean email_confirmed
+        string bio
+        string profile_image
+        datetime created_at
+    }
+
+    PENDING_SIGNUP {
+        int id PK
+        string username
+        string email
+        string password_hash
         string bio
         string profile_image
         datetime created_at
@@ -31,7 +42,8 @@ erDiagram
         text ingredients
         text steps
         string image_url
-        boolean comments_hidden
+        boolean is_archived
+        datetime archived_at
         datetime created_at
         int user_id FK
     }
@@ -79,4 +91,6 @@ erDiagram
 - `like.user_id + like.recipe_id` must be unique.
 - `saved_recipe.user_id + saved_recipe.recipe_id` must be unique.
 - `recipe.user_id` connects each recipe to its creator.
+- `recipe.is_archived` hides archived recipes from the public feed while keeping them recoverable by the owner.
 - `comment.parent_id` is nullable and is used for replies.
+- `pending_signup` stores unconfirmed registrations until the user opens the confirmation link.

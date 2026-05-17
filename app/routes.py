@@ -777,7 +777,7 @@ def confirm_email_change(token):
     logout_user()
     return render_template("login.html", error=None, success="Your email has been updated. Please log in again.")
 
-@main.route("/logout")
+@main.route("/logout", methods=["POST"])
 def logout():
     logout_user()
     return redirect(url_for("main.cover"))

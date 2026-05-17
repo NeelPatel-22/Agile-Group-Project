@@ -710,7 +710,11 @@ $(function () {
 
   $(document).on("submit", ".delete-recipe-form", function (event) {
     const title = $(this).data("recipe-title") || "this recipe";
-    if (!window.confirm(`Permanently delete ${title}? This cannot be undone.`)) {
+    const message =
+      $(this).data("confirm-message") ||
+      `This will permanently delete ${title}. This action cannot be undone. Continue?`;
+
+    if (!window.confirm(message)) {
       event.preventDefault();
     }
   });

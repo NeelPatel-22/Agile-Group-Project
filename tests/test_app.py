@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", message="The Query.get\\(\\) method is considered legacy.*")
 
 from app import create_app, db
-from app.models import Like, Recipe, SavedRecipe, User
+from app.models import Comment, Like, Recipe, SavedRecipe, User
 
 
 def csrf_from(response):
@@ -97,6 +97,26 @@ class SecurityTests(RecipeHubTestCase):
 
         response = self.login("pending@example.com")
         self.assertIn(b"Please confirm your email", response.data)
+
+    def test_logout_requires_post_and_csrf(self):
+        self.login()
+
+        get_response = self.client.get("/logout")
+        self.assertEqual(get_response.status_code, 405)
+
+        response = self.client.post("/logout", headers=self.csrf_header(), follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b"Login", response.data)
+
+    def test_other_user_profile_does_not_show_email(self):
+        self.login()
+
+        own_profile = self.client.get(f"/profile/{self.owner_id}")
+        self.assertIn(b"owner@example.com", own_profile.data)
+
+        other_profile = self.client.get(f"/profile/{self.other_id}")
+        self.assertEqual(other_profile.status_code, 200)
+        self.assertNotIn(b"other@example.com", other_profile.data)
 
 
 class RecipeFeatureTests(RecipeHubTestCase):
@@ -191,6 +211,28 @@ class RecipeFeatureTests(RecipeHubTestCase):
         with self.app.app_context():
             self.assertEqual(Like.query.filter_by(recipe_id=recipe_id).count(), 0)
             self.assertEqual(SavedRecipe.query.filter_by(recipe_id=recipe_id).count(), 0)
+
+    def test_reply_accepts_valid_ajax_csrf_header_when_form_token_is_stale(self):
+        with self.app.app_context():
+            recipe_id = self.create_recipe().id
+            comment = Comment(content="Top level", recipe_id=recipe_id, user_id=self.owner_id)
+            db.session.add(comment)
+            db.session.commit()
+            comment_id = comment.id
+
+        self.login()
+        response = self.client.post(
+            f"/recipes/{recipe_id}/comment",
+            data={
+                "content": "Nested reply",
+                "parent_id": comment_id,
+                "_csrf_token": "stale-token-from-live-html",
+            },
+            headers=self.csrf_header(),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.get_json()["success"])
 
 
 class SignupTests(RecipeHubTestCase):

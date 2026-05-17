@@ -21,16 +21,21 @@
           <p class="profile-bio">
             {{ user.bio if user.bio else "Passionate home cook sharing practical DIY recipes and quick kitchen ideas." }}
           </p>
+          {% if current_user.id == user.id %}
           <div class="profile-contact-row">
             <span>{{ user.email }}</span>
           </div>
+          {% endif %}
         </div>
 
         {% if current_user.id == user.id %}
         <div class="profile-actions">
           <a href="{{ url_for('main.add_recipe') }}" class="btn btn-primary">Add Recipe</a>
           <a href="{{ url_for('main.edit_profile', user_id=user.id) }}" class="btn btn-outline">Edit Profile</a>
-          <a href="{{ url_for('main.logout') }}" class="btn btn-danger">Logout</a>
+          <form method="POST" action="{{ url_for('main.logout') }}" class="m-0">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-danger" type="submit">Logout</button>
+          </form>
         </div>
         {% endif %}
       </div>
@@ -125,16 +130,6 @@
                     <path d="M10 12h4"></path>
                   </svg>
                 </button>
-                <form method="POST" action="{{ url_for('main.delete_recipe', recipe_id=recipe.id) }}" class="delete-recipe-form" data-recipe-title="{{ recipe.title }}">
-                  <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                  <button class="recipe-icon-action delete-action" type="submit" aria-label="Delete recipe" title="Delete recipe">
-                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                      <path d="M3 6h18"></path>
-                      <path d="M8 6V4h8v2"></path>
-                      <path d="M19 6l-1 14H6L5 6"></path>
-                    </svg>
-                  </button>
-                </form>
               </div>
             </article>
           {% else %}

@@ -34,9 +34,11 @@ def validate_csrf_token():
         return
 
     expected_token = session.get("_csrf_token")
-    submitted_token = request.form.get("_csrf_token") or request.headers.get("X-CSRFToken")
+    form_token = request.form.get("_csrf_token")
+    header_token = request.headers.get("X-CSRFToken")
+    submitted_tokens = [token for token in (form_token, header_token) if token]
 
-    if not expected_token or not submitted_token or not hmac.compare_digest(expected_token, submitted_token):
+    if not expected_token or not any(hmac.compare_digest(expected_token, token) for token in submitted_tokens):
         abort(400, description="Invalid or missing CSRF token.")
 
 
@@ -93,7 +95,7 @@ def configure_sqlite_connection():
 
 def create_app(config=None):
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "recipes123")
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(32)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///recipes.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = env_bool("SQLALCHEMY_TRACK_MODIFICATIONS", False)
     app.config["UPLOAD_FOLDER"] = os.path.join(
