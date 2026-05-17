@@ -46,7 +46,8 @@
             </div>
             {% endif %}
             <a href="{{ url_for('main.profile', user_id=recipe.author.id) }}" class="hero-profile-link">
-              <span>{{ initials }}</span>{{ recipe.author.username }}
+              <span class="hero-profile-avatar">{{ initials }}</span>
+              <span class="hero-profile-name">{{ recipe.author.username }}</span>
             </a>
             <div class="recipe-title-row">
               <p class="eyebrow">{{ "Archived Recipe" if recipe.is_archived else "Community Recipe" }}</p>

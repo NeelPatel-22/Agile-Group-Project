@@ -83,6 +83,10 @@ main,
   flex-wrap: wrap;
 }
 
+.nav-logout-form {
+  margin: 0;
+}
+
 .brand-mark {
   font-size: 1.4rem;
 }
@@ -110,6 +114,11 @@ main,
   color: var(--nav-link-hover) !important;
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
+}
+
+.nav-logout-button {
+  border: 0;
+  background: transparent;
 }
 
 .activity-nav-link {

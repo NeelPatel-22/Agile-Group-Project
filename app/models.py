@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,11 +6,15 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from . import db
 
 
+def utc_now():
+    return datetime.now(timezone.utc)
+
+
 class SavedRecipe(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_saved_recipe"),)
 
@@ -19,7 +23,7 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
 
     __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_recipe_like"),)
 
@@ -31,7 +35,7 @@ class PendingSignup(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     bio = db.Column(db.String(255), default="")
     profile_image = db.Column(db.String(255), default="")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
 
 
 class User(UserMixin, db.Model):
@@ -42,7 +46,7 @@ class User(UserMixin, db.Model):
     email_confirmed = db.Column(db.Boolean, default=False, nullable=False)
     bio = db.Column(db.String(255), default="")
     profile_image = db.Column(db.String(255), default="")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
 
     recipes = db.relationship("Recipe", backref="author", lazy=True, cascade="all, delete-orphan")
     comments = db.relationship("Comment", backref="author", lazy=True, cascade="all, delete-orphan")
@@ -75,7 +79,7 @@ class Recipe(db.Model):
     image_url = db.Column(db.String(255), default="")
     is_archived = db.Column(db.Boolean, default=False, nullable=False)
     archived_at = db.Column(db.DateTime)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     comments = db.relationship(
@@ -102,7 +106,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     is_hidden = db.Column(db.Boolean, default=False, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=utc_now, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipe.id"), nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("comment.id"))

@@ -1,5 +1,8 @@
+import hmac
 import os
-from flask import Flask
+import secrets
+
+from flask import Flask, abort, request, session
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO
@@ -16,6 +19,27 @@ socketio = SocketIO()
 
 def env_bool(name, default=False):
     return os.environ.get(name, str(default)).lower() in ("1", "true", "yes", "on")
+
+
+def csrf_token():
+    token = session.get("_csrf_token")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session["_csrf_token"] = token
+    return token
+
+
+def validate_csrf_token():
+    if request.method not in ("POST", "PUT", "PATCH", "DELETE"):
+        return
+
+    expected_token = session.get("_csrf_token")
+    form_token = request.form.get("_csrf_token")
+    header_token = request.headers.get("X-CSRFToken")
+    submitted_tokens = [token for token in (form_token, header_token) if token]
+
+    if not expected_token or not any(hmac.compare_digest(expected_token, token) for token in submitted_tokens):
+        abort(400, description="Invalid or missing CSRF token.")
 
 
 def run_sqlite_migrations():
@@ -71,7 +95,7 @@ def configure_sqlite_connection():
 
 def create_app(config=None):
     app = Flask(__name__)
-    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "recipes123")
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or secrets.token_urlsafe(32)
     app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI", "sqlite:///recipes.db")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = env_bool("SQLALCHEMY_TRACK_MODIFICATIONS", False)
     app.config["UPLOAD_FOLDER"] = os.path.join(
@@ -85,6 +109,7 @@ def create_app(config=None):
     app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
     app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
     app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER", "noreply@recipehub.local")
+    app.config["CSRF_PROTECTION_ENABLED"] = env_bool("CSRF_PROTECTION_ENABLED", True)
     if config:
         app.config.update(config)
 
@@ -101,6 +126,15 @@ def create_app(config=None):
 
     from app.routes import main
     app.register_blueprint(main)
+
+    @app.context_processor
+    def inject_csrf_token():
+        return {"csrf_token": csrf_token}
+
+    @app.before_request
+    def protect_post_requests():
+        if app.config.get("CSRF_PROTECTION_ENABLED", True):
+            validate_csrf_token()
 
     with app.app_context():
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)

@@ -109,7 +109,12 @@
   right: clamp(0.85rem, 2vw, 1.25rem);
   z-index: 2;
   display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.hero-owner-actions form {
+  margin: 0;
 }
 
 .hero-edit-link {
@@ -151,11 +156,12 @@
 .hero-profile-link {
   position: absolute;
   top: clamp(0.85rem, 2vw, 1.25rem);
-  right: calc(clamp(0.85rem, 2vw, 1.25rem) + 56px);
+  right: clamp(0.85rem, 2vw, 1.25rem);
   z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  max-width: min(260px, calc(100% - 2rem));
   min-height: 42px;
   padding: 0.42rem 0.82rem 0.42rem 0.48rem;
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -169,7 +175,18 @@
   backdrop-filter: blur(10px);
 }
 
-.hero-profile-link span {
+.hero-owner-actions + .hero-profile-link {
+  right: calc(clamp(0.85rem, 2vw, 1.25rem) + 100px);
+  max-width: min(260px, calc(100% - 8.5rem));
+}
+
+.hero-profile-link {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.hero-profile-avatar {
+  flex: 0 0 auto;
   width: 28px;
   height: 28px;
   display: inline-flex;
@@ -180,6 +197,12 @@
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 900;
+}
+
+.hero-profile-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hero-profile-link:hover {
@@ -541,9 +564,14 @@
   .hero-profile-link {
     right: 1rem;
     top: 3.8rem;
-    max-width: calc(100% - 4.5rem);
+    max-width: calc(100% - 2rem);
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  .hero-owner-actions + .hero-profile-link {
+    right: 1rem;
+    max-width: calc(100% - 2rem);
   }
 
   .recipe-hero-facts,

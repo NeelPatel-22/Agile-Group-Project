@@ -367,6 +367,10 @@
   justify-content: flex-end;
 }
 
+.recipe-card-actions form {
+  margin: 0;
+}
+
 .recipe-icon-action {
   width: 40px;
   height: 40px;
@@ -406,6 +410,12 @@
   background: var(--accent-color);
   border-color: var(--accent-color);
   color: var(--secondary-dark);
+}
+
+.recipe-icon-action.delete-action:hover {
+  background: #b42331;
+  border-color: #b42331;
+  color: #ffffff;
 }
 
 .saved-recipes-page .unsave-action {

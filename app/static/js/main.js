@@ -1,6 +1,15 @@
 $(function () {
   const socket = typeof io !== "undefined" ? io() : null;
   const allowedImageExtensions = ["png", "jpg", "jpeg", "gif", "webp"];
+  const csrfToken = $('meta[name="csrf-token"]').attr("content");
+
+  if (csrfToken) {
+    $.ajaxSetup({
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    });
+  }
 
   function smartTrim(value) {
     return value.replace(/\s+/g, " ").trim();
@@ -622,11 +631,19 @@ $(function () {
   $(document).on("click", ".reply-toggle-btn", function () {
     const button = $(this);
     const form = button.closest(".comment-content").find(".reply-form").first();
-    const isHidden = !form.prop("hidden");
-    form.prop("hidden", isHidden);
+    const shouldOpen = form.prop("hidden");
+
+    if (shouldOpen) {
+      form.prop("hidden", false).css("display", "grid").hide().slideDown(140);
+    } else {
+      form.slideUp(120, function () {
+        form.prop("hidden", true).css("display", "");
+      });
+    }
+
     button
-      .toggleClass("is-active", !isHidden)
-      .attr("aria-expanded", String(!isHidden));
+      .toggleClass("is-active", shouldOpen)
+      .attr("aria-expanded", String(shouldOpen));
     if (!form.prop("hidden")) {
       form.find('input[name="content"]').trigger("focus");
     }
@@ -645,7 +662,9 @@ $(function () {
       .done(function (response) {
         addCommentToCard(response);
         input.val("");
-        form.prop("hidden", true);
+        form.slideUp(120, function () {
+          form.prop("hidden", true).css("display", "");
+        });
         form
           .closest(".comment-content")
           .find(".reply-toggle-btn")
@@ -688,6 +707,17 @@ $(function () {
     });
     socket.on("owner_recipe_counts_updated", updateProfileRecipeStats);
   }
+
+  $(document).on("submit", ".delete-recipe-form", function (event) {
+    const title = $(this).data("recipe-title") || "this recipe";
+    const message =
+      $(this).data("confirm-message") ||
+      `This will permanently delete ${title}. This action cannot be undone. Continue?`;
+
+    if (!window.confirm(message)) {
+      event.preventDefault();
+    }
+  });
 
   loadActivityPage();
 });
